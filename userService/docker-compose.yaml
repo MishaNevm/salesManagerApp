@@ -1,0 +1,11 @@
+version: '3'
+services:
+  client-db:
+    image: postgres:12
+    restart: always
+    ports:
+      - 5445:5432
+    environment:
+      POSTGRES_PASSWORD : pass
+      POSTGRES_USER : user
+      POSTGRES_DB : userDB
