@@ -1,6 +1,6 @@
 package com.example.clientService.dto;
 
-import com.example.clientService.util.ClientTypes;
+import com.example.clientService.util.clientUtil.ClientTypes;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotEmpty;

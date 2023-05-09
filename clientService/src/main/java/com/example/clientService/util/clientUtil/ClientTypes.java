@@ -1,4 +1,4 @@
-package com.example.clientService.util;
+package com.example.clientService.util.clientUtil;
 
 public enum ClientTypes {
     IP,

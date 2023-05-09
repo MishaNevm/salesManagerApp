@@ -1,4 +1,4 @@
-package com.example.clientService.util;
+package com.example.clientService.util.clientUtil;
 
 import com.example.clientService.dto.ClientDTO;
 import com.example.clientService.models.Client;

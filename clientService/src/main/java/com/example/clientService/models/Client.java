@@ -1,6 +1,6 @@
 package com.example.clientService.models;
 
-import com.example.clientService.util.ClientTypes;
+import com.example.clientService.util.clientUtil.ClientTypes;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -34,10 +34,10 @@ public class Client {
     private ClientTypes type;
 
     @Column(name = "user_id")
-    private int userId;
+    private int user;
 
-    @Column(name = "bank_id")
-    private int bankId;
+    @OneToOne(mappedBy = "client")
+    private Bank bank;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.DATE)
@@ -47,7 +47,6 @@ public class Client {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
-
 
     public int getId() {
         return id;
@@ -97,20 +96,13 @@ public class Client {
         this.ogrn = ogrn;
     }
 
-    public int getUserId() {
-        return userId;
+
+    public Bank getBank() {
+        return bank;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public int getBankId() {
-        return bankId;
-    }
-
-    public void setBankId(int bankId) {
-        this.bankId = bankId;
+    public void setBank(Bank bank) {
+        this.bank = bank;
     }
 
     public ClientTypes getType() {
@@ -119,6 +111,14 @@ public class Client {
 
     public void setType(ClientTypes type) {
         this.type = type;
+    }
+
+    public void setUser(int user) {
+        this.user = user;
+    }
+
+    public int getUser() {
+        return user;
     }
 
     public Date getCreatedAt() {

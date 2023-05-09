@@ -2,7 +2,7 @@ package com.example.clientService.services;
 
 
 import com.example.clientService.models.Client;
-import com.example.clientService.util.ClientNotFoundException;
+import com.example.clientService.util.clientUtil.ClientNotFoundException;
 import com.example.clientService.repositoryes.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
