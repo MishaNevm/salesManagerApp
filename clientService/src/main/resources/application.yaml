@@ -1,0 +1,26 @@
+server:
+  port: 9090
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5444/clientDB
+    username: client
+    password: pass
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serializer.StringDeserializer
+      value-deserializer: com.example.clientService.kafka.JsonDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serializer.StringDeserializer
+      value-serializer: com.example.clientService.kafka.JsonSerializer
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090/admin
+      context-path: /admin
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
