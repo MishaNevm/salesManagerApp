@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping()
-    public List<UserDTO> findAll() {
+    public ResponseEntity<HttpStatus> findAll() {
         return userService.findAll().stream().map(modelMapper::convertUserToUserDTO).toList();
     }
 
