@@ -1,0 +1,26 @@
+server:
+  port: 8383
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5447/inventoryDB
+    username: inventory
+    password: pass
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: com.example.inventoryService.kafka.JsonDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: com.example.inventoryService.kafka.JsonSerializer
+  boot:
+    admin:
+      client:
+        url: http://localhost:8383/admin
+      context-path: /admin
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
