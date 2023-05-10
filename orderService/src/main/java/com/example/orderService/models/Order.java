@@ -12,9 +12,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "id")
-    private Client client;
+    @Column(name = "client_id")
+    private Integer clientId;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -32,12 +31,12 @@ public class Order {
         this.id = id;
     }
 
-    public Client getClient() {
-        return client;
+    public Integer getClientId() {
+        return clientId;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    public void setClientId (Integer clientId) {
+        this.clientId = clientId;
     }
 
     public Date getCreatedAt() {

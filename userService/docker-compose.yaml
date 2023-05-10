@@ -1,6 +1,6 @@
 version: '3'
 services:
-  client-db:
+  user-db:
     image: postgres:12
     restart: always
     ports:

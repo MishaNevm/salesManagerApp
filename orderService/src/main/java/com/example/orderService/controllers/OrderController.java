@@ -1,14 +1,12 @@
 package com.example.orderService.controllers;
 
-import com.example.salesManagerApp.dao.ClientDAO;
-import com.example.salesManagerApp.dto.OrderDTO;
-import com.example.salesManagerApp.models.Order;
-import com.example.salesManagerApp.services.OrderService;
-import com.example.salesManagerApp.util.ErrorResponse;
-import com.example.salesManagerApp.util.ModelMapperUtil;
-import com.example.salesManagerApp.util.orderUtil.OrderNotCreatedException;
-import com.example.salesManagerApp.util.orderUtil.OrderNotFoundException;
-import com.example.salesManagerApp.util.productUtil.ProductNotAddException;
+import com.example.orderService.dto.OrderDTO;
+import com.example.orderService.models.Order;
+import com.example.orderService.services.OrderService;
+import com.example.orderService.util.ErrorResponse;
+import com.example.orderService.util.ModelMapperUtil;
+import com.example.orderService.util.OrderNotCreatedException;
+import com.example.orderService.util.OrderNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,12 +23,9 @@ public class OrderController {
     private final OrderService orderService;
     private final ModelMapperUtil modelMapperUtil;
 
-    private final ClientDAO clientDAO;
-
-    public OrderController(OrderService orderService, ModelMapperUtil modelMapperUtil, ClientDAO clientDAO) {
+    public OrderController(OrderService orderService, ModelMapperUtil modelMapperUtil) {
         this.orderService = orderService;
         this.modelMapperUtil = modelMapperUtil;
-        this.clientDAO = clientDAO;
     }
 
     @GetMapping
@@ -71,33 +66,33 @@ public class OrderController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/add-product")
-    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-                                                        @RequestParam("product-id") Integer productId,
-                                                        @RequestParam("quantity") Integer quantity) {
-        orderService.addProductToOrder(orderService.findById(id), productId, quantity);
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @PatchMapping("/{id}/set-product-quantity")
-    public ResponseEntity<HttpStatus> setProductQuantity(@PathVariable("id") int id,
-                                                         @RequestParam(value = "product-id", required = false) Integer productId,
-                                                         @RequestParam(value = "quantity", required = false) Integer quantity) {
-        orderService.setQuantityProductInOrder(id, productId, quantity);
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}/deleteProduct")
-    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("id") int id,
-                                                    @RequestParam(value = "product-id", required = false) Integer productId) {
-        orderService.findById(id);
-        if (productId == null) {
-            orderService.deleteAllProductsFromOrder(id);
-        } else {
-            orderService.deleteProductFromOrder(id, productId);
-        }
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
+//    @PostMapping("/{id}/add-product")
+//    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
+//                                                        @RequestParam("product-id") Integer productId,
+//                                                        @RequestParam("quantity") Integer quantity) {
+//        orderService.addProductToOrder(orderService.findById(id), productId, quantity);
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
+//
+//    @PatchMapping("/{id}/set-product-quantity")
+//    public ResponseEntity<HttpStatus> setProductQuantity(@PathVariable("id") int id,
+//                                                         @RequestParam(value = "product-id", required = false) Integer productId,
+//                                                         @RequestParam(value = "quantity", required = false) Integer quantity) {
+//        orderService.setQuantityProductInOrder(id, productId, quantity);
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
+//
+//    @DeleteMapping("/{id}/deleteProduct")
+//    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("id") int id,
+//                                                    @RequestParam(value = "product-id", required = false) Integer productId) {
+//        orderService.findById(id);
+//        if (productId == null) {
+//            orderService.deleteAllProductsFromOrder(id);
+//        } else {
+//            orderService.deleteProductFromOrder(id, productId);
+//        }
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
 
 
     @ExceptionHandler
@@ -110,18 +105,13 @@ public class OrderController {
         return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotAddException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
     private Order checkRequest(Integer clientId, OrderDTO orderDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new OrderNotCreatedException(ErrorResponse.convertErrorsToMessage(bindingResult));
         }
         Order order = modelMapperUtil.convertOrderDTOToOrder(orderDTO);
         if (clientId != null) {
-            order.setClient(clientDAO.loadClientById(clientId));
+            order.setClientId(clientId);
         }
         return order;
     }

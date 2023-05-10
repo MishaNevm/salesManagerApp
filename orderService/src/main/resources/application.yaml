@@ -1,0 +1,26 @@
+server:
+  port: 8282
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5446/orderDB
+    username: order
+    password: pass
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: com.example.orderService.kafka.JsonDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: com.example.orderService.kafka.JsonSerializer
+  boot:
+    admin:
+      client:
+        url: http://localhost:8282/admin
+      context-path: /admin
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
