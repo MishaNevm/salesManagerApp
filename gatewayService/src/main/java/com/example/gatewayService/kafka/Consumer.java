@@ -1,7 +1,7 @@
 package com.example.gatewayService.kafka;
 
 import com.example.gatewayService.dto.UserDTOResponse;
-import com.example.gatewayService.services.UserStorageService;
+import com.example.gatewayService.service.UserStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +22,12 @@ public class Consumer {
         this.userStorageService = userStorageService;
     }
 
-    @KafkaListener(topics = "userTopic")
+    @KafkaListener(topics = "userTopicResponse")
     public void listenUserTopic(ConsumerRecord<Integer, byte[]> consumerRecord) {
-
-        int MethodCode = consumerRecord.key();
-        switch (MethodCode) {
-            case 0: {
-                try {
-                    userStorageService.setUserDTO(objectMapper.readValue(consumerRecord.value(), UserDTOResponse.class));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        try {
+            userStorageService.setUserDTOResponse(objectMapper.readValue(consumerRecord.value(), UserDTOResponse.class));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
-
 }

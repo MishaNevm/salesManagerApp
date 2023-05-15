@@ -2,14 +2,17 @@ package com.example.gatewayService.dto;
 
 import java.util.List;
 
-public class UserDTOResponse {
+public class UserDTOResponse implements CustomResponse<UserDTO> {
     List<UserDTO> userDTOList;
 
-    public List<UserDTO> getUserDTOList() {
+
+    @Override
+    public List<UserDTO> getResponse() {
         return userDTOList;
     }
 
-    public void setUserDTOList(List<UserDTO> userDTOList) {
-        this.userDTOList = userDTOList;
+    @Override
+    public void setResponse(List<UserDTO> response) {
+        userDTOList = response;
     }
 }

@@ -5,11 +5,11 @@ import java.util.List;
 public class UserDTOResponse {
     List<UserDTO> userDTOList;
 
-    public List<UserDTO> getUserDTOList() {
+    public List<UserDTO> getResponse() {
         return userDTOList;
     }
 
-    public void setUserDTOList(List<UserDTO> userDTOList) {
-        this.userDTOList = userDTOList;
+    public void setResponse(List<UserDTO> response) {
+        userDTOList = response;
     }
 }

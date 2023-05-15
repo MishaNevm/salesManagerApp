@@ -16,21 +16,19 @@ public class Producer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public String sendORequestToUserService(MethodsCodes methodsCodes) {
+    public void sendRequestToUserService(MethodsCodes methodsCodes) {
         try {
-            kafkaTemplate.send(USER_TOPIC, methodsCodes.getCode(), null);
+            kafkaTemplate.send(USER_TOPIC, methodsCodes.getCode(), new UserDTO());
         } catch (Exception e) {
-            return "ERROR";
+            throw new RuntimeException(e);
         }
-        return "OK";
     }
 
-    public String sendORequestToUserService(MethodsCodes methodsCodes, UserDTO userDTO) {
+    public void sendRequestToUserService(MethodsCodes methodsCodes, UserDTO userDTO) {
         try {
             kafkaTemplate.send("userTopic", methodsCodes.getCode(), userDTO);
         } catch (Exception e) {
-            return "ERROR";
+            throw new RuntimeException(e);
         }
-        return "OK";
     }
 }

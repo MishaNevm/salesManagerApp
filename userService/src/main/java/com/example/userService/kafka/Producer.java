@@ -13,11 +13,7 @@ public class Producer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessage(int methodCode) {
-        kafkaTemplate.send("userTopic", methodCode, null);
-    }
-
-    public void sendMessage(int methodCode, UserDTOResponse userDTOResponse) {
-        kafkaTemplate.send("userTopic", methodCode, userDTOResponse);
+    public void sendMessage(Integer methodCode, UserDTOResponse userDTOResponse) {
+        kafkaTemplate.send("userTopicResponse", methodCode, userDTOResponse);
     }
 }

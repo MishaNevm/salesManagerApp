@@ -4,17 +4,18 @@ public enum MethodsCodes {
 
     GET_ALL_USERS(0),
     GET_USER_BY_ID(1),
-    CREATE_USER(2),
-    UPDATE_USER(3),
-    DELETE_USER(4);
+    GET_USER_BY_EMAIL(2),
+    CREATE_USER(3),
+    UPDATE_USER(4),
+    DELETE_USER(5);
 
-    private final int code;
+    private final Integer code;
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    MethodsCodes(int code) {
+    MethodsCodes(Integer code) {
         this.code = code;
     }
 

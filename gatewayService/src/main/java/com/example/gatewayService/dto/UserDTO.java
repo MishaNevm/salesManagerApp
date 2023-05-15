@@ -10,7 +10,6 @@ import java.util.Date;
 
 public class UserDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     int id;
 
     @NotEmpty(message = "Имя должно быть не пустым")
@@ -32,7 +31,7 @@ public class UserDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date createdAt;
 
-    @NotEmpty(message = "Дата рождения должна быть не пустой")
+//    @NotEmpty(message = "Дата рождения должна быть не пустой")
     @Past(message = "Дата рождения должна быть в прошлом")
     private Date dateOfBirth;
 
@@ -90,5 +89,18 @@ public class UserDTO {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", patronymic='" + patronymic + '\'' +
+                ", email='" + email + '\'' +
+                ", createdAt=" + createdAt +
+                ", dateOfBirth=" + dateOfBirth +
+                '}';
     }
 }
