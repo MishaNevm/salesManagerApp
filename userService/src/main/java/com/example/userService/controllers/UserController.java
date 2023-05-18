@@ -40,17 +40,13 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
-        UserDTOResponse userDTOResponse = new UserDTOResponse();
-        userDTOResponse.setResponse (Collections.singletonList(userService.findById(id)));
-        producer.sendMessage(MethodsCodes.GET_USER_BY_ID.getCode(), userDTOResponse);
+        producer.sendMessage(MethodsCodes.GET_USER_BY_ID.getCode(), userService.findById(id));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/findByEmail")
     public ResponseEntity<HttpStatus> findByEmail(@RequestParam("email") String email) {
-        UserDTOResponse userDTOResponse = new UserDTOResponse();
-        userDTOResponse.setResponse (Collections.singletonList(userService.findByEmail(email)));
-        producer.sendMessage(MethodsCodes.GET_USER_BY_EMAIL.getCode(), userDTOResponse);
+        producer.sendMessage(MethodsCodes.GET_USER_BY_EMAIL.getCode(), userService.findByEmail(email));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

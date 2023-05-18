@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -33,13 +35,26 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDTO findById(int id) {
-        return modelMapper.convertUserToUserDTO(userRepository.findById(id).orElseThrow(UserNotFoundException::new));
+    public UserDTOResponse findById(int id) {
+        UserDTOResponse userDTOResponse = new UserDTOResponse();
+        userDTOResponse
+                .setResponse(Collections.singletonList(modelMapper
+                        .convertUserToUserDTO(userRepository
+                                .findById(id)
+                                .orElseThrow(UserNotFoundException::new))));
+        return userDTOResponse;
     }
 
     @Transactional(readOnly = true)
-    public UserDTO findByEmail(String email) {
-        return modelMapper.convertUserToUserDTO(userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new));
+    public UserDTOResponse findByEmail(String email) {
+        UserDTOResponse userDTOResponse = new UserDTOResponse();
+        userDTOResponse
+                .setResponse(Collections
+                        .singletonList(modelMapper
+                                .convertUserToUserDTO(userRepository
+                                        .findByEmail(email)
+                                        .orElseThrow(UserNotFoundException::new))));
+        return userDTOResponse;
     }
 
     public void save(User user) {
@@ -51,7 +66,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void delete (int id) {
+    public void delete(int id) {
         userRepository.deleteById(id);
     }
 }
