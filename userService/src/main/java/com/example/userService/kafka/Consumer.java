@@ -27,30 +27,12 @@ public class Consumer {
         int methodCode = consumerRecord.key();
         try {
             switch (methodCode) {
-                case 0: {
-                    userController.findAll();
-                    break;
-                }
-                case 1: {
-                    userController.findById(objectMapper.readValue(consumerRecord.value(), UserDTO.class).getId());
-                    break;
-                }
-                case 2: {
-                    userController.findByEmail(objectMapper.readValue(consumerRecord.value(), UserDTO.class).getEmail());
-                    break;
-                }
-                case 3:{
-                    userController.create(objectMapper.readValue(consumerRecord.value(), UserDTO.class));
-                    break;
-                }
-                case 4: {
-                    userController.update(objectMapper.readValue(consumerRecord.value(), UserDTO.class));
-                    break;
-                }
-                case 5: {
-                    userController.delete(objectMapper.readValue(consumerRecord.value(), UserDTO.class).getId());
-                    break;
-                }
+                case 0 -> userController.findAll();
+                case 1 -> userController.findById(objectMapper.readValue(consumerRecord.value(), UserDTO.class).getId());
+                case 2 -> userController.findByEmail(objectMapper.readValue(consumerRecord.value(), UserDTO.class).getEmail());
+                case 3 -> userController.create(objectMapper.readValue(consumerRecord.value(), UserDTO.class));
+                case 4 -> userController.update(objectMapper.readValue(consumerRecord.value(), UserDTO.class));
+                case 5 -> userController.delete(objectMapper.readValue(consumerRecord.value(), UserDTO.class).getId());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
