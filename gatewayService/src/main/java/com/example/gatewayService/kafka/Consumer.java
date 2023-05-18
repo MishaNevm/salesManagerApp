@@ -35,7 +35,7 @@ public class Consumer {
     }
 
 
-    @KafkaListener(topics = "userTopicResponse")
+    @KafkaListener(topics = "${application.kafka.userTopicResponse}")
     public void listenUserTopic(ConsumerRecord<Integer, byte[]> consumerRecord) {
         try {
             MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());

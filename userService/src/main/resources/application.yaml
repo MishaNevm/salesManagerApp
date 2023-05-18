@@ -1,5 +1,9 @@
 server:
   port: 8181
+application:
+  kafka:
+    userTopicRequest: "userTopicRequest"
+    userTopicResponse: "userTopicResponse"
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5445/userDB

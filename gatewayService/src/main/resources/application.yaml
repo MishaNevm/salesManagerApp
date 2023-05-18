@@ -1,5 +1,9 @@
 server:
   port: 8484
+application:
+  kafka:
+    userTopicRequest: "userTopicRequest"
+    userTopicResponse: "userTopicResponse"
 spring:
   kafka:
     bootstrap-servers: localhost:9092

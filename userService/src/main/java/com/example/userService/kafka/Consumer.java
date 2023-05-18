@@ -22,7 +22,7 @@ public class Consumer {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "userTopic")
+    @KafkaListener(topics = "${application.kafka.userTopicRequest}")
     public void userTopicListener(ConsumerRecord<Integer, byte[]> consumerRecord) {
         int methodCode = consumerRecord.key();
         try {
