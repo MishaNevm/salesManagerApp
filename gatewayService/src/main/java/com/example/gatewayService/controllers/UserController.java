@@ -2,6 +2,7 @@ package com.example.gatewayService.controllers;
 
 import com.example.gatewayService.dto.UserDTO;
 import com.example.gatewayService.dto.UserDTOResponse;
+import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.service.UserStorageService;
 import com.example.gatewayService.util.MethodsCodes;
@@ -19,34 +20,44 @@ public class UserController {
     private final Producer producer;
     private UserDTO userDTO;
 
-    public UserController(UserStorageService userStorageService, Producer producer) {
+    private final Consumer consumer;
+
+    public UserController(UserStorageService userStorageService, Producer producer, Consumer consumer) {
         this.userStorageService = userStorageService;
         this.producer = producer;
+        this.consumer = consumer;
     }
 
     @GetMapping()
-    public ResponseEntity<UserDTOResponse> getAllUsers() {
+    public ResponseEntity<UserDTOResponse> getAllUsers() throws InterruptedException {
         producer.sendRequestToUserService(MethodsCodes.GET_ALL_USERS);
-        userStorageService.waitForFlagChange();
-        return ResponseEntity.ok(userStorageService.getUserDTOResponse());
+        return ResponseEntity.ok((UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_USERS).take());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable("id") int id) {
+    public ResponseEntity<UserDTO> findById(@PathVariable("id") int id) throws InterruptedException {
         userDTO = new UserDTO();
         userDTO.setId(id);
         producer.sendRequestToUserService(MethodsCodes.GET_USER_BY_ID, userDTO);
-        userStorageService.waitForFlagChange();
-        return ResponseEntity.ok(userStorageService.getUserDTOResponse().getResponse().get(0));
+        return ResponseEntity
+                .ok(
+                        ((UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_ID)
+                                .take())
+                                .getResponse()
+                                .get(0));
     }
 
     @GetMapping("/findByEmail")
-    public ResponseEntity<UserDTO> findByEmail(@RequestParam(value = "email", required = false) String email) {
+    public ResponseEntity<UserDTO> findByEmail(@RequestParam(value = "email", required = false) String email) throws InterruptedException {
         userDTO = new UserDTO();
         userDTO.setEmail(email);
         producer.sendRequestToUserService(MethodsCodes.GET_USER_BY_EMAIL, userDTO);
-        userStorageService.waitForFlagChange();
-        return ResponseEntity.ok(userStorageService.getUserDTOResponse().getResponse().get(0));
+        return ResponseEntity
+                .ok(
+                        ((UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_EMAIL)
+                                .take())
+                                .getResponse()
+                                .get(0));
     }
 
     @PostMapping
