@@ -15,6 +15,7 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
       value-deserializer: com.example.clientService.kafka.JsonDeserializer
+      group-id: 'client-group-id'
     producer:
       key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
       value-serializer: com.example.clientService.kafka.JsonSerializer

@@ -27,8 +27,4 @@ public enum MethodsCodes {
         this.code = code;
         this.hasResponse = hasResponse;
     }
-
-    public static MethodsCodes searchByCode(Integer code) {
-        return Arrays.stream(MethodsCodes.values()).filter(a -> a.getCode().equals(code)).findFirst().orElse(null);
-    }
 }

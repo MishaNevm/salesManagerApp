@@ -1,15 +1,17 @@
 package com.example.clientService.services;
 
 
+import com.example.clientService.dto.ClientDTOResponse;
 import com.example.clientService.models.Client;
+import com.example.clientService.util.ModelMapperUtil;
 import com.example.clientService.util.clientUtil.ClientNotFoundException;
 import com.example.clientService.repositoryes.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,18 +19,35 @@ import java.util.Optional;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+    private final ModelMapperUtil modelMapperUtil;
+
+    private ClientDTOResponse clientDTOResponse;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, ModelMapperUtil modelMapperUtil) {
         this.clientRepository = clientRepository;
+        this.modelMapperUtil = modelMapperUtil;
     }
 
-    public List<Client> findAll() {
-        return clientRepository.findAll();
+    public ClientDTOResponse findAll() {
+        clientDTOResponse = new ClientDTOResponse();
+        clientDTOResponse
+                .setResponse(clientRepository.findAll()
+                        .stream()
+                        .map(modelMapperUtil::convertClientToClientDTO)
+                        .toList());
+        return clientDTOResponse;
     }
 
-    public Client findById(int id) {
-        return clientRepository.findById(id).orElseThrow(ClientNotFoundException::new);
+    public ClientDTOResponse findById(int id) {
+        clientDTOResponse = new ClientDTOResponse();
+        clientDTOResponse
+                .setResponse(Collections
+                        .singletonList(modelMapperUtil
+                                .convertClientToClientDTO(clientRepository
+                                        .findById(id)
+                                        .orElseThrow(ClientNotFoundException::new))));
+        return clientDTOResponse;
     }
 
     public Client findByShortName(String shortName) {

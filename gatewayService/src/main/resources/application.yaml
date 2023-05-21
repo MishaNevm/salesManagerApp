@@ -4,6 +4,8 @@ application:
   kafka:
     userTopicRequest: "userTopicRequest"
     userTopicResponse: "userTopicResponse"
+    clientTopicRequest: "clientTopicRequest"
+    clientTopicResponse: "clientTopicResponse"
 spring:
   kafka:
     bootstrap-servers: localhost:9092

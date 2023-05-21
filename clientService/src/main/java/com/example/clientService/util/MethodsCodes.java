@@ -1,16 +1,8 @@
-package com.example.gatewayService.util;
+package com.example.clientService.util;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 public enum MethodsCodes {
-
-    GET_ALL_USERS(0, true),
-    GET_USER_BY_ID(1, true),
-    GET_USER_BY_EMAIL(2, true),
-    CREATE_USER(3, false),
-    UPDATE_USER(4, false),
-    DELETE_USER(5, false),
     GET_ALL_CLIENTS(6, true),
     GET_CLIENT_BY_ID(7, true),
     CREATE_CLIENT(8, false),
@@ -20,7 +12,6 @@ public enum MethodsCodes {
     GET_CLIENTS_BY_INN(12, true),
     GET_CLIENTS_BY_KPP(13, true),
     GET_CLIENTS_BY_OGRN(14, true),
-
     GET_ALL_BANKS(15, true),
     GET_BANK_BY_ID(16, true),
     CREATE_BANK(17, false),
@@ -42,23 +33,4 @@ public enum MethodsCodes {
         this.code = code;
         this.hasResponse = hasResponse;
     }
-
-    public static MethodsCodes searchByCode(Integer code) {
-        return Arrays.stream(MethodsCodes.values()).filter(a -> a.getCode().equals(code)).findFirst().orElse(null);
-    }
-
-
-//    authenticateUser
-//            authorizeUser
-//    createOrder
-//            updateOrder
-//    deleteOrder
-//            getOrderById
-//    getOrdersByUser
-//            getProductById
-//    updateProductQuantity
-//            getInventory
-//    reserveProduct
-
-//    getOrdersByClient
 }

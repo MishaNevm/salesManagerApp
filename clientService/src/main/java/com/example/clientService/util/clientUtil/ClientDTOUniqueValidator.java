@@ -56,21 +56,21 @@ public class ClientDTOUniqueValidator implements Validator {
 
     //У ИП нет КПП
     private void checkKpp(ClientDTO clientToValidate, Errors errors) {
-        if (clientToValidate.getType() != null) {
-            Optional<Client> client = clientRepository.findByKpp(clientToValidate.getKpp());
-            if (clientToValidate.getKpp().equals("-") && !clientToValidate.getType().equals(ClientTypes.IP)) {
-                errors.rejectValue("kpp", "0", "КПП отсутствует только у ИП");
-                return;
-            }
-            if (!clientToValidate.getKpp().equals("-")) {
-                if (clientToValidate.getType().equals(ClientTypes.IP)) {
-                    errors.rejectValue("kpp", "0", "У ИП отсутсвует КПП");
-                } else if (client.isPresent()
-                        && client.get().getId() != clientToValidate.getId()) {
-                    errors.rejectValue("kpp", "0", "Клиент с этим КПП уже зарегистрирован");
-                }
-            }
-        }
+//        if (clientToValidate.getType() != null) {
+//            Optional<Client> client = clientRepository.findByKpp(clientToValidate.getKpp());
+//            if (clientToValidate.getKpp().equals("-") && !clientToValidate.getType().equals(ClientTypes.IP)) {
+//                errors.rejectValue("kpp", "0", "КПП отсутствует только у ИП");
+//                return;
+//            }
+//            if (!clientToValidate.getKpp().equals("-")) {
+//                if (clientToValidate.getType().equals(ClientTypes.IP)) {
+//                    errors.rejectValue("kpp", "0", "У ИП отсутсвует КПП");
+//                } else if (client.isPresent()
+//                        && client.get().getId() != clientToValidate.getId()) {
+//                    errors.rejectValue("kpp", "0", "Клиент с этим КПП уже зарегистрирован");
+//                }
+//            }
+//        }
     }
 
     private void checkOgrn(ClientDTO clientToValidate, Errors errors) {
