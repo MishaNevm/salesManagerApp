@@ -9,7 +9,6 @@ import java.util.Date;
 
 public class BankDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
     @NotEmpty(message = "Наименование банка должно быть не пустым")
@@ -38,13 +37,10 @@ public class BankDTO {
     @Size(min = 2, max = 50, message = "Страна должна быть от 2 до 50 символов")
     private String country;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private ClientDTO clientDTO;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date created_at;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date updated_at;
 
     public int getId() {

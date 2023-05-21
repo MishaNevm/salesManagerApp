@@ -4,7 +4,6 @@ import com.example.gatewayService.dto.UserDTO;
 import com.example.gatewayService.dto.UserDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
-import com.example.gatewayService.service.UserStorageService;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,23 +13,21 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
-    private final UserStorageService userStorageService;
     private final Producer producer;
     private UserDTO userDTO;
 
     private final Consumer consumer;
 
-    public UserController(UserStorageService userStorageService, Producer producer, Consumer consumer) {
-        this.userStorageService = userStorageService;
+    public UserController( Producer producer, Consumer consumer) {
         this.producer = producer;
         this.consumer = consumer;
     }
 
     @GetMapping()
     public ResponseEntity<UserDTOResponse> getAllUsers() throws InterruptedException {
-        producer.sendRequestToUserService(MethodsCodes.GET_ALL_USERS);
+        producer.sendRequestToUserService(MethodsCodes.GET_ALL_USERS, null);
         return ResponseEntity.ok((UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_USERS).take());
     }
 

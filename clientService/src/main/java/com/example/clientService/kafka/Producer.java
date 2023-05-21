@@ -1,5 +1,6 @@
 package com.example.clientService.kafka;
 
+import com.example.clientService.dto.BankDTOResponse;
 import com.example.clientService.dto.ClientDTOResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -18,6 +19,9 @@ public class Producer {
 
     public void sendMessageToClientTopicResponse(Integer methodCode, ClientDTOResponse clientDTOResponse) {
         kafkaTemplate.send(CLIENT_TOPIC_RESPONSE, methodCode, clientDTOResponse);
+    }
+    public void sendMessageToClientTopicResponse(Integer methodCode, BankDTOResponse bankDTOResponse) {
+        kafkaTemplate.send(CLIENT_TOPIC_RESPONSE, methodCode, bankDTOResponse);
     }
 
 }

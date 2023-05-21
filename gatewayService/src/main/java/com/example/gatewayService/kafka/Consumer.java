@@ -1,8 +1,9 @@
 package com.example.gatewayService.kafka;
 
+import com.example.gatewayService.dto.BankDTOResponse;
+import com.example.gatewayService.dto.ClientDTOResponse;
 import com.example.gatewayService.dto.CustomResponse;
 import com.example.gatewayService.dto.UserDTOResponse;
-import com.example.gatewayService.service.UserStorageService;
 import com.example.gatewayService.util.MethodsCodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -24,7 +25,7 @@ public class Consumer {
     private final Map<MethodsCodes, BlockingQueue<CustomResponse<?>>> responseMap;
 
     @Autowired
-    public Consumer(ObjectMapper objectMapper, UserStorageService userStorageService) {
+    public Consumer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         responseMap = new HashMap<>();
         for (MethodsCodes methodsCode : MethodsCodes.values()) {
@@ -41,6 +42,20 @@ public class Consumer {
             MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
             if (methodsCodes != null) {
                 responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), UserDTOResponse.class));
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @KafkaListener(topics = "${application.kafka.clientTopicResponse}")
+    public void listenClientTopic(ConsumerRecord<Integer, byte[]> consumerRecord) {
+        try {
+            MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
+            if (methodsCodes != null) {
+                if (methodsCodes.getCode() < MethodsCodes.GET_ALL_BANKS.getCode()) {
+                    responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ClientDTOResponse.class));
+                } else responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), BankDTOResponse.class));
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

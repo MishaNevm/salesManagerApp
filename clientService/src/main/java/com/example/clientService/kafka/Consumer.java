@@ -1,10 +1,12 @@
 package com.example.clientService.kafka;
 
+import com.example.clientService.controllers.BankController;
 import com.example.clientService.controllers.ClientController;
+import com.example.clientService.dto.BankDTO;
 import com.example.clientService.dto.ClientDTO;
+import com.example.clientService.dto.ClientDTOResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -17,22 +19,37 @@ public class Consumer {
     private final ObjectMapper objectMapper;
     private final ClientController clientController;
 
+    private final BankController bankController;
+
     @Autowired
-    public Consumer(ObjectMapper objectMapper, ClientController clientController) {
+    public Consumer(ObjectMapper objectMapper, ClientController clientController, BankController bankController) {
         this.objectMapper = objectMapper;
         this.clientController = clientController;
+        this.bankController = bankController;
     }
 
     @KafkaListener(topics = "${application.kafka.clientTopicRequest}")
-    public void clientRequestTopicListener(ConsumerRecord<Integer, byte[]> consumerRecord){
+    public void clientRequestTopicListener(ConsumerRecord<Integer, byte[]> consumerRecord) {
         int methodCode = consumerRecord.key();
         try {
             switch (methodCode) {
-                case 0 -> clientController.findAll();
-                case 1 -> clientController.findById(objectMapper.readValue(consumerRecord.value(), ClientDTO.class).getId());
-                case 3 -> clientController.create(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
-                case 4 -> clientController.update(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
-                case 5 -> clientController.delete(objectMapper.readValue(consumerRecord.value(), ClientDTO.class).getId());
+                case 6 -> clientController.findAll();
+                case 7 ->
+                        clientController.findById(objectMapper.readValue(consumerRecord.value(), ClientDTO.class).getId());
+                case 8 -> clientController.create(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
+                case 9 -> clientController.update(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
+                case 10 ->
+                        clientController.delete(objectMapper.readValue(consumerRecord.value(), ClientDTO.class).getId());
+                case 15 -> bankController.findAll();
+                case 16 ->
+                        bankController.findById(objectMapper.readValue(consumerRecord.value(), BankDTO.class).getId());
+                case 17 -> {
+                    ClientDTO clientDTO = objectMapper.readValue(consumerRecord.value(), ClientDTO.class);
+                    bankController.create(clientDTO.getId(), clientDTO.getBankDTO());
+                }
+                case 18 -> {
+                    bankController.update(objectMapper.readValue(consumerRecord.value(), BankDTO.class));
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

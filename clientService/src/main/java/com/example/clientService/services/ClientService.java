@@ -21,6 +21,8 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final ModelMapperUtil modelMapperUtil;
 
+    private ClientDTOResponse clientDTOResponse;
+
     @Autowired
     public ClientService(ClientRepository clientRepository, ModelMapperUtil modelMapperUtil) {
         this.clientRepository = clientRepository;
@@ -28,14 +30,23 @@ public class ClientService {
     }
 
     public ClientDTOResponse findAll() {
-        ClientDTOResponse clientDTOResponse = new ClientDTOResponse();
-        clientDTOResponse.setResponse(clientRepository.findAll().stream().map(modelMapperUtil::convertClientToClientDTO).toList());
+        clientDTOResponse = new ClientDTOResponse();
+        clientDTOResponse
+                .setResponse(clientRepository.findAll()
+                        .stream()
+                        .map(modelMapperUtil::convertClientToClientDTO)
+                        .toList());
         return clientDTOResponse;
     }
 
     public ClientDTOResponse findById(int id) {
-        ClientDTOResponse clientDTOResponse = new ClientDTOResponse();
-        clientDTOResponse.setResponse(Collections.singletonList(modelMapperUtil.convertClientToClientDTO(clientRepository.findById(id).orElseThrow(ClientNotFoundException::new))));
+        clientDTOResponse = new ClientDTOResponse();
+        clientDTOResponse
+                .setResponse(Collections
+                        .singletonList(modelMapperUtil
+                                .convertClientToClientDTO(clientRepository
+                                        .findById(id)
+                                        .orElseThrow(ClientNotFoundException::new))));
         return clientDTOResponse;
     }
 

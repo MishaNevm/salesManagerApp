@@ -58,7 +58,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid UserDTO user) {
-        userService.findById(user.getId());
+        user.setCreatedAt(userService.findById(user.getId()).getResponse().get(0).getCreatedAt());
 //        userDTOUniqueValidator.validate(user, bindingResult);
 //        if (bindingResult.hasErrors()) {
 //            throw new UserNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
