@@ -1,9 +1,6 @@
 package com.example.gatewayService.kafka;
 
-import com.example.gatewayService.dto.BankDTOResponse;
-import com.example.gatewayService.dto.ClientDTOResponse;
-import com.example.gatewayService.dto.CustomResponse;
-import com.example.gatewayService.dto.UserDTOResponse;
+import com.example.gatewayService.dto.*;
 import com.example.gatewayService.util.MethodsCodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -56,6 +53,18 @@ public class Consumer {
                 if (methodsCodes.getCode() < MethodsCodes.GET_ALL_BANKS.getCode()) {
                     responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ClientDTOResponse.class));
                 } else responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), BankDTOResponse.class));
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @KafkaListener(topics = "${application.kafka.orderTopicResponse}")
+    public void listenOrderTopic(ConsumerRecord<Integer, byte[]> consumerRecord){
+        try {
+            MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
+            if (methodsCodes != null) {
+                    responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), OrderDTOResponse.class));
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

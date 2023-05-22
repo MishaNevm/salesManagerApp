@@ -1,12 +1,17 @@
 package com.example.orderService.services;
 
+import com.example.orderService.dto.OrderDTO;
+import com.example.orderService.dto.OrderDTOResponse;
 import com.example.orderService.models.Order;
 import com.example.orderService.repositoryes.OrderRepository;
+import com.example.orderService.util.ModelMapperUtil;
 import com.example.orderService.util.OrderNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -15,28 +20,41 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final ModelMapperUtil modelMapperUtil;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, ModelMapperUtil modelMapperUtil) {
         this.orderRepository = orderRepository;
+        this.modelMapperUtil = modelMapperUtil;
     }
 
     @Transactional(readOnly = true)
-    public List<Order> findAll() {
-        return orderRepository.findAll();
+    public OrderDTOResponse findAll() {
+        OrderDTOResponse orderDTOResponse = new OrderDTOResponse();
+        orderDTOResponse.setResponse(orderRepository.findAll().stream().map(modelMapperUtil::convertOrderToOrderDTO).toList());
+        return orderDTOResponse;
     }
 
     @Transactional(readOnly = true)
-    public Order findById(int id) {
-        return orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
+    public OrderDTOResponse findById(int id) {
+        OrderDTOResponse orderDTOResponse = new OrderDTOResponse();
+        orderDTOResponse
+                .setResponse(Collections
+                        .singletonList(modelMapperUtil
+                                .convertOrderToOrderDTO(orderRepository
+                                        .findById(id)
+                                        .orElseThrow(OrderNotFoundException::new))));
+        return orderDTOResponse;
     }
 
-    public void save(Order order) {
+    public void save(OrderDTO orderDTO) {
+        Order order = modelMapperUtil.convertOrderDTOToOrder(orderDTO);
         order.setCreatedAt(new Date());
         orderRepository.save(order);
     }
 
-    public void update(Order order) {
+    public void update(OrderDTO orderDTO) {
+        Order order = modelMapperUtil.convertOrderDTOToOrder(orderDTO);
         order.setUpdatedAt(new Date());
         orderRepository.save(order);
     }

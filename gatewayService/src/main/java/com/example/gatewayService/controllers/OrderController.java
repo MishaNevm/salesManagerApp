@@ -1,12 +1,11 @@
-package com.example.orderService.controllers;
+package com.example.gatewayService.controllers;
 
-import com.example.orderService.dto.OrderDTO;
-import com.example.orderService.kafka.Producer;
-import com.example.orderService.services.OrderService;
-import com.example.orderService.util.ErrorResponse;
-import com.example.orderService.util.MethodsCodes;
-import com.example.orderService.util.OrderNotCreatedException;
-import com.example.orderService.util.OrderNotFoundException;
+
+import com.example.gatewayService.dto.OrderDTO;
+import com.example.gatewayService.dto.OrderDTOResponse;
+import com.example.gatewayService.kafka.Consumer;
+import com.example.gatewayService.kafka.Producer;
+import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,44 +16,47 @@ import javax.validation.Valid;
 @RequestMapping("/orders")
 public class OrderController {
 
-    private final OrderService orderService;
     private final Producer producer;
+    private final Consumer consumer;
 
-    public OrderController(OrderService orderService, Producer producer) {
-        this.orderService = orderService;
+    public OrderController(Producer producer, Consumer consumer) {
         this.producer = producer;
+        this.consumer = consumer;
     }
 
     @GetMapping
-    public ResponseEntity<HttpStatus> findAll() {
-        producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ALL_ORDERS.getCode(), orderService.findAll());
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ResponseEntity<OrderDTOResponse> findAll() throws InterruptedException {
+        producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
+        return ResponseEntity.ok((OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).take());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
-        producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ORDER_BY_ID.getCode(), orderService.findById(id));
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ResponseEntity<OrderDTO> findById(@PathVariable("id") int id) throws InterruptedException {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setId(id);
+        producer.sendRequestToOrderService(MethodsCodes.GET_ORDER_BY_ID, orderDTO);
+        return ResponseEntity.ok((OrderDTO) consumer.getResponseMap().get(MethodsCodes.GET_ORDER_BY_ID).take().getResponse().get(0));
     }
 
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid OrderDTO orderDTO) {
-        orderService.save(orderDTO);
+        producer.sendRequestToOrderService(MethodsCodes.CREATE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody @Valid OrderDTO orderDTO) {
-        orderDTO.setCreatedAt(orderService.findById(orderDTO.getId()).getResponse().get(0).getCreatedAt());
-        orderService.update(orderDTO);
+    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id ,@RequestBody @Valid OrderDTO orderDTO) {
+        orderDTO.setId(id);
+        producer.sendRequestToOrderService(MethodsCodes.UPDATE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
-        orderService.findById(id);
-        orderService.delete(id);
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setId(id);
+        producer.sendRequestToOrderService(MethodsCodes.DELETE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -87,15 +89,15 @@ public class OrderController {
 //    }
 
 
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotFoundException e) {
-        return new ResponseEntity<>(new ErrorResponse("Данный заказ не найден"), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotCreatedException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler
+//    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotFoundException e) {
+//        return new ResponseEntity<>(new ErrorResponse("Данный заказ не найден"), HttpStatus.BAD_REQUEST);
+//    }
+//
+//    @ExceptionHandler
+//    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotCreatedException e) {
+//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+//    }
 
 //    private Order checkRequest(Integer clientId, OrderDTO orderDTO, BindingResult bindingResult) {
 //        if (bindingResult.hasErrors()) {

@@ -6,16 +6,12 @@ import java.util.Date;
 
 public class OrderDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer clientId;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date createdAt;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date updatedAt;
 
     public int getId() {

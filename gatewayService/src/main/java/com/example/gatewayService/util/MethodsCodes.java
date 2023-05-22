@@ -25,7 +25,14 @@ public enum MethodsCodes {
     GET_BANK_BY_ID(16, true),
     CREATE_BANK(17, false),
     UPDATE_BANK(18, false),
-    DELETE_BANK(19, false);
+    DELETE_BANK(19, false),
+    GET_ALL_ORDERS(20, true),
+    GET_ORDER_BY_ID(21, true),
+    GET_ORDERS_BY_USER(22, true),
+    CREATE_ORDER(23, false),
+    UPDATE_ORDER(24, false),
+    DELETE_ORDER(25, false);
+
     private final Integer code;
 
     private final boolean hasResponse;
@@ -50,11 +57,6 @@ public enum MethodsCodes {
 
 //    authenticateUser
 //            authorizeUser
-//    createOrder
-//            updateOrder
-//    deleteOrder
-//            getOrderById
-//    getOrdersByUser
 //            getProductById
 //    updateProductQuantity
 //            getInventory
