@@ -6,6 +6,8 @@ application:
     userTopicResponse: "userTopicResponse"
     clientTopicRequest: "clientTopicRequest"
     clientTopicResponse: "clientTopicResponse"
+    orderTopicRequest: "orderTopicRequest"
+    orderTopicResponse: "orderTopicResponse"
 spring:
   kafka:
     bootstrap-servers: localhost:9092

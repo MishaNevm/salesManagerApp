@@ -2,6 +2,7 @@ package com.example.gatewayService.kafka;
 
 import com.example.gatewayService.dto.BankDTO;
 import com.example.gatewayService.dto.ClientDTO;
+import com.example.gatewayService.dto.OrderDTO;
 import com.example.gatewayService.dto.UserDTO;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,13 +14,16 @@ public class Producer {
 
     private final String USER_TOPIC_REQUEST;
     private final String CLIENT_TOPIC_REQUEST;
+
+    private final String ORDER_TOPIC_REQUEST;
     private final KafkaTemplate<Integer, Object> kafkaTemplate;
 
     public Producer(@Value("${application.kafka.userTopicRequest}") String userTopicRequest,
                     @Value("${application.kafka.clientTopicRequest}") String clientTopicRequest,
-                    KafkaTemplate<Integer, Object> kafkaTemplate) {
+                    @Value("${application.kafka.orderTopicRequest}") String orderTopicRequest, KafkaTemplate<Integer, Object> kafkaTemplate) {
         USER_TOPIC_REQUEST = userTopicRequest;
         CLIENT_TOPIC_REQUEST = clientTopicRequest;
+        ORDER_TOPIC_REQUEST = orderTopicRequest;
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -42,6 +46,14 @@ public class Producer {
     public void sendRequestToClientService(MethodsCodes methodsCodes, BankDTO bankDTO) {
         try {
             kafkaTemplate.send(CLIENT_TOPIC_REQUEST, methodsCodes.getCode(), bankDTO);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendRequestToOrderService(MethodsCodes methodsCodes, OrderDTO orderDTO) {
+        try {
+            kafkaTemplate.send(ORDER_TOPIC_REQUEST, methodsCodes.getCode(), orderDTO);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
