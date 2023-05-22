@@ -1,5 +1,9 @@
 server:
   port: 8383
+application:
+  kafka:
+    inventoryTopicRequest: "inventoryTopicRequest"
+    inventoryTopicResponse: "inventoryTopicResponse"
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5447/inventoryDB
@@ -11,6 +15,7 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: com.example.inventoryService.kafka.JsonDeserializer
+      group-id: 'inventory-group-id'
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: com.example.inventoryService.kafka.JsonSerializer
