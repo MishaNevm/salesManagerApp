@@ -13,11 +13,11 @@ spring:
     bootstrap-servers: localhost:9092
     consumer:
       auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
       value-deserializer: com.example.inventoryService.kafka.JsonDeserializer
       group-id: 'inventory-group-id'
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
       value-serializer: com.example.inventoryService.kafka.JsonSerializer
   boot:
     admin:

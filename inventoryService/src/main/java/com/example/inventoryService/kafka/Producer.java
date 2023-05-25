@@ -13,7 +13,7 @@ public class Producer {
 
     private final KafkaTemplate<Integer, Object> kafkaTemplate;
 
-    public Producer(@Value("${application.kafka.productTopicResponse}") String productTopicResponse, KafkaTemplate<Integer, Object> kafkaTemplate) {
+    public Producer(@Value("${application.kafka.inventoryTopicResponse}") String productTopicResponse, KafkaTemplate<Integer, Object> kafkaTemplate) {
         PRODUCT_TOPIC_RESPONSE = productTopicResponse;
         this.kafkaTemplate = kafkaTemplate;
     }

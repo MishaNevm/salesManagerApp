@@ -1,4 +1,4 @@
-package com.example.gatewayService.dto;
+package com.example.gatewayService.util;
 
 import java.util.List;
 

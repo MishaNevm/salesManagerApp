@@ -31,7 +31,12 @@ public enum MethodsCodes {
     GET_ORDERS_BY_USER(22, true),
     CREATE_ORDER(23, false),
     UPDATE_ORDER(24, false),
-    DELETE_ORDER(25, false);
+    DELETE_ORDER(25, false),
+    GET_ALL_PRODUCTS(26, true),
+    GET_PRODUCT_BY_ID(27, true),
+    CREATE_PRODUCT(28, false),
+    UPDATE_PRODUCT(29, false),
+    DELETE_PRODUCT(30, false);
 
     private final Integer code;
 

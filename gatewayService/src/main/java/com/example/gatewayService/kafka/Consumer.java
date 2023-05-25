@@ -1,7 +1,10 @@
 package com.example.gatewayService.kafka;
 
 import com.example.gatewayService.dto.*;
+import com.example.gatewayService.util.CustomResponse;
 import com.example.gatewayService.util.MethodsCodes;
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +68,18 @@ public class Consumer {
             MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
             if (methodsCodes != null) {
                     responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), OrderDTOResponse.class));
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @KafkaListener(topics = "${application.kafka.inventoryTopicResponse}")
+    public void listenInventoryTopic(ConsumerRecord<Integer, byte[]> consumerRecord){
+        try {
+            MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
+            if (methodsCodes != null) {
+                responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ProductDTOResponse.class));
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

@@ -7,6 +7,7 @@ import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class UserController {
     }
 
     @GetMapping()
-    public ResponseEntity<UserDTOResponse> getAllUsers() throws InterruptedException {
+    public ResponseEntity<UserDTOResponse> getAllUsers(Model model) throws InterruptedException {
         producer.sendRequestToUserService(MethodsCodes.GET_ALL_USERS, null);
         return ResponseEntity.ok((UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_USERS).take());
     }
