@@ -1,6 +1,6 @@
 package com.example.gatewayService.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -28,11 +28,11 @@ public class UserDTO {
     @Email(message = "Почта должна быть в формате текст@текст.com/ru")
     private String email;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date createdAt;
 
 //    @NotEmpty(message = "Дата рождения должна быть не пустой")
     @Past(message = "Дата рождения должна быть в прошлом")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
 
     public int getId() {

@@ -22,13 +22,18 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
       value-serializer: com.example.gatewayService.kafka.JsonSerializer
       client-id: 'gateway-group-id'
-  boot:
-    admin:
-      client:
-        url: http://localhost:8484/admin
-      context-path: /admin
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+#  boot:
+#    admin:
+#      client:
+#        url: http://localhost:8484/admin
+#      context-path: /admin
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
