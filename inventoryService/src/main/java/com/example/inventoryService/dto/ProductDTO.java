@@ -8,7 +8,6 @@ import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 public class ProductDTO {
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
     @NotEmpty(message = "Наименование товара не должно быть пустым")
@@ -19,10 +18,8 @@ public class ProductDTO {
     @Min(value = 0, message = "Количество товара не может быть меньше 0")
     private int quantity;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date createdAt;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date updatedAt;
 
     public int getId() {

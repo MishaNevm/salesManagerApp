@@ -1,28 +1,26 @@
 package com.example.gatewayService.dto;
 
-//import com.example.salesManagerApp.util.productUtil.ProductTypes;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
+
+import com.example.gatewayService.util.ProductTypes;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 public class ProductDTO {
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
     @NotEmpty(message = "Наименование товара не должно быть пустым")
     private String name;
 
-//    private ProductTypes type;
+    private ProductTypes type;
 
     @Min(value = 0, message = "Количество товара не может быть меньше 0")
     private int quantity;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date createdAt;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date updatedAt;
 
     public int getId() {
@@ -41,13 +39,13 @@ public class ProductDTO {
         this.name = name;
     }
 
-//    public ProductTypes getType() {
-//        return type;
-//    }
-//
-//    public void setType(ProductTypes type) {
-//        this.type = type;
-//    }
+    public ProductTypes getType() {
+        return type;
+    }
+
+    public void setType(ProductTypes type) {
+        this.type = type;
+    }
 
     public int getQuantity() {
         return quantity;

@@ -1,63 +1,57 @@
 package com.example.inventoryService.controllers;
 
 import com.example.inventoryService.dto.ProductDTO;
+import com.example.inventoryService.kafka.Producer;
 import com.example.inventoryService.services.ProductService;
-import com.example.inventoryService.util.ErrorResponse;
-import com.example.inventoryService.util.ModelMapperUtil;
-import com.example.inventoryService.util.ProductNotAddException;
-import com.example.inventoryService.util.ProductNotFoundException;
-import com.example.inventoryService.util.ProductNotSaveException;
+import com.example.inventoryService.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
-    private final ModelMapperUtil modelMapper;
+    private final Producer producer;
 
     @Autowired
-    public ProductController(ProductService productService, ModelMapperUtil modelMapper) {
+    public ProductController(ProductService productService, Producer producer) {
         this.productService = productService;
-        this.modelMapper = modelMapper;
+        this.producer = producer;
     }
 
     @GetMapping
-    public List<ProductDTO> findAll() {
-        return productService.findAll().stream().map(modelMapper::convertProductToProductDTO).toList();
+    public ResponseEntity<HttpStatus> findAll() {
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_ALL_PRODUCTS.getCode(), productService.findAll());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ProductDTO findById(@PathVariable("id") int id) {
-        return modelMapper.convertProductToProductDTO(productService.findById(id));
+    public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCT_BY_ID.getCode(), productService.findById(id));
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> save(@RequestBody @Valid ProductDTO productDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ProductNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-        }
-        productService.save(modelMapper.convertProductDTOToProduct(productDTO));
+    public ResponseEntity<HttpStatus> save(@RequestBody @Valid ProductDTO productDTO) {
+//        if (bindingResult.hasErrors()) {
+//            throw new ProductNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
+//        }
+        productService.save(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id,
-                                             @RequestBody @Valid ProductDTO productDTO,
-                                             BindingResult bindingResult) {
-        productDTO.setCreatedAt(productService.findById(id).getCreatedAt());
-        productDTO.setId(id);
-        if (bindingResult.hasErrors()) {
-            throw new ProductNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-        }
-        productService.update(modelMapper.convertProductDTOToProduct(productDTO));
+    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
+        productDTO.setCreatedAt(productService.findById(productDTO.getId()).getResponse().get(0).getCreatedAt());
+//        if (bindingResult.hasErrors()) {
+//            throw new ProductNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
+//        }
+        productService.update(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -68,13 +62,13 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/add-to-order")
-    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-                                                        @RequestParam(value = "order-id", required = false) Integer orderId,
-                                                        @RequestParam(value = "quantity", required = false) Integer quantity) {
-        productService.addProductToOrder(productService.findById(id), orderId, quantity);
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
+//    @PostMapping("/{id}/add-to-order")
+//    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
+//                                                        @RequestParam(value = "order-id", required = false) Integer orderId,
+//                                                        @RequestParam(value = "quantity", required = false) Integer quantity) {
+//        productService.addProductToOrder(productService.findById(id), orderId, quantity);
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
 
     @PatchMapping("/{id}/change-order")
     public ResponseEntity<HttpStatus> changeOrderInProduct(@PathVariable("id") int id,

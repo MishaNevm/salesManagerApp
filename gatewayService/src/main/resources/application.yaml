@@ -8,6 +8,8 @@ application:
     clientTopicResponse: "clientTopicResponse"
     orderTopicRequest: "orderTopicRequest"
     orderTopicResponse: "orderTopicResponse"
+    inventoryTopicRequest: "inventoryTopicRequest"
+    inventoryTopicResponse: "inventoryTopicResponse"
 spring:
   kafka:
     bootstrap-servers: localhost:9092
