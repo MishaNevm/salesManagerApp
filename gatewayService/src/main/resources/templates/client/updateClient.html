@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Update Client</title>
+</head>
+<body>
+<h2>Update Client</h2>
+<form th:method="POST" th:action="@{/clients/{id}}" th:object="${client}" id="clientForm">
+  <input type="hidden" th:name="_method" th:value="PATCH" />
+  <label for="clientShortName">Short Name:</label>
+  <input type="text" th:field="*{shortName}" id="clientShortName"/>
+  <div style="color:red" th:if="${#fields.hasErrors('shortName')}" th:errors="*{shortName}">Short Name error</div>
+  <br/>
+  <label for="clientFullName">Full Name:</label>
+  <input type="text" th:field="*{fullName}" id="clientFullName"/>
+  <div style="color:red" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full Name error</div>
+  <br/>
+  <label for="clientInn">INN:</label>
+  <input type="text" th:field="*{inn}" id="clientInn"/>
+  <div style="color:red" th:if="${#fields.hasErrors('inn')}" th:errors="*{inn}">INN error</div>
+  <br/>
+  <label for="clientKpp">KPP:</label>
+  <input type="text" th:field="*{kpp}" id="clientKpp"/>
+  <div style="color:red" th:if="${#fields.hasErrors('kpp')}" th:errors="*{kpp}">KPP error</div>
+  <br/>
+  <label for="clientOgrn">OGRN:</label>
+  <input type="text" th:field="*{ogrn}" id="clientOgrn"/>
+  <div style="color:red" th:if="${#fields.hasErrors('ogrn')}" th:errors="*{ogrn}">OGRN error</div>
+  <br/>
+  <input type="submit" value="Update Client"/>
+</form>
+
+<hr/>
+<h2>Create Bank</h2>
+<form th:method="POST" th:action="@{/clients/{id}}" th:object="${bank}" id="bankForm">
+  <input type="hidden" th:name="_method" th:value="PATCH" />
+  <label for="bankName">Bank Name:</label>
+  <input type="text" th:field="*{name}" id="bankName"/>
+  <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Bank Name error</div>
+  <br/>
+  <label for="bik">BIK:</label>
+  <input type="text" th:field="*{bik}" id="bik"/>
+  <div style="color:red" th:if="${#fields.hasErrors('bik')}" th:errors="*{bik}">BIK error</div>
+  <br/>
+  <label for="checkingAccount">Checking Account: </label>
+  <input type="text" th:field="*{checkingAccount}" id="checkingAccount"/>
+  <div style="color:red" th:if="${#fields.hasErrors('checkingAccount')}" th:errors="*{checkingAccount}">Checking Account error</div>
+  <br/>
+  <label for="corporateAccount">Corporate Account: </label>
+  <input type="text" th:field="*{corporateAccount}" id="corporateAccount"/>
+  <div style="color:red" th:if="${#fields.hasErrors('corporateAccount')}" th:errors="*{corporateAccount}">Corporate Account error</div>
+  <br/>
+  <label for="city">City: </label>
+  <input type="text" th:field="*{city}" id="city"/>
+  <div style="color:red" th:if="${#fields.hasErrors('city')}" th:errors="*{city}">City error</div>
+  <br/>
+  <label for="country">Country: </label>
+  <input type="text" th:field="*{country}" id="country"/>
+  <div style="color:red" th:if="${#fields.hasErrors('country')}" th:errors="*{country}">Country error</div>
+  <br/>
+  <input type="submit" value="Update Bank"/>
+</form>
+</body>
+</html>
