@@ -47,25 +47,23 @@ public class ClientController {
     }
 
     @GetMapping("/new")
-    public String create(@ModelAttribute("client") ClientDTO clientDTO, @ModelAttribute("bank") BankDTO bankDTO) {
+    public String create(@ModelAttribute("client") ClientDTO clientDTO) {
         return "client/createClient";
     }
 
     @PostMapping
     public String create(@ModelAttribute("client") @Valid ClientDTO clientDTO,
-                         BindingResult clientBindingResult,
-                         @ModelAttribute("bank") @Valid BankDTO bankDTO,
-                         BindingResult bankBindingResult) {
-        if (bankBindingResult.hasErrors() || clientBindingResult.hasErrors()) {
+                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return "client/createClient";
         }
-        clientDTO.setBankDTO(bankDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_CLIENT, clientDTO);
         return "redirect:/clients";
     }
 
     @GetMapping("/{id}/addBank")
-    public String createBankToClient(@ModelAttribute("bank") BankDTO bankDTO) {
+    public String createBankToClient(@PathVariable("id") int id, Model model,@ModelAttribute("bank") BankDTO bankDTO) {
+        model.addAttribute("id", id);
         return "client/createBankToClient";
     }
 
@@ -76,8 +74,8 @@ public class ClientController {
         }
         clientDTO = new ClientDTO();
         clientDTO.setId(id);
-        clientDTO.setBankDTO(bankDTO);
-        producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, clientDTO);
+        bankDTO.setClientDTO(clientDTO);
+        producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
         return "redirect:/clients/" + id;
     }
 
@@ -86,20 +84,16 @@ public class ClientController {
         clientDTO = new ClientDTO();
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_CLIENT_BY_ID, clientDTO);
-        clientDTO = (ClientDTO) consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).take().getResponse().get(0);
-        model.addAttribute("client", clientDTO);
-        model.addAttribute("bank", clientDTO.getBankDTO());
+        model.addAttribute("client", consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).take().getResponse().get(0));
         return "client/updateClient";
     }
 
     @PatchMapping("/{id}")
     public String update(@PathVariable("id") int id,
                          @ModelAttribute("client") @Valid ClientDTO clientDTO,
-                         BindingResult clientBindingResult,
-                         @ModelAttribute("bank") BankDTO bankDTO,
-                         BindingResult bankBindingResult) {
+                         BindingResult bindingResult) {
 //        clientDTOUniqueValidator.validate(clientDTO, bindingResult);
-        if (clientBindingResult.hasErrors() || bankBindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "client/updateClient";
         }
         producer.sendRequestToClientService(MethodsCodes.UPDATE_CLIENT, clientDTO);
@@ -107,11 +101,11 @@ public class ClientController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
+    public String delete(@PathVariable("id") int id) {
         clientDTO = new ClientDTO();
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.DELETE_CLIENT, clientDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return "redirect:/clients";
     }
 
 

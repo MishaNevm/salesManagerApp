@@ -13,14 +13,20 @@
 <hr/>
 <div th:if="${client.getBankDTO() == null}">
     <p th:text="${client.getShortName() + 's bank information is not available'}"></p>
+    <br/>
+    <a th:href="@{/clients/{id}/addBank(id=${client.getId()})}">Add bank</a>
 </div>
 <div th:if="${client.getBankDTO() != null}">
-    <p th:text="${'Bank Name: ' + client.getBankDTO().getBankName()}"></p>
-    <p th:text="${'Account Number: ' + client.getBankDTO().getAccountNumber()}"></p>
-    <p th:text="${'Bank Address: ' + client.getBankDTO().getBankAddress()}"></p>
+    <p th:text="${'Bank Name: ' + client.getBankDTO().getName()}"></p>
+    <p th:text="${'Account Number: ' + client.getBankDTO().getCheckingAccount()}"></p>
+    <p th:text="${'Corporate Account: ' + client.getBankDTO().getCorporateAccount()}"></p>
+    <p th:text="${'Bank Address: ' + client.getBankDTO().getCountry() + ', ' + client.getBankDTO().getCity()}"></p>
+    <br/>
+    <a th:href="@{/banks/{id}/edit(id=${client.getBankDTO().getId()})}">Update bank</a>
 </div>
 <br/>
-<a th:href="@{/clients/{id}/edit(id=${client.getId()})}">Update</a>
+<a th:href="@{/clients/{id}/edit(id=${client.getId()})}">Update client</a>
+<br/>
 <br/>
 <form th:method="DELETE" th:action="@{/clients/{id}(id=${client.getId()})}" th:object="${client}">
     <input type="submit" value="Delete"/>

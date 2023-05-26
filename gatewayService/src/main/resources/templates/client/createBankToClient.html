@@ -7,8 +7,8 @@
 <body>
 <h2>Add Bank to Client</h2>
 
-<form th:method="POST" th:action="@{/clients/{id}}" th:object="${bank}">
-  <input type="hidden" th:name="id" th:value="${id}"/>
+<form th:method="POST" th:action="@{/clients/__${id}__}" th:object="${bank}">
+  <input type="hidden" th:name="id" th:value="${__${id}__}"/>
 
   <label for="name">Bank Name:</label>
   <input type="text" th:field="*{name}" id="name"/>
