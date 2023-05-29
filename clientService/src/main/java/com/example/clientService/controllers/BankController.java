@@ -43,13 +43,12 @@ public class BankController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<HttpStatus> create(@PathVariable("id") int clientId
-            , @RequestBody BankDTO bankDTO) {
+    public ResponseEntity<HttpStatus> create(@RequestBody BankDTO bankDTO) {
 //        if (bindingResult.hasErrors()) {
 //            throw new BankNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
 //        }
         Bank bank = modelMapper.convertBankDTOToBank(bankDTO);
-        bank.setClient(clientDAO.loadClientById(clientId));
+//        bank.setClient(clientDAO.loadClientById(clientId));
         bankService.save(bank);
         return ResponseEntity.ok(HttpStatus.OK);
     }

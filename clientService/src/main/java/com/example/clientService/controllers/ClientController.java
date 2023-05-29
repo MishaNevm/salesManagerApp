@@ -3,6 +3,7 @@ package com.example.clientService.controllers;
 import com.example.clientService.dto.ClientDTO;
 import com.example.clientService.kafka.Producer;
 import com.example.clientService.models.Client;
+import com.example.clientService.services.BankService;
 import com.example.clientService.services.ClientService;
 import com.example.clientService.util.*;
 import com.example.clientService.util.clientUtil.ClientDTOUniqueValidator;

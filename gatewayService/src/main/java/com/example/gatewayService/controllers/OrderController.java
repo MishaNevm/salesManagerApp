@@ -1,18 +1,19 @@
 package com.example.gatewayService.controllers;
 
 
+import com.example.gatewayService.dto.ClientDTO;
 import com.example.gatewayService.dto.OrderDTO;
-import com.example.gatewayService.dto.OrderDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@RestController
+@Controller
 @RequestMapping("/orders")
 public class OrderController {
 
@@ -25,39 +26,61 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<OrderDTOResponse> findAll() throws InterruptedException {
+    public String findAll(Model model) throws InterruptedException {
         producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
-        return ResponseEntity.ok((OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).take());
+        model.addAttribute("orders", consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).take().getResponse());
+        return "order/getAllOrders";
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDTO> findById(@PathVariable("id") int id) throws InterruptedException {
+    public String findById(@PathVariable("id") int id, Model model) throws InterruptedException {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(id);
         producer.sendRequestToOrderService(MethodsCodes.GET_ORDER_BY_ID, orderDTO);
-        return ResponseEntity.ok((OrderDTO) consumer.getResponseMap().get(MethodsCodes.GET_ORDER_BY_ID).take().getResponse().get(0));
+        model.addAttribute("order", consumer.getResponseMap().get(MethodsCodes.GET_ORDER_BY_ID).take().getResponse().get(0));
+        return "order/getOrderById";
+    }
+
+    @GetMapping("/new")
+    public String create(@ModelAttribute("order") OrderDTO orderDTO) {
+        return "order/createOrder";
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid OrderDTO orderDTO) {
+    public String create(@ModelAttribute("order") @Valid OrderDTO orderDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "order/createOrder";
+        }
         producer.sendRequestToOrderService(MethodsCodes.CREATE_ORDER, orderDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return "redirect:/orders";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String update (@PathVariable("id") int id, Model model) throws InterruptedException {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setId(id);
+        producer.sendRequestToOrderService(MethodsCodes.GET_ORDER_BY_ID, orderDTO);
+        model.addAttribute("order", consumer.getResponseMap().get(MethodsCodes.GET_ORDER_BY_ID).take().getResponse().get(0));
+        return "order/updateOrder";
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id ,@RequestBody @Valid OrderDTO orderDTO) {
+    public String update(@PathVariable("id") int id, @ModelAttribute("order") @Valid OrderDTO orderDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "order/updateOrder";
+        }
         orderDTO.setId(id);
         producer.sendRequestToOrderService(MethodsCodes.UPDATE_ORDER, orderDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return "redirect:/orders/" + id;
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
+    public String delete(@PathVariable("id") int id) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(id);
         producer.sendRequestToOrderService(MethodsCodes.DELETE_ORDER, orderDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return "redirect:/orders";
     }
 
 //    @PostMapping("/{id}/add-product")

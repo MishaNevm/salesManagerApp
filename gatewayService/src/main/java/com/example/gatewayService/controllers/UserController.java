@@ -5,49 +5,47 @@ import com.example.gatewayService.dto.UserDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@RestController
+@Controller
 @RequestMapping("/users")
 public class UserController {
     private final Producer producer;
-    private UserDTO userDTO;
 
     private final Consumer consumer;
 
-    public UserController( Producer producer, Consumer consumer) {
+    public UserController(Producer producer, Consumer consumer) {
         this.producer = producer;
         this.consumer = consumer;
     }
 
     @GetMapping()
-    public ResponseEntity<UserDTOResponse> getAllUsers(Model model) throws InterruptedException {
+    public String getAllUsers(Model model) throws InterruptedException {
         producer.sendRequestToUserService(MethodsCodes.GET_ALL_USERS, null);
-        return ResponseEntity.ok((UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_USERS).take());
+        model.addAttribute("users", consumer.getResponseMap().get(MethodsCodes.GET_ALL_USERS).take().getResponse());
+        return "user/getAllUsers";
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable("id") int id) throws InterruptedException {
-        userDTO = new UserDTO();
+    public String findById(@PathVariable("id") int id, Model model) throws InterruptedException {
+        UserDTO userDTO = new UserDTO();
         userDTO.setId(id);
         producer.sendRequestToUserService(MethodsCodes.GET_USER_BY_ID, userDTO);
-        return ResponseEntity
-                .ok(
-                        ((UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_ID)
-                                .take())
-                                .getResponse()
-                                .get(0));
+        model.addAttribute("user", consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_ID)
+                .take().getResponse().get(0));
+        return "user/getUserById";
     }
 
     @GetMapping("/findByEmail")
     public ResponseEntity<UserDTO> findByEmail(@RequestParam(value = "email", required = false) String email) throws InterruptedException {
-        userDTO = new UserDTO();
+        UserDTO userDTO = new UserDTO();
         userDTO.setEmail(email);
         producer.sendRequestToUserService(MethodsCodes.GET_USER_BY_EMAIL, userDTO);
         return ResponseEntity
@@ -58,26 +56,41 @@ public class UserController {
                                 .get(0));
     }
 
+    @GetMapping("/new")
+    public String create(@ModelAttribute("user") UserDTO userDTO) {
+        return "user/createUser";
+    }
+
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserDTO user, BindingResult bindingResult) {
+    public String create(@ModelAttribute("user") @Valid UserDTO user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) return "user/createUser";
         producer.sendRequestToUserService(MethodsCodes.CREATE_USER, user);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return "redirect:/users";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String update(Model model, @PathVariable("id") int id) throws InterruptedException {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(id);
+        producer.sendRequestToUserService(MethodsCodes.GET_USER_BY_ID, userDTO);
+        model.addAttribute("user", consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_ID)
+                .take().getResponse().get(0));
+        return "user/updateUser";
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id,
-                                             @RequestBody @Valid UserDTO user, BindingResult bindingResult) {
-        user.setId(id);
+    public String update(@ModelAttribute("user") @Valid UserDTO user, BindingResult bindingResult) {
         producer.sendRequestToUserService(MethodsCodes.UPDATE_USER, user);
-        return ResponseEntity.ok(HttpStatus.OK);
+        if (bindingResult.hasErrors()) return "user/updateUser";
+        return "redirect:/users";
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
-        userDTO = new UserDTO();
+    public String delete(@PathVariable("id") int id) {
+        UserDTO userDTO = new UserDTO();
         userDTO.setId(id);
         producer.sendRequestToUserService(MethodsCodes.DELETE_USER, userDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return "redirect:/users";
     }
 }
 

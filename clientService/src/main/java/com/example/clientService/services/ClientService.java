@@ -2,7 +2,9 @@ package com.example.clientService.services;
 
 
 import com.example.clientService.dto.ClientDTOResponse;
+import com.example.clientService.models.Bank;
 import com.example.clientService.models.Client;
+import com.example.clientService.repositoryes.BankRepository;
 import com.example.clientService.util.ModelMapperUtil;
 import com.example.clientService.util.clientUtil.ClientNotFoundException;
 import com.example.clientService.repositoryes.ClientRepository;
@@ -20,13 +22,14 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final ModelMapperUtil modelMapperUtil;
-
+    private final BankRepository bankRepository;
     private ClientDTOResponse clientDTOResponse;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository, ModelMapperUtil modelMapperUtil) {
+    public ClientService(ClientRepository clientRepository, ModelMapperUtil modelMapperUtil, BankRepository bankRepository) {
         this.clientRepository = clientRepository;
         this.modelMapperUtil = modelMapperUtil;
+        this.bankRepository = bankRepository;
     }
 
     public ClientDTOResponse findAll() {

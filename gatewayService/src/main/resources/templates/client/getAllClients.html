@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Clients</title>
+</head>
+<body>
+<br/>
+<p th:if="${clients.isEmpty()}">No clients</p>
+<div th:unless="${clients.isEmpty()}" th:each="client : ${clients}">
+    <a th:href="@{/clients/{id}(id=${client.getId()})}"
+       th:text="${client.getShortName() + ', ' + client.getFullName()}">VALUE</a>
+</div>
+<br/>
+<hr/>
+<a href="/clients/new">Add client</a>
+</body>
+</html>

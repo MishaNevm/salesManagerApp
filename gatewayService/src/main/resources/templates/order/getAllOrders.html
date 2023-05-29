@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All orders</title>
+</head>
+<body>
+<br/>
+<p th:if="${orders.isEmpty()}">No orders</p>
+<div th:unless="${orders.isEmpty()}" th:each="order : ${orders}">
+    <a th:href="@{/orders/{id}(id=${order.getId()})}" th:text="${order.getClientId() + ', ' + order.getCreatedAt()}">VALUE</a>
+</div>
+<br/>
+<hr/>
+<a href="/orders/new">Add order</a>
+</body>
+</html>

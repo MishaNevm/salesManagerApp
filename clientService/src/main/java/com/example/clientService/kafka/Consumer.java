@@ -36,7 +36,7 @@ public class Consumer {
                 case 6 -> clientController.findAll();
                 case 7 ->
                         clientController.findById(objectMapper.readValue(consumerRecord.value(), ClientDTO.class).getId());
-                case 8 -> clientController.create(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
+                case 8 -> {clientController.create(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));}
                 case 9 -> clientController.update(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
                 case 10 ->
                         clientController.delete(objectMapper.readValue(consumerRecord.value(), ClientDTO.class).getId());
@@ -44,11 +44,13 @@ public class Consumer {
                 case 16 ->
                         bankController.findById(objectMapper.readValue(consumerRecord.value(), BankDTO.class).getId());
                 case 17 -> {
-                    ClientDTO clientDTO = objectMapper.readValue(consumerRecord.value(), ClientDTO.class);
-                    bankController.create(clientDTO.getId(), clientDTO.getBankDTO());
+                    bankController.create(objectMapper.readValue(consumerRecord.value(), BankDTO.class));
                 }
                 case 18 -> {
                     bankController.update(objectMapper.readValue(consumerRecord.value(), BankDTO.class));
+                }
+                case 19 -> {
+                    bankController.delete(objectMapper.readValue(consumerRecord.value(), BankDTO.class).getId());
                 }
             }
         } catch (IOException e) {
