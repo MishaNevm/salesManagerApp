@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Products</title>
+</head>
+<body>
+<br/>
+<p th:if="${products.isEmpty()}">No products</p>
+<div th:unless="${products.isEmpty()}" th:each="product : ${products}">
+    <a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name + ', Quantity: ' + product.quantity}">Product Details</a>
+</div>
+<br/>
+<a href="/products/new">Add Product</a>
+</body>
+</html>
+
