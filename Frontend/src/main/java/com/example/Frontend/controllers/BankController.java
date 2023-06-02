@@ -43,7 +43,8 @@ public class BankController {
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        model.addAttribute("bank", restTemplate.getForObject(GET_BANK_BY_ID + id, BankDTO.class));
+        BankDTO bankDTO = restTemplate.getForObject(GET_BANK_BY_ID + id, BankDTO.class);
+        model.addAttribute("bank", bankDTO);
         return "bank/updateBank";
     }
 

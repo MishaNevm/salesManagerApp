@@ -7,7 +7,7 @@
 <body>
 <h2>Create Client and Bank</h2>
 <form th:method="PATCH" th:action="@{/banks/{id}(id=${bank.getId()})}" th:object="${bank}">
-
+    <input type="hidden" th:field="*{clientDTO.id}"/>
     <label for="bankName">Bank Name:</label>
     <input type="text" th:field="*{name}" id="bankName"/>
     <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Bank Name error</div>

@@ -73,6 +73,9 @@ public class ClientController {
         if (bindingResult.hasErrors()) {
             return "client/createBankToClient";
         }
+        ClientDTO clientDTO = new ClientDTO();
+        clientDTO.setId(id);
+        bankDTO.setClientDTO(clientDTO);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<BankDTO> entity = new HttpEntity<>(bankDTO, headers);

@@ -21,7 +21,7 @@ create table banks
     corporate_account varchar(21),
     city              varchar(100),
     country           varchar(100),
-    client_id         int references clients (id),
+    client_id         int references clients (id) on delete cascade,
     created_at        date,
     updated_at        timestamp
 )
