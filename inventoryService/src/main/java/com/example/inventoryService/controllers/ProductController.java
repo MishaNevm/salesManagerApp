@@ -1,7 +1,9 @@
 package com.example.inventoryService.controllers;
 
 import com.example.inventoryService.dto.ProductDTO;
+import com.example.inventoryService.dto.ProductOrderDTO;
 import com.example.inventoryService.kafka.Producer;
+import com.example.inventoryService.services.ProductOrderService;
 import com.example.inventoryService.services.ProductService;
 import com.example.inventoryService.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +19,13 @@ public class ProductController {
 
     private final ProductService productService;
     private final Producer producer;
+    private final ProductOrderService productOrderService;
 
     @Autowired
-    public ProductController(ProductService productService, Producer producer) {
+    public ProductController(ProductService productService, Producer producer, ProductOrderService productOrderService) {
         this.productService = productService;
         this.producer = producer;
+        this.productOrderService = productOrderService;
     }
 
     @GetMapping
@@ -62,13 +66,11 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @PostMapping("/{id}/add-to-order")
-//    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-//                                                        @RequestParam(value = "order-id", required = false) Integer orderId,
-//                                                        @RequestParam(value = "quantity", required = false) Integer quantity) {
-//        productService.addProductToOrder(productService.findById(id), orderId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
+    @PostMapping("/{id}/add-to-order")
+    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
+        productOrderService.save(productOrderDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 
     @PatchMapping("/{id}/change-order")
     public ResponseEntity<HttpStatus> changeOrderInProduct(@PathVariable("id") int id,

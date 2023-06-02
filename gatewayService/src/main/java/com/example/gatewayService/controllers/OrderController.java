@@ -3,6 +3,8 @@ package com.example.gatewayService.controllers;
 
 import com.example.gatewayService.dto.OrderDTO;
 import com.example.gatewayService.dto.OrderDTOResponse;
+import com.example.gatewayService.dto.ProductDTO;
+import com.example.gatewayService.dto.ProductOrderDTO;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
@@ -60,14 +62,19 @@ public class OrderController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @PostMapping("/{id}/add-product")
-//    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-//                                                        @RequestParam("product-id") Integer productId,
-//                                                        @RequestParam("quantity") Integer quantity) {
-//        orderService.addProductToOrder(orderService.findById(id), productId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-//
+    @PostMapping("/{id}/add-product")
+    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
+                                                        @RequestParam("product-id") Integer productId,
+                                                        @RequestParam("quantity") Integer quantity) {
+        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(productId);
+        productOrderDTO.setProduct(productDTO);
+        productOrderDTO.setOrderId(id);
+        productOrderDTO.setQuantity(quantity);
+        producer.sendRequestToInventoryService(MethodsCodes.ADD_PRODUCT_TO_ORDER, productOrderDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 //    @PatchMapping("/{id}/set-product-quantity")
 //    public ResponseEntity<HttpStatus> setProductQuantity(@PathVariable("id") int id,
 //                                                         @RequestParam(value = "product-id", required = false) Integer productId,

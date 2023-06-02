@@ -1,8 +1,7 @@
 package com.example.Frontend.controllers;
 
 
-import com.example.Frontend.dto.OrderDTO;
-import com.example.Frontend.dto.OrderDTOResponse;
+import com.example.Frontend.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -20,8 +20,10 @@ public class OrderController {
 
     private final RestTemplate restTemplate;
     private final String GET_ALL_ORDERS = "http://localhost:8484/orders";
-    private final String GET_ORDER_BY_ID = "http://localhost:8484/orders/";
+    private final String GET_ALL_PRODUCTS = "http://localhost:8484/products";
+    private final String GET_ORDER_BY_ID = "http://localhost:8484/orders/%d";
     private final String CREATE_ORDER = GET_ALL_ORDERS;
+    private final String ADD_PRODUCT_TO_ORDER = "http://localhost:8484/orders/%d/add-product?product-id=%d&quantity=%d";
     private final String UPDATE_ORDER = GET_ORDER_BY_ID;
     private final String DELETE_ORDER = GET_ORDER_BY_ID;
 
@@ -38,7 +40,7 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("order", restTemplate.getForObject(GET_ORDER_BY_ID + id, OrderDTO.class));
+        model.addAttribute("order", restTemplate.getForObject(String.format(GET_ORDER_BY_ID,id), OrderDTO.class));
         return "order/getOrderById";
     }
 
@@ -60,7 +62,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}/edit")
-    public String update (@PathVariable("id") int id, Model model) throws InterruptedException {
+    public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
         model.addAttribute("order", restTemplate.getForObject(GET_ORDER_BY_ID + id, OrderDTO.class));
         return "order/updateOrder";
     }
@@ -85,13 +87,21 @@ public class OrderController {
         return "redirect:/orders";
     }
 
-//    @PostMapping("/{id}/add-product")
-//    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-//                                                        @RequestParam("product-id") Integer productId,
-//                                                        @RequestParam("quantity") Integer quantity) {
-//        orderService.addProductToOrder(orderService.findById(id), productId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
+    @GetMapping("/{id}/add-product")
+    public String addProductToOrder(@PathVariable("id") int id ,Model model) {
+        model.addAttribute("id", id);
+        model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(GET_ALL_PRODUCTS, ProductDTOResponse.class)).getResponse());
+        return "order/addProductToOrder";
+    }
+
+
+    @PostMapping("/{id}/add-product")
+    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
+                                                        @RequestParam(value = "product-id", required = false) Integer productId,
+                                                        @RequestParam(value = "quantity", required = false) Integer quantity) {
+        restTemplate.exchange(String.format(ADD_PRODUCT_TO_ORDER, id, productId, quantity), HttpMethod.POST, null, HttpStatus.class);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 //
 //    @PatchMapping("/{id}/set-product-quantity")
 //    public ResponseEntity<HttpStatus> setProductQuantity(@PathVariable("id") int id,

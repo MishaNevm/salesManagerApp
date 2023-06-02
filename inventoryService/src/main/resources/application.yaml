@@ -24,6 +24,8 @@ spring:
       client:
         url: http://localhost:8383/admin
       context-path: /admin
+  jpa:
+    show-sql: true
 management:
   endpoints:
     web:

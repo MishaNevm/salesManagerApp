@@ -2,6 +2,7 @@ package com.example.inventoryService.kafka;
 
 import com.example.inventoryService.controllers.ProductController;
 import com.example.inventoryService.dto.ProductDTO;
+import com.example.inventoryService.dto.ProductOrderDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class Consumer {
             case 28 -> productController.save(objectMapper.readValue(consumerRecord.value(), ProductDTO.class));
             case 29 -> productController.update(objectMapper.readValue(consumerRecord.value(), ProductDTO.class));
             case 30 -> productController.delete(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
+            case 31 -> productController.addProductToOrder(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class));
         }
     }
 }

@@ -36,7 +36,8 @@ public enum MethodsCodes {
     GET_PRODUCT_BY_ID(27, true),
     CREATE_PRODUCT(28, false),
     UPDATE_PRODUCT(29, false),
-    DELETE_PRODUCT(30, false);
+    DELETE_PRODUCT(30, false),
+    ADD_PRODUCT_TO_ORDER(31, false);
 
     private final Integer code;
 

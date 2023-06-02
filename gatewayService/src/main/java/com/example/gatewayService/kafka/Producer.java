@@ -65,4 +65,12 @@ public class Producer {
             throw new RuntimeException(e);
         }
     }
+
+    public void sendRequestToInventoryService(MethodsCodes methodsCodes, ProductOrderDTO productOrderDTO) {
+        try {
+            kafkaTemplate.send(INVENTORY_TOPIC_REQUEST, methodsCodes.getCode(), productOrderDTO);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
