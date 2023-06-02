@@ -2,22 +2,17 @@ package com.example.gatewayService.controllers;
 
 import com.example.gatewayService.dto.ProductDTO;
 import com.example.gatewayService.dto.ProductDTOResponse;
-import com.example.gatewayService.dto.UserDTO;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
-import com.example.gatewayService.util.ProductTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Controller
+@RestController
 @RequestMapping("/products")
 public class ProductController {
 
@@ -33,62 +28,37 @@ public class ProductController {
 
 
     @GetMapping
-    public String findAll(Model model) throws InterruptedException {
+    public ProductDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToInventoryService(MethodsCodes.GET_ALL_PRODUCTS, new ProductDTO());
-        model.addAttribute("products", consumer.getResponseMap().get(MethodsCodes.GET_ALL_PRODUCTS).take().getResponse());
-        return "inventory/getAllProducts";
+        return (ProductDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_PRODUCTS).take();
     }
 
     @GetMapping("/{id}")
-    public String findById(@PathVariable("id") int id, Model model) throws InterruptedException {
+    public ProductDTO findById(@PathVariable("id") int id) throws InterruptedException {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(id);
         producer.sendRequestToInventoryService(MethodsCodes.GET_PRODUCT_BY_ID, productDTO);
-        model.addAttribute("product", consumer.getResponseMap().get(MethodsCodes.GET_PRODUCT_BY_ID).take().getResponse().get(0));
-        return "inventory/getProductById";
-    }
-
-    @GetMapping("/new")
-    public String create(Model model) {
-        model.addAttribute("product", new ProductDTO());
-        model.addAttribute("types", ProductTypes.values());
-        return "inventory/createProduct";
+        return (ProductDTO) consumer.getResponseMap().get(MethodsCodes.GET_PRODUCT_BY_ID).take().getResponse().get(0);
     }
 
     @PostMapping
-    public String create(@ModelAttribute("product") @Valid ProductDTO productDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "inventory/createProduct";
-        }
+    public ResponseEntity<HttpStatus> create(@RequestBody @Valid ProductDTO productDTO) {
         producer.sendRequestToInventoryService(MethodsCodes.CREATE_PRODUCT, productDTO);
-        return "redirect:/products";
-    }
-
-    @GetMapping("/{id}/edit")
-    public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(id);
-        producer.sendRequestToInventoryService(MethodsCodes.GET_PRODUCT_BY_ID, productDTO);
-        model.addAttribute("types", ProductTypes.values());
-        model.addAttribute("product", consumer.getResponseMap().get(MethodsCodes.GET_PRODUCT_BY_ID).take().getResponse().get(0));
-        return "inventory/updateProduct";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public String update(@PathVariable("id") int id, @ModelAttribute("product") @Valid ProductDTO productDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "inventory/updateProduct";
-        }
+    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT, productDTO);
-        return "redirect:/products/" + id;
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
+    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(id);
         producer.sendRequestToInventoryService(MethodsCodes.DELETE_PRODUCT, productDTO);
-        return "redirect:/products";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 //    @PostMapping("/{id}/add-to-order")

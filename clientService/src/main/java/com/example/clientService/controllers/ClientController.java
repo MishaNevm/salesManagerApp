@@ -22,15 +22,17 @@ import javax.validation.Valid;
 public class ClientController {
 
     private final ClientService clientService;
+    private final BankService bankService;
     private final ModelMapperUtil modelMapper;
     private final ClientDTOUniqueValidator clientDTOUniqueValidator;
     private final Producer producer;
 
 
     @Autowired
-    public ClientController(ClientService clientService, ModelMapperUtil modelMapper,
+    public ClientController(ClientService clientService, BankService bankService, ModelMapperUtil modelMapper,
                             ClientDTOUniqueValidator clientDTOUniqueValidator, Producer producer) {
         this.clientService = clientService;
+        this.bankService = bankService;
         this.modelMapper = modelMapper;
         this.clientDTOUniqueValidator = clientDTOUniqueValidator;
         this.producer = producer;
@@ -38,8 +40,8 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<HttpStatus> findAll() {
-         producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_CLIENTS.getCode(), clientService.findAll());
-         return ResponseEntity.ok(HttpStatus.OK);
+        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_CLIENTS.getCode(), clientService.findAll());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -73,9 +75,11 @@ public class ClientController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
-        clientService.findById(id);
-        clientService.delete(id);
+    public ResponseEntity<HttpStatus> delete(@RequestBody ClientDTO clientDTO) {
+        if (clientDTO.getBankDTO() != null) {
+            bankService.delete(clientDTO.getBankDTO().getId());
+        }
+        clientService.delete(clientDTO.getId());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

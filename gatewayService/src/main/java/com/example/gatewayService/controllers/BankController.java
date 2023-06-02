@@ -2,15 +2,15 @@ package com.example.gatewayService.controllers;
 
 
 import com.example.gatewayService.dto.BankDTO;
+import com.example.gatewayService.dto.BankDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/banks")
 public class BankController {
     private final Producer producer;
@@ -25,48 +25,32 @@ public class BankController {
 
 
     @GetMapping()
-    public String findAll(Model model) throws InterruptedException {
+    public BankDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.GET_ALL_BANKS, new BankDTO());
-        model.addAttribute("banks", consumer.getResponseMap().get(MethodsCodes.GET_ALL_BANKS).take().getResponse());
-        return "bank/getAllBanks";
+        return (BankDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_BANKS).take();
     }
 
     @GetMapping("/{id}")
-    private String findById(@PathVariable("id") int id, Model model) throws InterruptedException {
+    private BankDTO findById(@PathVariable("id") int id) throws InterruptedException {
         bankDTO = new BankDTO();
         bankDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_BANK_BY_ID, bankDTO);
-        model.addAttribute("bank", consumer.getResponseMap().get(MethodsCodes.GET_BANK_BY_ID).take().getResponse().get(0));
-        return "bank/getBankById";
+        return (BankDTO) consumer.getResponseMap().get(MethodsCodes.GET_BANK_BY_ID).take().getResponse().get(0);
     }
 
-    @GetMapping("/{id}/edit")
-    public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        bankDTO = new BankDTO();
-        bankDTO.setId(id);
-        producer.sendRequestToClientService(MethodsCodes.GET_BANK_BY_ID, bankDTO);
-        model.addAttribute("bank", consumer.getResponseMap().get(MethodsCodes.GET_BANK_BY_ID).take().getResponse().get(0));
-        return "bank/updateBank";
-    }
 
     @PatchMapping("/{id}")
-    public String update(@PathVariable("id") int id, @ModelAttribute("bank") BankDTO bankDTO, BindingResult bindingResult) {
-//        bankDTOUniqueValidator.validate(bankDTO, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return "bank/updateBank";
-        }
+    public ResponseEntity<HttpStatus> update(@RequestBody BankDTO bankDTO) {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_BANK, bankDTO);
-        if (bankDTO.getClientDTO() != null) {
-            return "redirect:/clients/" + bankDTO.getClientDTO().getId();
-        } else return "redirect:/banks/" + id;
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
+    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         bankDTO = new BankDTO();
         bankDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.DELETE_BANK, bankDTO);
-        return "redirect:/banks";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 //    @ExceptionHandler

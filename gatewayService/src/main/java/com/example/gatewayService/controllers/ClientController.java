@@ -8,21 +8,17 @@ import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Controller
+@RestController
 @RequestMapping("/clients")
 public class ClientController {
 
     private final Consumer consumer;
     private final Producer producer;
-
-    private ClientDTO clientDTO;
 
     public ClientController(Consumer consumer, Producer producer) {
         this.consumer = consumer;
@@ -31,81 +27,46 @@ public class ClientController {
 
 
     @GetMapping
-    public String findAll(Model model) throws InterruptedException {
+    public ClientDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.GET_ALL_CLIENTS, new ClientDTO());
-        model.addAttribute("clients", consumer.getResponseMap().get(MethodsCodes.GET_ALL_CLIENTS).take().getResponse());
-        return "client/getAllClients";
+        return (ClientDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_CLIENTS).take();
     }
 
     @GetMapping("/{id}")
-    public String findById(@PathVariable("id") int id, Model model) throws InterruptedException {
-        clientDTO = new ClientDTO();
+    public ClientDTO findById(@PathVariable("id") int id, Model model) throws InterruptedException {
+        ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_CLIENT_BY_ID, clientDTO);
-        model.addAttribute("client", consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).take().getResponse().get(0));
-        return "client/getClientById";
+        return (ClientDTO) consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).take().getResponse().get(0);
     }
 
-    @GetMapping("/new")
-    public String create(@ModelAttribute("client") ClientDTO clientDTO) {
-        return "client/createClient";
-    }
 
     @PostMapping
-    public String create(@ModelAttribute("client") @Valid ClientDTO clientDTO,
-                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "client/createClient";
-        }
+    public ResponseEntity<HttpStatus> create(@RequestBody @Valid ClientDTO clientDTO) {
         producer.sendRequestToClientService(MethodsCodes.CREATE_CLIENT, clientDTO);
-        return "redirect:/clients";
-    }
-
-    @GetMapping("/{id}/addBank")
-    public String createBankToClient(@PathVariable("id") int id, Model model,@ModelAttribute("bank") BankDTO bankDTO) {
-        model.addAttribute("id", id);
-        return "client/createBankToClient";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/{id}")
-    public String createBankToClient(@PathVariable("id") int id, @ModelAttribute("bank") @Valid BankDTO bankDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "client/createBankToClient";
-        }
-        clientDTO = new ClientDTO();
+    public ResponseEntity<HttpStatus> createBankToClient(@PathVariable("id") int id, @RequestBody @Valid BankDTO bankDTO) {
+        ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         bankDTO.setClientDTO(clientDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
-        return "redirect:/clients/" + id;
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/edit")
-    public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        clientDTO = new ClientDTO();
-        clientDTO.setId(id);
-        producer.sendRequestToClientService(MethodsCodes.GET_CLIENT_BY_ID, clientDTO);
-        model.addAttribute("client", consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).take().getResponse().get(0));
-        return "client/updateClient";
-    }
 
     @PatchMapping("/{id}")
-    public String update(@PathVariable("id") int id,
-                         @ModelAttribute("client") @Valid ClientDTO clientDTO,
-                         BindingResult bindingResult) {
-//        clientDTOUniqueValidator.validate(clientDTO, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return "client/updateClient";
-        }
+    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_CLIENT, clientDTO);
-        return "redirect:/clients/" + id;
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
-        clientDTO = new ClientDTO();
-        clientDTO.setId(id);
+    public ResponseEntity<HttpStatus> delete(@RequestBody ClientDTO clientDTO) {
         producer.sendRequestToClientService(MethodsCodes.DELETE_CLIENT, clientDTO);
-        return "redirect:/clients";
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
