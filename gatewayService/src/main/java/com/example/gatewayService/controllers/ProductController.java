@@ -2,6 +2,8 @@ package com.example.gatewayService.controllers;
 
 import com.example.gatewayService.dto.ProductDTO;
 import com.example.gatewayService.dto.ProductDTOResponse;
+import com.example.gatewayService.dto.ProductOrderDTO;
+import com.example.gatewayService.dto.ProductOrderDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
@@ -31,6 +33,14 @@ public class ProductController {
     public ProductDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToInventoryService(MethodsCodes.GET_ALL_PRODUCTS, new ProductDTO());
         return (ProductDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_PRODUCTS).take();
+    }
+
+    @GetMapping("/get-products-by-order")
+    public ProductDTOResponse findAllProductsByOrderId(@RequestParam(value = "order-id", required = false) Integer orderId) throws InterruptedException {
+        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
+        productOrderDTO.setOrderId(orderId);
+        producer.sendRequestToInventoryService(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID, productOrderDTO);
+        return (ProductDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID).take();
     }
 
     @GetMapping("/{id}")

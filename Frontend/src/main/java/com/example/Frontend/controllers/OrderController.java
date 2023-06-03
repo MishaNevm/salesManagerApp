@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -22,10 +21,14 @@ public class OrderController {
     private final String GET_ALL_ORDERS = "http://localhost:8484/orders";
     private final String GET_ALL_PRODUCTS = "http://localhost:8484/products";
     private final String GET_ORDER_BY_ID = "http://localhost:8484/orders/%d";
+    private final String GET_PRODUCTS_BY_ORDER_ID = "http://localhost:8484/products/get-products-by-order?order-id=%d";
     private final String CREATE_ORDER = GET_ALL_ORDERS;
     private final String ADD_PRODUCT_TO_ORDER = "http://localhost:8484/orders/%d/add-product?product-id=%d&quantity=%d";
     private final String UPDATE_ORDER = GET_ORDER_BY_ID;
     private final String DELETE_ORDER = GET_ORDER_BY_ID;
+    private final String DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID = "http://localhost:8484/orders/%d/delete-products";
+    private final String DELETE_PRODUCT_IN_ORDER_BY_ORDER_ID_AND_PRODUCT_ID = "http://localhost:8484/orders/%d/delete-from-order?product-id=%d";
+
 
     @Autowired
     public OrderController(RestTemplate restTemplate) {
@@ -40,7 +43,10 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("order", restTemplate.getForObject(String.format(GET_ORDER_BY_ID,id), OrderDTO.class));
+        model.addAttribute("order", restTemplate.getForObject(String.format(GET_ORDER_BY_ID, id), OrderDTO.class));
+        model.addAttribute("products", Objects.requireNonNull(restTemplate
+                .getForObject(String
+                        .format(GET_PRODUCTS_BY_ORDER_ID, id), ProductDTOResponse.class)).getResponse());
         return "order/getOrderById";
     }
 
@@ -80,15 +86,28 @@ public class OrderController {
         return "redirect:/orders/" + id;
     }
 
+    @DeleteMapping("/{id}/delete-from-order")
+    public String deleteByOrderIdAndProductId(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId) {
+        restTemplate.exchange(String.format(DELETE_PRODUCT_IN_ORDER_BY_ORDER_ID_AND_PRODUCT_ID, orderId, productId), HttpMethod.DELETE, null, HttpStatus.class);
+        return "redirect:/orders/" + orderId;
+    }
+
+    @DeleteMapping("/{id}/delete-products")
+    public String deleteAllProductsByOrderId(@PathVariable("id") int id) {
+        restTemplate.exchange(String.format(DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID, id), HttpMethod.DELETE, null, HttpStatus.class);
+        return "redirect:/orders/" + id;
+    }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        restTemplate.exchange(DELETE_ORDER + id, HttpMethod.DELETE, null, HttpStatus.class);
+        restTemplate.exchange(String.format(DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID, id), HttpMethod.DELETE, null, HttpStatus.class);
+        restTemplate.exchange(String.format(DELETE_ORDER, id), HttpMethod.DELETE, null, HttpStatus.class);
+
         return "redirect:/orders";
     }
 
     @GetMapping("/{id}/add-product")
-    public String addProductToOrder(@PathVariable("id") int id ,Model model) {
+    public String addProductToOrder(@PathVariable("id") int id, Model model) {
         model.addAttribute("id", id);
         model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(GET_ALL_PRODUCTS, ProductDTOResponse.class)).getResponse());
         return "order/addProductToOrder";
@@ -96,11 +115,11 @@ public class OrderController {
 
 
     @PostMapping("/{id}/add-product")
-    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-                                                        @RequestParam(value = "product-id", required = false) Integer productId,
-                                                        @RequestParam(value = "quantity", required = false) Integer quantity) {
+    public String addProductToOrder(@PathVariable("id") int id,
+                                    @RequestParam(value = "product-id", required = false) Integer productId,
+                                    @RequestParam(value = "quantity", required = false) Integer quantity) {
         restTemplate.exchange(String.format(ADD_PRODUCT_TO_ORDER, id, productId, quantity), HttpMethod.POST, null, HttpStatus.class);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return "redirect:/orders/" + id;
     }
 //
 //    @PatchMapping("/{id}/set-product-quantity")

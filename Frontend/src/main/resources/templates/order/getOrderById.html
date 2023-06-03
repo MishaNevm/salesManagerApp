@@ -1,22 +1,51 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Order Details</title>
 </head>
 <body>
-<p th:text="${'Order ID: ' + order.getId()}">VALUE</p>
-<p th:text="${'Client ID: '+ order.getClientId()}">VALUE</p>
-<p th:text="${'Created At: ' + order.getCreatedAt()}">VALUE</p>
-<p th:text="${'Updated At: ' + order.getUpdatedAt()}">VALUE</p>
+<p th:text="${'Order ID: ' + order.id}">VALUE</p>
+<p th:text="${'Client ID: ' + order.clientId}">VALUE</p>
+<p th:text="${'Created At: ' + order.createdAt}">VALUE</p>
+<p th:text="${'Updated At: ' + order.updatedAt}">VALUE</p>
 <br/>
 <hr/>
 <a href="/orders">All orders</a>
 <br/>
-<a th:href="@{/orders/{id}/edit(id=${order.getId()})}">Update</a>
+<a th:href="@{/orders/{id}/edit(id=${order.id})}">Update</a>
 <br/>
-<form th:method="DELETE" th:action="@{/orders/{id}(id=${order.getId()})}" th:object="${order}">
-    <input type="submit" value="Delete">
+<a th:href="@{/orders/{id}/add-product(id=${order.id})}">Add product</a>
+<br/>
+
+<th:block th:if="${not #lists.isEmpty(products)}">
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+        </tr>
+        <tr th:each="product : ${products}">
+            <td th:text="${product.name}"></td>
+            <td th:text="${product.quantity}"></td>
+            <form th:method="DELETE" th:action="@{/orders/{id}/delete-from-order(id=${order.id})}">
+                <input type="hidden" name="product-id" th:value="${product.id}"/>
+                <input type="submit" value="Delete product"/>
+            </form>
+        </tr>
+    </table>
+    <form th:method="DELETE" th:action="@{/orders/{id}/delete-products(id=${order.id})}">
+        <input type="submit" value="Delete products">
+    </form>
+</th:block>
+
+<th:block th:if="${#lists.isEmpty(products)}">
+    <p>No products in the order.</p>
+</th:block>
+<form th:method="DELETE" th:action="@{/orders/{id}(id=${order.id})}" th:object="${order}">
+    <input type="submit" value="Delete order">
 </form>
+
 </body>
 </html>
+
+

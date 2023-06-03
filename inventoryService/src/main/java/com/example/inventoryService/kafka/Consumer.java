@@ -29,11 +29,22 @@ public class Consumer {
         int methodCode = consumerRecord.key();
         switch (methodCode) {
             case 26 -> productController.findAll();
-            case 27 -> productController.findById(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
+            case 27 ->
+                    productController.findById(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
             case 28 -> productController.save(objectMapper.readValue(consumerRecord.value(), ProductDTO.class));
             case 29 -> productController.update(objectMapper.readValue(consumerRecord.value(), ProductDTO.class));
-            case 30 -> productController.delete(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
-            case 31 -> productController.addProductToOrder(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class));
+            case 30 ->
+                    productController.delete(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
+            case 31 ->
+                    productController.addProductToOrder(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class));
+            case 32 ->
+                    productController.findAllProductsByOrderId(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class).getOrderId());
+            case 33 ->
+                    productController.deleteAllProductsInOrderByOrderId(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class).getOrderId());
+            case 34 -> {
+                ProductOrderDTO productOrderDTO = objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class);
+                productController.deleteByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId());
+            }
         }
     }
 }

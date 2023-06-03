@@ -34,6 +34,12 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @GetMapping("/get-products-by-order")
+    public ResponseEntity<HttpStatus> findAllProductsByOrderId(@RequestParam(value = "order-id", required = false) Integer orderId) {
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID.getCode(), productOrderService.findByOrderId(orderId));
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
         producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCT_BY_ID.getCode(), productService.findById(id));
@@ -52,10 +58,14 @@ public class ProductController {
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
         productDTO.setCreatedAt(productService.findById(productDTO.getId()).getResponse().get(0).getCreatedAt());
-//        if (bindingResult.hasErrors()) {
-//            throw new ProductNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
         productService.update(productDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+
+    @PostMapping("/{id}/add-to-order")
+    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
+        productOrderService.save(productOrderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -66,21 +76,17 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/add-to-order")
-    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
-        productOrderService.save(productOrderDTO);
+    @DeleteMapping("/{id}/delete-from-order")
+    public ResponseEntity<HttpStatus> deleteByOrderIdAndProductId(@RequestParam(value = "orderId", required = false) Integer orderId, @PathVariable("id") int productId) {
+        productOrderService.deleteByOrderIdAndProductId(orderId, productId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PatchMapping("/{id}/change-order")
-    public ResponseEntity<HttpStatus> changeOrderInProduct(@PathVariable("id") int id,
-                                                           @RequestParam(value = "old-order-id", required = false) Integer oldOrderId,
-                                                           @RequestParam(value = "new-order-id", required = false) Integer newOrderId) {
-        productService.findById(id);
-//        productService.changeOrderInProduct(id, oldOrderId, newOrderId);
+    @DeleteMapping()
+    public ResponseEntity<HttpStatus> deleteAllProductsInOrderByOrderId(@RequestParam(value = "orderId", required = false) Integer orderId) {
+        productOrderService.deleteAllProductsByOrderId(orderId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotSaveException e) {

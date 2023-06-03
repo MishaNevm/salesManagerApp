@@ -1,7 +1,6 @@
 package com.example.gatewayService.util;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 public enum MethodsCodes {
 
@@ -37,7 +36,10 @@ public enum MethodsCodes {
     CREATE_PRODUCT(28, false),
     UPDATE_PRODUCT(29, false),
     DELETE_PRODUCT(30, false),
-    ADD_PRODUCT_TO_ORDER(31, false);
+    ADD_PRODUCT_TO_ORDER(31, false),
+    GET_PRODUCTS_BY_ORDER_ID(32, true),
+    DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID(33, false),
+    DELETE_PRODUCT_BY_ORDER_ID_AND_PRODUCT_ID(34, false);
 
     private final Integer code;
 

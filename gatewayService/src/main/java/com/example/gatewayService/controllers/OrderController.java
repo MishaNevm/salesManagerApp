@@ -53,6 +53,25 @@ public class OrderController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}/delete-from-order")
+    public ResponseEntity<HttpStatus> deleteByOrderIdAndProductId(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId) {
+        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
+        productOrderDTO.setOrderId(orderId);
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(productId);
+        productOrderDTO.setProduct(productDTO);
+        producer.sendRequestToInventoryService(MethodsCodes.DELETE_PRODUCT_BY_ORDER_ID_AND_PRODUCT_ID, productOrderDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/delete-products")
+    public ResponseEntity<HttpStatus> deleteProductsInOrderByOrderId(@PathVariable("id") int id) {
+        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
+        productOrderDTO.setOrderId(id);
+        producer.sendRequestToInventoryService(MethodsCodes.DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID, productOrderDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
@@ -80,18 +99,6 @@ public class OrderController {
 //                                                         @RequestParam(value = "product-id", required = false) Integer productId,
 //                                                         @RequestParam(value = "quantity", required = false) Integer quantity) {
 //        orderService.setQuantityProductInOrder(id, productId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-//
-//    @DeleteMapping("/{id}/deleteProduct")
-//    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("id") int id,
-//                                                    @RequestParam(value = "product-id", required = false) Integer productId) {
-//        orderService.findById(id);
-//        if (productId == null) {
-//            orderService.deleteAllProductsFromOrder(id);
-//        } else {
-//            orderService.deleteProductFromOrder(id, productId);
-//        }
 //        return ResponseEntity.ok(HttpStatus.OK);
 //    }
 
