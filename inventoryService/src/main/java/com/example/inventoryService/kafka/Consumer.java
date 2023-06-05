@@ -45,6 +45,8 @@ public class Consumer {
                 ProductOrderDTO productOrderDTO = objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class);
                 productController.deleteByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId());
             }
+            case 35 ->
+                    productController.updateProductQuantityInOrder(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class));
         }
     }
 }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -29,6 +31,10 @@ public class OrderController {
     private final String DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID = "http://localhost:8484/orders/%d/delete-products";
     private final String DELETE_PRODUCT_IN_ORDER_BY_ORDER_ID_AND_PRODUCT_ID = "http://localhost:8484/orders/%d/delete-from-order?product-id=%d";
 
+    private final String UPDATE_PRODUCT_QUANTITY_IN_ORDER = "http://localhost:8484/orders/%d/update-product-quantity?product-id=%d&quantity=%d";
+
+    private List<ProductDTO> productDTOList;
+
 
     @Autowired
     public OrderController(RestTemplate restTemplate) {
@@ -44,9 +50,10 @@ public class OrderController {
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
         model.addAttribute("order", restTemplate.getForObject(String.format(GET_ORDER_BY_ID, id), OrderDTO.class));
-        model.addAttribute("products", Objects.requireNonNull(restTemplate
+        productDTOList = Objects.requireNonNull(restTemplate
                 .getForObject(String
-                        .format(GET_PRODUCTS_BY_ORDER_ID, id), ProductDTOResponse.class)).getResponse());
+                        .format(GET_PRODUCTS_BY_ORDER_ID, id), ProductDTOResponse.class)).getResponse();
+        model.addAttribute("products", productDTOList);
         return "order/getOrderById";
     }
 
@@ -69,7 +76,7 @@ public class OrderController {
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        model.addAttribute("order", restTemplate.getForObject(GET_ORDER_BY_ID + id, OrderDTO.class));
+        model.addAttribute("order", restTemplate.getForObject(String.format(UPDATE_ORDER, id), OrderDTO.class));
         return "order/updateOrder";
     }
 
@@ -86,16 +93,32 @@ public class OrderController {
         return "redirect:/orders/" + id;
     }
 
+    @GetMapping("/{id}/update-product-quantity")
+    public String updateProductQuantityInOrder(Model model, @PathVariable("id") int orderId) {
+        model.addAttribute("orderId", orderId);
+        model.addAttribute("products", productDTOList);
+        return "order/updateProductInOrder";
+    }
+
+    @PatchMapping("/{id}/update-product-quantity")
+    public String updateProductQuantityInOrder(@PathVariable("id") int orderId,
+                                               @RequestParam(value = "product-id", required = false) Integer productId,
+                                               @RequestParam(value = "quantity", required = false) Integer quantity) {
+        restTemplate.exchange(String.format(UPDATE_PRODUCT_QUANTITY_IN_ORDER, orderId, productId, quantity), HttpMethod.PATCH, null, HttpStatus.class);
+        productDTOList = null;
+        return "redirect:/orders/" + orderId;
+    }
+
     @DeleteMapping("/{id}/delete-from-order")
-    public String deleteByOrderIdAndProductId(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId) {
+    public String deleteProductInOrderByOrderIdAndProductId(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId) {
         restTemplate.exchange(String.format(DELETE_PRODUCT_IN_ORDER_BY_ORDER_ID_AND_PRODUCT_ID, orderId, productId), HttpMethod.DELETE, null, HttpStatus.class);
         return "redirect:/orders/" + orderId;
     }
 
     @DeleteMapping("/{id}/delete-products")
-    public String deleteAllProductsByOrderId(@PathVariable("id") int id) {
-        restTemplate.exchange(String.format(DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID, id), HttpMethod.DELETE, null, HttpStatus.class);
-        return "redirect:/orders/" + id;
+    public String deleteAllProductsInOrder(@PathVariable("id") int orderId) {
+        restTemplate.exchange(String.format(DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID, orderId), HttpMethod.DELETE, null, HttpStatus.class);
+        return "redirect:/orders/" + orderId;
     }
 
     @DeleteMapping("/{id}")
@@ -121,26 +144,6 @@ public class OrderController {
         restTemplate.exchange(String.format(ADD_PRODUCT_TO_ORDER, id, productId, quantity), HttpMethod.POST, null, HttpStatus.class);
         return "redirect:/orders/" + id;
     }
-//
-//    @PatchMapping("/{id}/set-product-quantity")
-//    public ResponseEntity<HttpStatus> setProductQuantity(@PathVariable("id") int id,
-//                                                         @RequestParam(value = "product-id", required = false) Integer productId,
-//                                                         @RequestParam(value = "quantity", required = false) Integer quantity) {
-//        orderService.setQuantityProductInOrder(id, productId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-//
-//    @DeleteMapping("/{id}/deleteProduct")
-//    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("id") int id,
-//                                                    @RequestParam(value = "product-id", required = false) Integer productId) {
-//        orderService.findById(id);
-//        if (productId == null) {
-//            orderService.deleteAllProductsFromOrder(id);
-//        } else {
-//            orderService.deleteProductFromOrder(id, productId);
-//        }
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
 
 
 //    @ExceptionHandler

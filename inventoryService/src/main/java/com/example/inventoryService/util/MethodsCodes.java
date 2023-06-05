@@ -9,7 +9,8 @@ public enum MethodsCodes {
     ADD_PRODUCT_TO_ORDER(31, false),
     GET_PRODUCTS_BY_ORDER_ID(32, true),
     DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID(33, false),
-    DELETE_PRODUCT_BY_ORDER_ID_AND_PRODUCT_ID(34, false);
+    DELETE_PRODUCT_BY_ORDER_ID_AND_PRODUCT_ID(34, false),
+    UPDATE_PRODUCT_QUANTITY_IN_ORDER(35, false);
 
     private final Integer code;
 

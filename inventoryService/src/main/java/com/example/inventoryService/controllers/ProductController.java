@@ -54,7 +54,11 @@ public class ProductController {
         productService.save(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
+    @PostMapping("/{id}/add-to-order")
+    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
+        productOrderService.save(productOrderDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
         productDTO.setCreatedAt(productService.findById(productDTO.getId()).getResponse().get(0).getCreatedAt());
@@ -62,12 +66,12 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-
-    @PostMapping("/{id}/add-to-order")
-    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
-        productOrderService.save(productOrderDTO);
+    @PatchMapping("/update-quantity-in-order")
+    public ResponseEntity<HttpStatus> updateProductQuantityInOrder (ProductOrderDTO productOrderDTO) {
+        productOrderService.updateProductQuantityInOrder(productOrderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {

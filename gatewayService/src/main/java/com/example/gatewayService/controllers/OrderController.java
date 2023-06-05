@@ -53,6 +53,19 @@ public class OrderController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @PatchMapping("/{id}/update-product-quantity")
+    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId,
+                                                                   @RequestParam(value = "quantity", required = false) Integer quantity) {
+        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
+        productOrderDTO.setOrderId(orderId);
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(productId);
+        productOrderDTO.setProduct(productDTO);
+        productOrderDTO.setQuantity(quantity);
+        producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, productOrderDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}/delete-from-order")
     public ResponseEntity<HttpStatus> deleteByOrderIdAndProductId(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId) {
         ProductOrderDTO productOrderDTO = new ProductOrderDTO();

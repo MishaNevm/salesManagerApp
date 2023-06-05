@@ -3,7 +3,6 @@ package com.example.gatewayService.controllers;
 import com.example.gatewayService.dto.ProductDTO;
 import com.example.gatewayService.dto.ProductDTOResponse;
 import com.example.gatewayService.dto.ProductOrderDTO;
-import com.example.gatewayService.dto.ProductOrderDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.MethodsCodes;
@@ -62,6 +61,7 @@ public class ProductController {
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT, productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {

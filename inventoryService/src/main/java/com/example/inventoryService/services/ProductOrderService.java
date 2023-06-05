@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class ProductOrderService {
 
     private final ProductOrderRepository productOrderRepository;
@@ -32,6 +32,7 @@ public class ProductOrderService {
         this.productRepository = productRepository;
     }
 
+    @Transactional(readOnly = true)
     public ProductDTOResponse findByOrderId(int orderId) {
         List<ProductOrder> productOrders = productOrderRepository.findByOrderId(orderId);
         if (productOrders.isEmpty()) return new ProductDTOResponse();
@@ -45,19 +46,28 @@ public class ProductOrderService {
         return productDTOResponse;
     }
 
-    @Transactional
     public void save(ProductOrderDTO productOrderDTO) {
-        productRepository.findById(productOrderDTO.getProduct().getId()).ifPresent(a -> a.setQuantity(a.getQuantity() - productOrderDTO.getQuantity()));
         Optional<ProductOrder> productOrderOptional = productOrderRepository.findByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId());
         if (productOrderOptional.isPresent()) {
             ProductOrder productOrder = productOrderOptional.get();
             Product product = productOrder.getProduct();
             product.setQuantity(product.getQuantity() - productOrderDTO.getQuantity());
             productOrder.setQuantity(productOrder.getQuantity() + productOrderDTO.getQuantity());
-        } else productOrderRepository.save(modelMapperUtil.convertProductOrderDTOToProductOrder(productOrderDTO));
+        } else {
+            productRepository.findById(productOrderDTO.getProduct().getId()).ifPresent(a -> a.setQuantity(a.getQuantity() - productOrderDTO.getQuantity()));
+            productOrderRepository.save(modelMapperUtil.convertProductOrderDTOToProductOrder(productOrderDTO));
+        }
     }
 
-    @Transactional
+
+    public void updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
+        productOrderRepository.findByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId()).ifPresent(a -> {
+            Product product = a.getProduct();
+            product.setQuantity(product.getQuantity() + a.getQuantity() - productOrderDTO.getQuantity());
+            a.setQuantity(productOrderDTO.getQuantity());
+        });
+    }
+
     public void deleteAllProductsByOrderId(int orderId) {
         List<ProductOrder> productOrders = productOrderRepository.findByOrderId(orderId);
         if (!productOrders.isEmpty()) {
@@ -69,7 +79,6 @@ public class ProductOrderService {
         }
     }
 
-    @Transactional
     public void deleteByOrderIdAndProductId(int orderId, int productId) {
         productOrderRepository.findByOrderIdAndProductId(orderId, productId).ifPresent(a -> {
             Product product = a.getProduct();

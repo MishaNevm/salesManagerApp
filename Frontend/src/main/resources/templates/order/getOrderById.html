@@ -36,6 +36,8 @@
     <form th:method="DELETE" th:action="@{/orders/{id}/delete-products(id=${order.id})}">
         <input type="submit" value="Delete products">
     </form>
+    <br/>
+    <a th:href="@{/orders/{id}/update-product-quantity(id=${order.id})}">Update product quantity</a>
 </th:block>
 
 <th:block th:if="${#lists.isEmpty(products)}">
@@ -44,6 +46,7 @@
 <form th:method="DELETE" th:action="@{/orders/{id}(id=${order.id})}" th:object="${order}">
     <input type="submit" value="Delete order">
 </form>
+<br/>
 
 </body>
 </html>
