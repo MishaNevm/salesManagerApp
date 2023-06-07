@@ -47,6 +47,13 @@ public class OrderService {
         return orderDTOResponse;
     }
 
+    @Transactional(readOnly = true)
+    public OrderDTOResponse findByClientId(int clientId) {
+        OrderDTOResponse orderDTOResponse = new OrderDTOResponse();
+        orderDTOResponse.setResponse(orderRepository.findByClientId(clientId).stream().map(modelMapperUtil::convertOrderToOrderDTO).toList());
+        return orderDTOResponse;
+    }
+
     public void save(OrderDTO orderDTO) {
         Order order = modelMapperUtil.convertOrderDTOToOrder(orderDTO);
         order.setCreatedAt(new Date());

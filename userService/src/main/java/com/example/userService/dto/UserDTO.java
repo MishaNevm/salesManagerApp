@@ -29,9 +29,11 @@ public class UserDTO {
     @Email(message = "Почта должна быть в формате текст@текст.com/ru")
     private String email;
 
+    private String password;
+
     private Date createdAt;
 
-//    @NotEmpty(message = "Дата рождения должна быть не пустой")
+    //    @NotEmpty(message = "Дата рождения должна быть не пустой")
     @Past(message = "Дата рождения должна быть в прошлом")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
@@ -74,6 +76,14 @@ public class UserDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Date getCreatedAt() {

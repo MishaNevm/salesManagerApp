@@ -2,14 +2,15 @@ package com.example.gatewayService.kafka;
 
 import com.example.gatewayService.dto.*;
 import com.example.gatewayService.util.CustomResponse;
+import com.example.gatewayService.util.ErrorResponse;
 import com.example.gatewayService.util.MethodsCodes;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -23,14 +24,18 @@ public class Consumer {
     private final ObjectMapper objectMapper;
 
     private final Map<MethodsCodes, BlockingQueue<CustomResponse<?>>> responseMap;
+    private final Map<MethodsCodes, BlockingQueue<ErrorResponse>> bindingResultResponseMap;
 
     @Autowired
     public Consumer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         responseMap = new HashMap<>();
+        bindingResultResponseMap = new HashMap<>();
         for (MethodsCodes methodsCode : MethodsCodes.values()) {
-            if (methodsCode.isHasResponse()) {
-                responseMap.put(methodsCode, new ArrayBlockingQueue<>(300));
+            if (methodsCode.isHasModelResponse()) {
+                responseMap.put(methodsCode, new ArrayBlockingQueue<>(100));
+            } else {
+                bindingResultResponseMap.put(methodsCode, new ArrayBlockingQueue<>(100));
             }
         }
     }
@@ -41,7 +46,10 @@ public class Consumer {
         try {
             MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
             if (methodsCodes != null) {
-                responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), UserDTOResponse.class));
+                if (methodsCodes.isHasModelResponse()) {
+                    responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), UserDTOResponse.class));
+                } else
+                    bindingResultResponseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ErrorResponse.class));
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -53,9 +61,15 @@ public class Consumer {
         try {
             MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
             if (methodsCodes != null) {
-                if (methodsCodes.getCode() < MethodsCodes.GET_ALL_BANKS.getCode()) {
-                    responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ClientDTOResponse.class));
-                } else responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), BankDTOResponse.class));
+                if (methodsCodes.isHasModelResponse()) {
+                    if (methodsCodes.getCode() < MethodsCodes.GET_ALL_BANKS.getCode()) {
+                        responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ClientDTOResponse.class));
+                    } else {
+                        responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), BankDTOResponse.class));
+                    }
+                } else {
+                    bindingResultResponseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ErrorResponse.class));
+                }
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -63,11 +77,11 @@ public class Consumer {
     }
 
     @KafkaListener(topics = "${application.kafka.orderTopicResponse}")
-    public void listenOrderTopic(ConsumerRecord<Integer, byte[]> consumerRecord){
+    public void listenOrderTopic(ConsumerRecord<Integer, byte[]> consumerRecord) {
         try {
             MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
             if (methodsCodes != null) {
-                    responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), OrderDTOResponse.class));
+                responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), OrderDTOResponse.class));
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -75,7 +89,7 @@ public class Consumer {
     }
 
     @KafkaListener(topics = "${application.kafka.inventoryTopicResponse}")
-    public void listenInventoryTopic(ConsumerRecord<Integer, byte[]> consumerRecord){
+    public void listenInventoryTopic(ConsumerRecord<Integer, byte[]> consumerRecord) {
         try {
             MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
             if (methodsCodes != null) {
@@ -88,5 +102,9 @@ public class Consumer {
 
     public Map<MethodsCodes, BlockingQueue<CustomResponse<?>>> getResponseMap() {
         return responseMap;
+    }
+
+    public Map<MethodsCodes, BlockingQueue<ErrorResponse>> getBindingResultResponseMap() {
+        return bindingResultResponseMap;
     }
 }

@@ -5,13 +5,17 @@ import com.example.gatewayService.dto.ClientDTO;
 import com.example.gatewayService.dto.ClientDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
+import com.example.gatewayService.util.ErrorResponse;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/clients")
@@ -48,12 +52,12 @@ public class ClientController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<HttpStatus> createBankToClient(@PathVariable("id") int id, @RequestBody @Valid BankDTO bankDTO) {
+    public ErrorResponse createBankToClient(@PathVariable("id") int id, @RequestBody @Valid BankDTO bankDTO) throws InterruptedException {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         bankDTO.setClientDTO(clientDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return consumer.getBindingResultResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
     }
 
 

@@ -40,22 +40,19 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<HttpStatus> findAll() {
-        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_CLIENTS.getCode(), clientService.findAll());
+        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_CLIENTS, clientService.findAll());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
-        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_CLIENT_BY_ID.getCode(), clientService.findById(id));
+        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_CLIENT_BY_ID, clientService.findById(id));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping
     public int create(@RequestBody @Valid ClientDTO clientDTO) {
-//        clientDTOUniqueValidator.validate(clientDTO, bindingResult);
-//                if (bindingResult.hasErrors()) {
-//            throw new ClientNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
+
         Client client = modelMapper.convertClientDTOToClient(clientDTO);
         clientService.save(client);
         return client.getId();
@@ -64,11 +61,6 @@ public class ClientController {
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) {
         clientDTO.setCreatedAt(clientService.findById(clientDTO.getId()).getResponse().get(0).getCreatedAt());
-//        clientDTO.setId(id);
-//        clientDTOUniqueValidator.validate(clientDTO, bindingResult);
-//        if (bindingResult.hasErrors()) {
-//            throw new ClientNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
         Client client = modelMapper.convertClientDTOToClient(clientDTO);
         clientService.update(client);
         return ResponseEntity.ok(HttpStatus.OK);
@@ -81,23 +73,5 @@ public class ClientController {
         }
         clientService.delete(clientDTO.getId());
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ClientNotSaveException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ClientNotFoundException e) {
-        return new ResponseEntity<>(new ErrorResponse("Клиент не найден"), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(InvalidFormatException e) {
-        return new ResponseEntity<>
-                (new ErrorResponse("Тип юридического лица должен быть один из: IP, OOO, AO, ZAO, NKO, PAO, KFH")
-                        , HttpStatus.BAD_REQUEST);
     }
 }

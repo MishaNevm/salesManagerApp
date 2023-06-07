@@ -13,18 +13,18 @@ public enum MethodsCodes {
 
     private final Integer code;
 
-    private final boolean hasResponse;
+    private final boolean hasModelResponse;
 
     public Integer getCode() {
         return code;
     }
 
-    public boolean isHasResponse() {
-        return hasResponse;
+    public boolean isHasModelResponse() {
+        return hasModelResponse;
     }
 
-    MethodsCodes(Integer code, boolean hasResponse) {
+    MethodsCodes(Integer code, boolean hasModelResponse) {
         this.code = code;
-        this.hasResponse = hasResponse;
+        this.hasModelResponse = hasModelResponse;
     }
 }

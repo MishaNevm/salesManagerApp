@@ -2,9 +2,13 @@ package com.example.clientService.kafka;
 
 import com.example.clientService.dto.BankDTOResponse;
 import com.example.clientService.dto.ClientDTOResponse;
+import com.example.clientService.util.ErrorResponse;
+import com.example.clientService.util.MethodsCodes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 @Component
 public class Producer {
@@ -17,11 +21,15 @@ public class Producer {
         CLIENT_TOPIC_RESPONSE = clientTopicResponse;
     }
 
-    public void sendMessageToClientTopicResponse(Integer methodCode, ClientDTOResponse clientDTOResponse) {
-        kafkaTemplate.send(CLIENT_TOPIC_RESPONSE, methodCode, clientDTOResponse);
+    public void sendMessageToClientTopicResponse(MethodsCodes methodCode, ClientDTOResponse clientDTOResponse) {
+        kafkaTemplate.send(CLIENT_TOPIC_RESPONSE, methodCode.getCode(), clientDTOResponse);
     }
-    public void sendMessageToClientTopicResponse(Integer methodCode, BankDTOResponse bankDTOResponse) {
-        kafkaTemplate.send(CLIENT_TOPIC_RESPONSE, methodCode, bankDTOResponse);
+    public void sendMessageToClientTopicResponse(MethodsCodes methodCode, BankDTOResponse bankDTOResponse) {
+        kafkaTemplate.send(CLIENT_TOPIC_RESPONSE, methodCode.getCode(), bankDTOResponse);
+    }
+
+    public void sendMessageToClientTopicResponse(MethodsCodes methodCode, ErrorResponse errorResponse) {
+        kafkaTemplate.send(CLIENT_TOPIC_RESPONSE, methodCode.getCode(), errorResponse);
     }
 
 }

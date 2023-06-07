@@ -22,10 +22,10 @@
     <input type="email" th:field="*{email}" id="email"/>
     <div style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Error</div>
     <br/>
-<!--    <label for="password">Password: </label>-->
-<!--    <input type="password" th:field="*{password}" id="password"/>-->
-<!--    <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</div>-->
-<!--    <br/>-->
+    <label for="password">Password: </label>
+    <input type="password" th:field="*{password}" id="password"/>
+    <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</div>
+    <br/>
     <label for="dateOfBirth">Date of Birth: </label>
     <input type="date" th:field="*{dateOfBirth}" id="dateOfBirth"/>
     <div style="color:red" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}">Error</div>

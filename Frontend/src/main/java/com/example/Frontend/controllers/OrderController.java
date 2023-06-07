@@ -20,18 +20,18 @@ import java.util.Objects;
 public class OrderController {
 
     private final RestTemplate restTemplate;
-    private final String GET_ALL_ORDERS = "http://localhost:8484/orders";
-    private final String GET_ALL_PRODUCTS = "http://localhost:8484/products";
-    private final String GET_ORDER_BY_ID = "http://localhost:8484/orders/%d";
-    private final String GET_PRODUCTS_BY_ORDER_ID = "http://localhost:8484/products/get-products-by-order?order-id=%d";
-    private final String CREATE_ORDER = GET_ALL_ORDERS;
-    private final String ADD_PRODUCT_TO_ORDER = "http://localhost:8484/orders/%d/add-product?product-id=%d&quantity=%d";
-    private final String UPDATE_ORDER = GET_ORDER_BY_ID;
-    private final String DELETE_ORDER = GET_ORDER_BY_ID;
-    private final String DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID = "http://localhost:8484/orders/%d/delete-products";
-    private final String DELETE_PRODUCT_IN_ORDER_BY_ORDER_ID_AND_PRODUCT_ID = "http://localhost:8484/orders/%d/delete-from-order?product-id=%d";
-
-    private final String UPDATE_PRODUCT_QUANTITY_IN_ORDER = "http://localhost:8484/orders/%d/update-product-quantity?product-id=%d&quantity=%d";
+    protected static final String GET_ALL_ORDERS = "http://localhost:8484/orders";
+    protected static final String GET_ALL_PRODUCTS = "http://localhost:8484/products";
+    protected static final String GET_ORDER_BY_ID = "http://localhost:8484/orders/%d";
+    protected static final String GET_PRODUCTS_BY_ORDER_ID = "http://localhost:8484/products/get-products-by-order?order-id=%d";
+    protected static final String CREATE_ORDER = "http://localhost:8484/orders?client-id=%d";
+    protected static final String ADD_PRODUCT_TO_ORDER = "http://localhost:8484/orders/%d/add-product?product-id=%d&quantity=%d";
+    protected static final String UPDATE_ORDER = "http://localhost:8484/orders/%d?client-id=%d";
+    protected static final String DELETE_ORDER = GET_ORDER_BY_ID;
+    protected static final String DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID = "http://localhost:8484/orders/%d/delete-products";
+    protected static final String DELETE_PRODUCT_IN_ORDER_BY_ORDER_ID_AND_PRODUCT_ID = "http://localhost:8484/orders/%d/delete-from-order?product-id=%d";
+    protected static final String UPDATE_PRODUCT_QUANTITY_IN_ORDER = "http://localhost:8484/orders/%d/update-product-quantity?product-id=%d&quantity=%d";
+    protected static final String GET_ORDERS_BY_CLIENT_ID = "http://localhost:8484/orders?client-id=%d";
 
     private List<ProductDTO> productDTOList;
 
@@ -58,39 +58,34 @@ public class OrderController {
     }
 
     @GetMapping("/new")
-    public String create(@ModelAttribute("order") OrderDTO orderDTO) {
+    public String create(Model model) {
+        model.addAttribute("clients", Objects
+                .requireNonNull(restTemplate
+                        .getForObject(ClientController.GET_ALL_CLIENTS, ClientDTOResponse.class))
+                .getResponse());
         return "order/createOrder";
     }
 
     @PostMapping
-    public String create(@ModelAttribute("order") @Valid OrderDTO orderDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "order/createOrder";
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<OrderDTO> entity = new HttpEntity<>(orderDTO, headers);
-        restTemplate.exchange(CREATE_ORDER, HttpMethod.POST, entity, HttpStatus.class);
+    public String create(@RequestParam("client-id") int clientId) {
+        restTemplate.exchange(String.format(CREATE_ORDER, clientId), HttpMethod.POST, null, HttpStatus.class);
         return "redirect:/orders";
     }
 
     @GetMapping("/{id}/edit")
-    public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        model.addAttribute("order", restTemplate.getForObject(String.format(UPDATE_ORDER, id), OrderDTO.class));
+    public String update(@PathVariable("id") int orderId, Model model) throws InterruptedException {
+        model.addAttribute("id", orderId);
+        model.addAttribute("clients", Objects
+                .requireNonNull(restTemplate
+                        .getForObject(ClientController.GET_ALL_CLIENTS, ClientDTOResponse.class))
+                .getResponse());
         return "order/updateOrder";
     }
 
     @PatchMapping("/{id}")
-    public String update(@PathVariable("id") int id, @ModelAttribute("order") @Valid OrderDTO orderDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "order/updateOrder";
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<OrderDTO> entity = new HttpEntity<>(orderDTO, headers);
-        restTemplate.exchange(UPDATE_ORDER + id, HttpMethod.PATCH, entity, HttpStatus.class);
-        return "redirect:/orders/" + id;
+    public String update(@PathVariable("id") int orderId, @RequestParam(value = "client-id", required = false) int clientId) {
+        restTemplate.exchange(String.format(UPDATE_ORDER, orderId, clientId), HttpMethod.PATCH, null, HttpStatus.class);
+        return "redirect:/orders/" + orderId;
     }
 
     @GetMapping("/{id}/update-product-quantity")

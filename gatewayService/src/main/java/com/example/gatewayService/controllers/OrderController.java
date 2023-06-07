@@ -27,9 +27,16 @@ public class OrderController {
     }
 
     @GetMapping
-    public OrderDTOResponse findAll() throws InterruptedException {
-        producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
-        return (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).take();
+    public OrderDTOResponse findAll(@RequestParam(value = "client-id", required = false) Integer clientId) throws InterruptedException {
+        OrderDTOResponse orderDTOResponse;
+        if (clientId != null) {
+            producer.sendRequestToOrderService(MethodsCodes.GET_ORDERS_BY_CLIENT_ID, clientId);
+            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ORDERS_BY_CLIENT_ID).take();
+        } else {
+            producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
+            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).take();
+        }
+        return orderDTOResponse;
     }
 
     @GetMapping("/{id}")
@@ -42,13 +49,18 @@ public class OrderController {
 
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid OrderDTO orderDTO) {
+    public ResponseEntity<HttpStatus> create(@RequestParam(value = "client-id", required = false) int clientId) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setClientId(clientId);
         producer.sendRequestToOrderService(MethodsCodes.CREATE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody @Valid OrderDTO orderDTO) {
+    public ResponseEntity<HttpStatus> update(@PathVariable("id") int orderId, @RequestParam(value = "client-id", required = false) int clientId) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setId(orderId);
+        orderDTO.setClientId(clientId);
         producer.sendRequestToOrderService(MethodsCodes.UPDATE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -107,14 +119,6 @@ public class OrderController {
         producer.sendRequestToInventoryService(MethodsCodes.ADD_PRODUCT_TO_ORDER, productOrderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-//    @PatchMapping("/{id}/set-product-quantity")
-//    public ResponseEntity<HttpStatus> setProductQuantity(@PathVariable("id") int id,
-//                                                         @RequestParam(value = "product-id", required = false) Integer productId,
-//                                                         @RequestParam(value = "quantity", required = false) Integer quantity) {
-//        orderService.setQuantityProductInOrder(id, productId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-
 
 //    @ExceptionHandler
 //    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotFoundException e) {
@@ -124,16 +128,5 @@ public class OrderController {
 //    @ExceptionHandler
 //    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotCreatedException e) {
 //        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
-
-//    private Order checkRequest(Integer clientId, OrderDTO orderDTO, BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            throw new OrderNotCreatedException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
-//        Order order = modelMapperUtil.convertOrderDTOToOrder(orderDTO);
-//        if (clientId != null) {
-//            order.setClientId(clientId);
-//        }
-//        return order;
 //    }
 }

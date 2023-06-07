@@ -1,16 +1,19 @@
 package com.example.clientService.controllers;
 
-import com.example.clientService.dao.ClientDAO;
 import com.example.clientService.dto.BankDTO;
 import com.example.clientService.kafka.Producer;
-import com.example.clientService.models.Bank;
 import com.example.clientService.services.BankService;
 import com.example.clientService.util.*;
-import com.example.clientService.util.bankUtil.*;
+import com.example.clientService.util.bankUtil.BankDTOUniqueValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/banks")
@@ -18,48 +21,53 @@ public class BankController {
 
     private final Producer producer;
     private final BankService bankService;
-    private final ClientDAO clientDAO;
-    private final ModelMapperUtil modelMapper;
+    private final BankDTOUniqueValidator bankDTOUniqueValidator;
+
 
     @Autowired
-    public BankController(Producer producer, BankService bankService, ClientDAO clientDAO, ModelMapperUtil modelMapper) {
+    public BankController(Producer producer, BankService bankService, BankDTOUniqueValidator bankDTOUniqueValidator) {
         this.producer = producer;
         this.bankService = bankService;
-        this.clientDAO = clientDAO;
-        this.modelMapper = modelMapper;
+        this.bankDTOUniqueValidator = bankDTOUniqueValidator;
     }
 
 
     @GetMapping()
     public ResponseEntity<HttpStatus> findAll() {
-        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_BANKS.getCode(), bankService.findAll());
+        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_BANKS, bankService.findAll());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
-        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_BANK_BY_ID.getCode(), bankService.findById(id));
+        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_BANK_BY_ID, bankService.findById(id));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/{id}")
     public ResponseEntity<HttpStatus> create(@RequestBody BankDTO bankDTO) {
-//        if (bindingResult.hasErrors()) {
-//            throw new BankNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
-        Bank bank = modelMapper.convertBankDTOToBank(bankDTO);
-//        bank.setClient(clientDAO.loadClientById(clientId));
-        bankService.save(bank);
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(bankDTO, "bank");
+        bankDTOUniqueValidator.validate(bankDTO, bindingResult);
+        if (!bindingResult.hasErrors()) {
+            bankService.save(bankDTO);
+        }
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setFieldErrorList(new ArrayList<>());
+        bindingResult.getFieldErrors().forEach(a -> {
+            ErrorMessage errorMessage = new ErrorMessage();
+            errorMessage.setField(a.getField());
+            errorMessage.setMessage(a.getDefaultMessage());
+            errorMessage.setCode(a.getCode());
+            errorResponse.getFieldErrorList().add(errorMessage);
+        });
+        producer.sendMessageToClientTopicResponse(MethodsCodes.CREATE_BANK, errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody BankDTO bankDTO) {
-        bankDTO.setCreated_at(bankService.findById(bankDTO.getId()).getResponse().get(0).getCreated_at());
-//        if (bindingResult.hasErrors()) {
-//            throw new BankNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
-        bankService.update(modelMapper.convertBankDTOToBank(bankDTO));
+        bankDTO.setCreatedAt(bankService.findById(bankDTO.getId()).getResponse().get(0).getCreatedAt());
+        bankService.update(bankDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -68,15 +76,5 @@ public class BankController {
         bankService.findById(id);
         bankService.delete(id);
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandle(BankNotSaveException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandle(BankNotFoundException e) {
-        return new ResponseEntity<>(new ErrorResponse("Данный банк не найден"), HttpStatus.BAD_REQUEST);
     }
 }

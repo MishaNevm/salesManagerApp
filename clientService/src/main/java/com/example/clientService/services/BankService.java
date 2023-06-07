@@ -45,13 +45,15 @@ public class BankService {
     }
 
     @Transactional
-    public void save (Bank bank) {
+    public void save (BankDTO bankDTO) {
+        Bank bank = modelMapperUtil.convertBankDTOToBank(bankDTO);
         bank.setCreated_at(new Date());
         bankRepository.save(bank);
     }
 
     @Transactional
-    public void update (Bank bank) {
+    public void update (BankDTO bankDTO) {
+        Bank bank = modelMapperUtil.convertBankDTOToBank(bankDTO);
         bank.setUpdated_at(new Date());
         bankRepository.save(bank);
     }

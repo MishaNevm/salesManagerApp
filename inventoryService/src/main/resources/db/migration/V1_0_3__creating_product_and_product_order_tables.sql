@@ -4,7 +4,7 @@ create table products
     name       varchar(100) unique,
     type       varchar(20),
     quantity   int,
-    created_at date,
+    created_at timestamp,
     updated_at timestamp
 
 );

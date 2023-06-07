@@ -3,9 +3,6 @@ package com.example.Frontend.controllers;
 
 import com.example.Frontend.dto.UserDTO;
 import com.example.Frontend.dto.UserDTOResponse;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

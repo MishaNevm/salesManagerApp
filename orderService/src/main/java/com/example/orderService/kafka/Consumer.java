@@ -32,6 +32,7 @@ public class Consumer {
                 case 23 -> orderController.create(objectMapper.readValue(consumerRecord.value(), OrderDTO.class));
                 case 24 -> orderController.update(objectMapper.readValue(consumerRecord.value(), OrderDTO.class));
                 case 25 -> orderController.delete(objectMapper.readValue(consumerRecord.value(), OrderDTO.class).getId());
+                case 36 -> orderController.findByClientId(objectMapper.readValue(consumerRecord.value(), Integer.class));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

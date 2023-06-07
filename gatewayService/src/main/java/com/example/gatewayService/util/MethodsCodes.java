@@ -40,22 +40,23 @@ public enum MethodsCodes {
     GET_PRODUCTS_BY_ORDER_ID(32, true),
     DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID(33, false),
     DELETE_PRODUCT_BY_ORDER_ID_AND_PRODUCT_ID(34, false),
-    UPDATE_PRODUCT_QUANTITY_IN_ORDER(35, false);
+    UPDATE_PRODUCT_QUANTITY_IN_ORDER(35, false),
+    GET_ORDERS_BY_CLIENT_ID(36, true);
     private final Integer code;
 
-    private final boolean hasResponse;
+    private final boolean hasModelResponse;
 
     public Integer getCode() {
         return code;
     }
 
-    public boolean isHasResponse() {
-        return hasResponse;
+    public boolean isHasModelResponse() {
+        return hasModelResponse;
     }
 
-    MethodsCodes(Integer code, boolean hasResponse) {
+    MethodsCodes(Integer code, boolean hasModelResponse) {
         this.code = code;
-        this.hasResponse = hasResponse;
+        this.hasModelResponse = hasModelResponse;
     }
 
     public static MethodsCodes searchByCode(Integer code) {

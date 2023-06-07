@@ -1,6 +1,4 @@
-package com.example.clientService.util;
-
-import org.springframework.validation.FieldError;
+package com.example.gatewayService.util;
 
 import java.util.List;
 

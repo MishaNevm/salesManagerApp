@@ -7,7 +7,7 @@ create table clients
     kpp        varchar(10),
     ogrn       varchar(14) unique,
     type       varchar(10),
-    created_at date,
+    created_at timestamp,
     updated_at timestamp,
     user_id    int
 );
@@ -22,6 +22,8 @@ create table banks
     city              varchar(100),
     country           varchar(100),
     client_id         int references clients (id) on delete cascade,
-    created_at        date,
+    created_at        timestamp,
     updated_at        timestamp
-)
+);
+
+insert into clients(short_name) values ('Пустой')

@@ -4,10 +4,13 @@ package com.example.Frontend.controllers;
 import com.example.Frontend.dto.BankDTO;
 import com.example.Frontend.dto.ClientDTO;
 import com.example.Frontend.dto.ClientDTOResponse;
+import com.example.Frontend.dto.OrderDTOResponse;
+import com.example.Frontend.util.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -20,12 +23,12 @@ import java.util.Objects;
 public class ClientController {
 
     private final RestTemplate restTemplate;
-    private final String GET_ALL_CLIENTS = "http://localhost:8484/clients";
-    private final String GET_CLIENT_BY_ID = "http://localhost:8484/clients/";
-    private final String CREATE_CLIENT = GET_ALL_CLIENTS;
-    private final String CREATE_BANK_TO_CLIENT = GET_CLIENT_BY_ID;
-    private final String UPDATE_CLIENT = GET_CLIENT_BY_ID;
-    private final String DELETE_CLIENT = GET_CLIENT_BY_ID;
+    protected final static String GET_ALL_CLIENTS = "http://localhost:8484/clients";
+    protected final static String GET_CLIENT_BY_ID = "http://localhost:8484/clients/";
+    protected final static String CREATE_CLIENT = GET_ALL_CLIENTS;
+    protected final static String CREATE_BANK_TO_CLIENT = GET_CLIENT_BY_ID;
+    protected final static String UPDATE_CLIENT = GET_CLIENT_BY_ID;
+    protected final static String DELETE_CLIENT = GET_CLIENT_BY_ID;
 
     @Autowired
     public ClientController(RestTemplate restTemplate) {
@@ -41,6 +44,12 @@ public class ClientController {
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
         model.addAttribute("client", restTemplate.getForObject(GET_CLIENT_BY_ID + id, ClientDTO.class));
+        model.addAttribute("orders", Objects.requireNonNull(restTemplate
+                        .getForObject(String
+                                        .format(OrderController
+                                                .GET_ORDERS_BY_CLIENT_ID, id),
+                                OrderDTOResponse.class))
+                .getResponse());
         return "client/getClientById";
     }
 
@@ -79,7 +88,13 @@ public class ClientController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<BankDTO> entity = new HttpEntity<>(bankDTO, headers);
-        restTemplate.exchange(CREATE_BANK_TO_CLIENT + id, HttpMethod.POST, entity, HttpStatus.class);
+        ErrorResponse errorResponse = restTemplate.postForObject(CREATE_BANK_TO_CLIENT + id, entity, ErrorResponse.class);
+        if (errorResponse != null) {
+            errorResponse.getFieldErrorList().forEach(a -> {
+                bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage());
+            });
+            return "client/createBankToClient";
+        }
         return "redirect:/clients/" + id;
     }
 

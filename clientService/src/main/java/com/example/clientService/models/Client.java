@@ -34,7 +34,7 @@ public class Client {
     private ClientTypes type;
 
     @Column(name = "user_id")
-    private int user;
+    private Integer user;
 
     @OneToOne(mappedBy = "client")
     private Bank bank;
@@ -113,11 +113,11 @@ public class Client {
         this.type = type;
     }
 
-    public void setUser(int user) {
+    public void setUser(Integer user) {
         this.user = user;
     }
 
-    public int getUser() {
+    public Integer getUser() {
         return user;
     }
 

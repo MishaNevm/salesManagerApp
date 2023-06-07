@@ -1,7 +1,5 @@
 package com.example.clientService.util;
 
-import java.util.Arrays;
-
 public enum MethodsCodes {
     GET_ALL_CLIENTS(6, true),
     GET_CLIENT_BY_ID(7, true),
