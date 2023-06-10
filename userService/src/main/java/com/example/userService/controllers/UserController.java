@@ -1,7 +1,6 @@
 package com.example.userService.controllers;
 
 import com.example.userService.dto.UserDTO;
-import com.example.userService.dto.UserDTOResponse;
 import com.example.userService.kafka.Producer;
 import com.example.userService.services.UserService;
 import com.example.userService.util.*;
@@ -9,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/users")

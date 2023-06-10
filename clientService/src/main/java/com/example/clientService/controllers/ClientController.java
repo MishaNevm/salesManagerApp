@@ -22,15 +22,17 @@ import javax.validation.Valid;
 public class ClientController {
 
     private final ClientService clientService;
+    private final BankService bankService;
     private final ModelMapperUtil modelMapper;
     private final ClientDTOUniqueValidator clientDTOUniqueValidator;
     private final Producer producer;
 
 
     @Autowired
-    public ClientController(ClientService clientService, ModelMapperUtil modelMapper,
+    public ClientController(ClientService clientService, BankService bankService, ModelMapperUtil modelMapper,
                             ClientDTOUniqueValidator clientDTOUniqueValidator, Producer producer) {
         this.clientService = clientService;
+        this.bankService = bankService;
         this.modelMapper = modelMapper;
         this.clientDTOUniqueValidator = clientDTOUniqueValidator;
         this.producer = producer;
@@ -38,22 +40,19 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<HttpStatus> findAll() {
-         producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_CLIENTS.getCode(), clientService.findAll());
-         return ResponseEntity.ok(HttpStatus.OK);
+        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_CLIENTS, clientService.findAll());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
-        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_CLIENT_BY_ID.getCode(), clientService.findById(id));
+        producer.sendMessageToClientTopicResponse(MethodsCodes.GET_CLIENT_BY_ID, clientService.findById(id));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping
     public int create(@RequestBody @Valid ClientDTO clientDTO) {
-//        clientDTOUniqueValidator.validate(clientDTO, bindingResult);
-//                if (bindingResult.hasErrors()) {
-//            throw new ClientNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
+
         Client client = modelMapper.convertClientDTOToClient(clientDTO);
         clientService.save(client);
         return client.getId();
@@ -62,38 +61,17 @@ public class ClientController {
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) {
         clientDTO.setCreatedAt(clientService.findById(clientDTO.getId()).getResponse().get(0).getCreatedAt());
-//        clientDTO.setId(id);
-//        clientDTOUniqueValidator.validate(clientDTO, bindingResult);
-//        if (bindingResult.hasErrors()) {
-//            throw new ClientNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
         Client client = modelMapper.convertClientDTOToClient(clientDTO);
         clientService.update(client);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
-        clientService.findById(id);
-        clientService.delete(id);
+    public ResponseEntity<HttpStatus> delete(@RequestBody ClientDTO clientDTO) {
+        if (clientDTO.getBankDTO() != null) {
+            bankService.delete(clientDTO.getBankDTO().getId());
+        }
+        clientService.delete(clientDTO.getId());
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ClientNotSaveException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ClientNotFoundException e) {
-        return new ResponseEntity<>(new ErrorResponse("Клиент не найден"), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(InvalidFormatException e) {
-        return new ResponseEntity<>
-                (new ErrorResponse("Тип юридического лица должен быть один из: IP, OOO, AO, ZAO, NKO, PAO, KFH")
-                        , HttpStatus.BAD_REQUEST);
     }
 }

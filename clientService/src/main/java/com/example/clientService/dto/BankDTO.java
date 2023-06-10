@@ -1,7 +1,5 @@
 package com.example.clientService.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -39,9 +37,9 @@ public class BankDTO {
 
     private ClientDTO clientDTO;
 
-    private Date created_at;
+    private Date createdAt;
 
-    private Date updated_at;
+    private Date updatedAt;
 
     public int getId() {
         return id;
@@ -108,19 +106,19 @@ public class BankDTO {
         this.clientDTO = clientDTO;
     }
 
-    public Date getCreated_at() {
-        return created_at;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Date getUpdated_at() {
-        return updated_at;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

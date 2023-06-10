@@ -2,6 +2,7 @@ package com.example.inventoryService.kafka;
 
 import com.example.inventoryService.controllers.ProductController;
 import com.example.inventoryService.dto.ProductDTO;
+import com.example.inventoryService.dto.ProductOrderDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,24 @@ public class Consumer {
         int methodCode = consumerRecord.key();
         switch (methodCode) {
             case 26 -> productController.findAll();
-            case 27 -> productController.findById(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
+            case 27 ->
+                    productController.findById(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
             case 28 -> productController.save(objectMapper.readValue(consumerRecord.value(), ProductDTO.class));
             case 29 -> productController.update(objectMapper.readValue(consumerRecord.value(), ProductDTO.class));
-            case 30 -> productController.delete(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
+            case 30 ->
+                    productController.delete(objectMapper.readValue(consumerRecord.value(), ProductDTO.class).getId());
+            case 31 ->
+                    productController.addProductToOrder(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class));
+            case 32 ->
+                    productController.findAllProductsByOrderId(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class).getOrderId());
+            case 33 ->
+                    productController.deleteAllProductsInOrderByOrderId(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class).getOrderId());
+            case 34 -> {
+                ProductOrderDTO productOrderDTO = objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class);
+                productController.deleteByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId());
+            }
+            case 35 ->
+                    productController.updateProductQuantityInOrder(objectMapper.readValue(consumerRecord.value(), ProductOrderDTO.class));
         }
     }
 }

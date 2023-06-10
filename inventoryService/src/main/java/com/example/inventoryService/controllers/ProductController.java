@@ -1,7 +1,9 @@
 package com.example.inventoryService.controllers;
 
 import com.example.inventoryService.dto.ProductDTO;
+import com.example.inventoryService.dto.ProductOrderDTO;
 import com.example.inventoryService.kafka.Producer;
+import com.example.inventoryService.services.ProductOrderService;
 import com.example.inventoryService.services.ProductService;
 import com.example.inventoryService.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +19,24 @@ public class ProductController {
 
     private final ProductService productService;
     private final Producer producer;
+    private final ProductOrderService productOrderService;
 
     @Autowired
-    public ProductController(ProductService productService, Producer producer) {
+    public ProductController(ProductService productService, Producer producer, ProductOrderService productOrderService) {
         this.productService = productService;
         this.producer = producer;
+        this.productOrderService = productOrderService;
     }
 
     @GetMapping
     public ResponseEntity<HttpStatus> findAll() {
         producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_ALL_PRODUCTS.getCode(), productService.findAll());
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @GetMapping("/get-products-by-order")
+    public ResponseEntity<HttpStatus> findAllProductsByOrderId(@RequestParam(value = "order-id", required = false) Integer orderId) {
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID.getCode(), productOrderService.findByOrderId(orderId));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -44,16 +54,24 @@ public class ProductController {
         productService.save(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
+    @PostMapping("/{id}/add-to-order")
+    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
+        productOrderService.save(productOrderDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
         productDTO.setCreatedAt(productService.findById(productDTO.getId()).getResponse().get(0).getCreatedAt());
-//        if (bindingResult.hasErrors()) {
-//            throw new ProductNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
         productService.update(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
+    @PatchMapping("/update-quantity-in-order")
+    public ResponseEntity<HttpStatus> updateProductQuantityInOrder (ProductOrderDTO productOrderDTO) {
+        productOrderService.updateProductQuantityInOrder(productOrderDTO);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
@@ -62,23 +80,17 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @PostMapping("/{id}/add-to-order")
-//    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-//                                                        @RequestParam(value = "order-id", required = false) Integer orderId,
-//                                                        @RequestParam(value = "quantity", required = false) Integer quantity) {
-//        productService.addProductToOrder(productService.findById(id), orderId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-
-    @PatchMapping("/{id}/change-order")
-    public ResponseEntity<HttpStatus> changeOrderInProduct(@PathVariable("id") int id,
-                                                           @RequestParam(value = "old-order-id", required = false) Integer oldOrderId,
-                                                           @RequestParam(value = "new-order-id", required = false) Integer newOrderId) {
-        productService.findById(id);
-//        productService.changeOrderInProduct(id, oldOrderId, newOrderId);
+    @DeleteMapping("/{id}/delete-from-order")
+    public ResponseEntity<HttpStatus> deleteByOrderIdAndProductId(@RequestParam(value = "orderId", required = false) Integer orderId, @PathVariable("id") int productId) {
+        productOrderService.deleteByOrderIdAndProductId(orderId, productId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @DeleteMapping()
+    public ResponseEntity<HttpStatus> deleteAllProductsInOrderByOrderId(@RequestParam(value = "orderId", required = false) Integer orderId) {
+        productOrderService.deleteAllProductsByOrderId(orderId);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotSaveException e) {

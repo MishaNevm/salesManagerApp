@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Order</title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>Название товара</th>
+        <th>Тип товара</th>
+        <th>Общее количество</th>
+        <th>Количество для добавления</th>
+        <th>Действие</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="product : ${products}">
+        <form method="post" th:action="@{/orders/{id}/add-product(id=${id})}">
+            <tr>
+                <td th:text="${product.name}"></td>
+                <td th:text="${product.type}"></td>
+                <td th:text="${product.quantity}"></td>
+                <td>
+                    <input type="text" name="quantity" min="0" id="quantity">
+                </td>
+                <td>
+                    <input type="hidden" name="product-id" th:value="${product.id}" id="product-id">
+                    <button type="submit">Добавить</button>
+                </td>
+            </tr>
+        </form>
+    </th:block>
+    </tbody>
+</table>
+</body>
+</html>

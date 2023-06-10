@@ -22,6 +22,7 @@ public class Product {
     @Column(name = "quantity")
     private int quantity;
 
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

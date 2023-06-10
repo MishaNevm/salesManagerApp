@@ -31,6 +31,12 @@ public class OrderController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @GetMapping("/find")
+    public ResponseEntity<HttpStatus> findByClientId(@RequestParam(value = "client-id", required = false) int clientId) {
+        producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ORDERS_BY_CLIENT_ID.getCode(), orderService.findByClientId(clientId));
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
         producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ORDER_BY_ID.getCode(), orderService.findById(id));
@@ -58,14 +64,7 @@ public class OrderController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @PostMapping("/{id}/add-product")
-//    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-//                                                        @RequestParam("product-id") Integer productId,
-//                                                        @RequestParam("quantity") Integer quantity) {
-//        orderService.addProductToOrder(orderService.findById(id), productId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-//
+
 //    @PatchMapping("/{id}/set-product-quantity")
 //    public ResponseEntity<HttpStatus> setProductQuantity(@PathVariable("id") int id,
 //                                                         @RequestParam(value = "product-id", required = false) Integer productId,

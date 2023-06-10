@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование заказа</title>
+</head>
+<body>
+<h1>Редактирование заказа</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Сокращенное наименование</th>
+        <th>Полное наименование</th>
+        <th>ИНН</th>
+        <th>КПП</th>
+        <th>ОГРН</th>
+        <th>Действие</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="client : ${clients}">
+        <td th:text="${client.shortName}"></td>
+        <td th:text="${client.fullName}"></td>
+        <td th:text="${client.inn}"></td>
+        <td th:text="${client.kpp}"></td>
+        <td th:text="${client.ogrn}"></td>
+        <td>
+            <form th:method="PATCH" th:action="@{/orders/{id}(id=${id})}" th:object="${order}">
+                <input type="hidden" name="client-id" th:value="${client.id}">
+                <button type="submit">Обновить заказ</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

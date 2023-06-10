@@ -5,6 +5,7 @@ create table users
     surname       varchar(100),
     patronymic    varchar(100),
     email         varchar(100) unique,
+    password      varchar(100),
     created_at    date,
     date_of_birth date
 )
