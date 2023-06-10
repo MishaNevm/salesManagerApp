@@ -65,11 +65,11 @@ public class BankController {
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id, @ModelAttribute("bank") BankDTO bankDTO) {
+    public String delete(@PathVariable("id") int id, @RequestParam(value = "client-id", required = false) Integer clientId) {
         restTemplate.exchange(DELETE_BANK + id, HttpMethod.DELETE, null, HttpStatus.class);
-        if (bankDTO.getClientDTO() == null) {
+        if (clientId == null) {
             return "redirect:/banks";
-        } else return "redirect:/clients/" + bankDTO.getClientDTO().getId();
+        } else return "redirect:/clients/" + clientId;
     }
 
 //    @ExceptionHandler

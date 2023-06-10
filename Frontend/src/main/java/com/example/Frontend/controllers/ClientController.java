@@ -6,16 +6,18 @@ import com.example.Frontend.dto.ClientDTO;
 import com.example.Frontend.dto.ClientDTOResponse;
 import com.example.Frontend.dto.OrderDTOResponse;
 import com.example.Frontend.util.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Objects;
 
 @Controller
@@ -23,6 +25,7 @@ import java.util.Objects;
 public class ClientController {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     protected final static String GET_ALL_CLIENTS = "http://localhost:8484/clients";
     protected final static String GET_CLIENT_BY_ID = "http://localhost:8484/clients/";
     protected final static String CREATE_CLIENT = GET_ALL_CLIENTS;
@@ -31,8 +34,9 @@ public class ClientController {
     protected final static String DELETE_CLIENT = GET_CLIENT_BY_ID;
 
     @Autowired
-    public ClientController(RestTemplate restTemplate) {
+    public ClientController(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping
@@ -82,21 +86,26 @@ public class ClientController {
         if (bindingResult.hasErrors()) {
             return "client/createBankToClient";
         }
-        ClientDTO clientDTO = new ClientDTO();
-        clientDTO.setId(id);
-        bankDTO.setClientDTO(clientDTO);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<BankDTO> entity = new HttpEntity<>(bankDTO, headers);
-        ErrorResponse errorResponse = restTemplate.postForObject(CREATE_BANK_TO_CLIENT + id, entity, ErrorResponse.class);
-        if (errorResponse != null) {
-            errorResponse.getFieldErrorList().forEach(a -> {
-                bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage());
-            });
+
+        bankDTO.setClientDTO(new ClientDTO(id));
+
+        try {
+            restTemplate.postForObject(CREATE_BANK_TO_CLIENT + id, bankDTO, HttpStatus.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            String responseBody = e.getResponseBodyAsString();
+            try {
+                ErrorResponse errorResponse = objectMapper.readValue(responseBody, ErrorResponse.class);
+                errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             return "client/createBankToClient";
         }
+
         return "redirect:/clients/" + id;
     }
+
+
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {

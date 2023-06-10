@@ -41,6 +41,11 @@ public class ClientDTO {
 
     private Date updatedAt;
 
+    public ClientDTO(int id) {
+        this.id = id;
+    }
+    public ClientDTO() {}
+
     public int getId() {
         return id;
     }
