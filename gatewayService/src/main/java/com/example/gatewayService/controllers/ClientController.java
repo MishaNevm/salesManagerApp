@@ -7,11 +7,10 @@ import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.ErrorResponse;
 import com.example.gatewayService.util.MethodsCodes;
+import com.example.gatewayService.util.bankUtil.BankNotCreatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -52,12 +51,16 @@ public class ClientController {
     }
 
     @PostMapping("/{id}")
-    public ErrorResponse createBankToClient(@PathVariable("id") int id, @RequestBody @Valid BankDTO bankDTO) throws InterruptedException {
+    public HttpStatus createBankToClient(@PathVariable("id") int id, @RequestBody @Valid BankDTO bankDTO) throws InterruptedException {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         bankDTO.setClientDTO(clientDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
-        return consumer.getBindingResultResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
+        ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
+        if (errorResponse != null && errorResponse.getErrors() != null) {
+            throw new BankNotCreatedException(errorResponse);
+        }
+        return HttpStatus.OK;
     }
 
 
@@ -71,6 +74,11 @@ public class ClientController {
     public ResponseEntity<HttpStatus> delete(@RequestBody ClientDTO clientDTO) {
         producer.sendRequestToClientService(MethodsCodes.DELETE_CLIENT, clientDTO);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> exceptionHandler(BankNotCreatedException e) {
+        return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
     }
 
 

@@ -3,15 +3,19 @@ package com.example.clientService.util.bankUtil;
 import com.example.clientService.dto.BankDTO;
 import com.example.clientService.models.Bank;
 import com.example.clientService.repositoryes.BankRepository;
+import com.example.clientService.util.ValidationError;
+import com.example.clientService.util.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
-public class BankDTOUniqueValidator implements Validator {
+public class BankDTOUniqueValidator {
 
     private final BankRepository bankRepository;
 
@@ -20,27 +24,38 @@ public class BankDTOUniqueValidator implements Validator {
         this.bankRepository = bankRepository;
     }
 
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return clazz.equals(BankDTO.class);
-    }
-
-    @Override
-    public void validate(Object target, Errors errors) {
-        BankDTO bankDTO = (BankDTO) target;
-        checkBik(bankRepository.findByBik(bankDTO.getBik()), bankDTO, errors);
-        checkCheckingAccount(bankRepository.findByCheckingAccount(bankDTO.getCheckingAccount()), bankDTO, errors);
-    }
-
-    private void checkBik(Optional<Bank> bankFromDb, BankDTO bankToValidate, Errors errors) {
-        if (bankFromDb.isPresent() && bankFromDb.get().getId() != bankToValidate.getId()) {
-            errors.rejectValue("bik", "0", "Банк с данным бик уже зарегистрирован");
+    public void validate(BankDTO bankDTO) throws ValidationException {
+        ValidationException validationException = new ValidationException();
+        validationException.setErrors(new ArrayList<>());
+        List<Bank> bankList = bankRepository.findByBikOrCheckingAccount(bankDTO.getBik(), bankDTO.getCheckingAccount());
+        checkBik(bankList, bankDTO, validationException);
+        checkCheckingAccount(bankList, bankDTO, validationException);
+        if (!validationException.getErrors().isEmpty()) {
+            throw validationException;
         }
     }
 
-    private void checkCheckingAccount(Optional<Bank> bankFromDb, BankDTO bankToValidate, Errors errors) {
-        if (bankFromDb.isPresent() && bankFromDb.get().getId() != bankToValidate.getId()) {
-            errors.rejectValue("checkingAccount", "0", "Банк с данным рассчетным счетом уже зарегистрирован");
+    private void checkBik(List<Bank> bankList, BankDTO bankToValidate, ValidationException validationException) {
+        for (Bank bank : bankList) {
+            if (bank.getBik().equals(bankToValidate.getBik()) && bank.getId() != bankToValidate.getId()) {
+                ValidationError validationError = new ValidationError();
+                validationError.setField("bik");
+                validationError.setCode("0");
+                validationError.setMessage("Банк с данным бик уже зарегестрирован");
+                validationException.getErrors().add(validationError);
+            }
+        }
+    }
+
+    private void checkCheckingAccount(List<Bank> bankList, BankDTO bankToValidate, ValidationException validationException) {
+        for (Bank bank : bankList) {
+            if (bank.getCheckingAccount().equals(bankToValidate.getCheckingAccount()) && bank.getId() != bankToValidate.getId()) {
+                ValidationError validationError = new ValidationError();
+                validationError.setField("checkingAccount");
+                validationError.setCode("0");
+                validationError.setMessage("Банк с данным рассчетным счетом уже зарегестрирован");
+                validationException.getErrors().add(validationError);
+            }
         }
     }
 }

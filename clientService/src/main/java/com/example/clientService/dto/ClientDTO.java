@@ -2,8 +2,6 @@ package com.example.clientService.dto;
 
 //import com.example.salesManagerApp.util.clientUtil.ClientTypes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -42,6 +40,11 @@ public class ClientDTO {
     private Date createdAt;
 
     private Date updatedAt;
+
+    public ClientDTO(int id) {
+        this.id = id;
+    }
+    public ClientDTO() {}
 
     public int getId() {
         return id;

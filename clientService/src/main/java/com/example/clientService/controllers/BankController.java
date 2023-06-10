@@ -46,20 +46,13 @@ public class BankController {
 
     @PostMapping("/{id}")
     public ResponseEntity<HttpStatus> create(@RequestBody BankDTO bankDTO) {
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(bankDTO, "bank");
-        bankDTOUniqueValidator.validate(bankDTO, bindingResult);
-        if (!bindingResult.hasErrors()) {
-            bankService.save(bankDTO);
-        }
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setFieldErrorList(new ArrayList<>());
-        bindingResult.getFieldErrors().forEach(a -> {
-            ErrorMessage errorMessage = new ErrorMessage();
-            errorMessage.setField(a.getField());
-            errorMessage.setMessage(a.getDefaultMessage());
-            errorMessage.setCode(a.getCode());
-            errorResponse.getFieldErrorList().add(errorMessage);
-        });
+        try {
+            bankDTOUniqueValidator.validate(bankDTO);
+            bankService.save(bankDTO);
+        } catch (ValidationException e) {
+            errorResponse.setErrors(e.getErrors());
+        }
         producer.sendMessageToClientTopicResponse(MethodsCodes.CREATE_BANK, errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }

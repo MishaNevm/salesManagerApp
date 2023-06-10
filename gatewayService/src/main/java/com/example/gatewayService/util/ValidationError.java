@@ -1,13 +1,20 @@
-package com.example.clientService.util;
+package com.example.gatewayService.util;
 
 public class ValidationError {
-    private final String field;
-    private final String code;
-    private final String message;
+    private String field;
+    private String code;
+    private String message;
 
-    public ValidationError(String field, String code, String message) {
+
+    public void setField(String field) {
         this.field = field;
+    }
+
+    public void setCode(String code) {
         this.code = code;
+    }
+
+    public void setMessage(String message) {
         this.message = message;
     }
 
