@@ -1,4 +1,4 @@
-package com.example.clientService.util.clientUtil;
+package com.example.Frontend.util;
 
 public enum ClientTypes {
     IP("ИП"),

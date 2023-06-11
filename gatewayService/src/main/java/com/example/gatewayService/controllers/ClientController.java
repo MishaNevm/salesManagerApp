@@ -6,8 +6,8 @@ import com.example.gatewayService.dto.ClientDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
 import com.example.gatewayService.util.ErrorResponse;
+import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
-import com.example.gatewayService.util.bankUtil.BankNotCreatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -36,7 +36,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public ClientDTO findById(@PathVariable("id") int id, Model model) throws InterruptedException {
+    public ClientDTO findById(@PathVariable("id") int id) throws InterruptedException {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_CLIENT_BY_ID, clientDTO);
@@ -45,8 +45,12 @@ public class ClientController {
 
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid ClientDTO clientDTO) {
+    public ResponseEntity<HttpStatus> create(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.CREATE_CLIENT, clientDTO);
+        ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.CREATE_CLIENT).poll(15, TimeUnit.SECONDS);
+        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
+            throw new ErrorResponseException(errorResponse);
+        }
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -57,45 +61,33 @@ public class ClientController {
         bankDTO.setClientDTO(clientDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
         ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
-        if (errorResponse != null && errorResponse.getErrors() != null) {
-            throw new BankNotCreatedException(errorResponse);
+        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
+            throw new ErrorResponseException(errorResponse);
         }
         return HttpStatus.OK;
     }
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) {
+    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_CLIENT, clientDTO);
+        ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.UPDATE_CLIENT).poll(15, TimeUnit.SECONDS);
+        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
+            throw new ErrorResponseException(errorResponse);
+        }
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
+        ClientDTO clientDTO = new ClientDTO();
+        clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.DELETE_CLIENT, clientDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(BankNotCreatedException e) {
+    public ResponseEntity<ErrorResponse> exceptionHandler(ErrorResponseException e) {
         return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
     }
-
-
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(ClientNotSaveException e) {
-//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(ClientNotFoundException e) {
-//        return new ResponseEntity<>(new ErrorResponse("Клиент не найден"), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(InvalidFormatException e) {
-//        return new ResponseEntity<>
-//                (new ErrorResponse("Тип юридического лица должен быть один из: IP, OOO, AO, ZAO, NKO, PAO, KFH")
-//                        , HttpStatus.BAD_REQUEST);
-//    }
 }

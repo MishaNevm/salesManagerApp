@@ -5,10 +5,14 @@ import com.example.gatewayService.dto.BankDTO;
 import com.example.gatewayService.dto.BankDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
+import com.example.gatewayService.util.ErrorResponse;
+import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/banks")
@@ -38,10 +42,13 @@ public class BankController {
         return (BankDTO) consumer.getResponseMap().get(MethodsCodes.GET_BANK_BY_ID).take().getResponse().get(0);
     }
 
-
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody BankDTO bankDTO) {
+    public ResponseEntity<HttpStatus> update(@RequestBody BankDTO bankDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_BANK, bankDTO);
+        ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.UPDATE_BANK).poll(15, TimeUnit.SECONDS);
+        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
+            throw new ErrorResponseException(errorResponse);
+        }
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -53,13 +60,8 @@ public class BankController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandle(BankNotSaveException e) {
-//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandle(BankNotFoundException e) {
-//        return new ResponseEntity<>(new ErrorResponse("Данный банк не найден"), HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> exceptionHandle(ErrorResponseException e) {
+        return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
+    }
 }

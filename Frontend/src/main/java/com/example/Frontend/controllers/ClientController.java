@@ -5,6 +5,7 @@ import com.example.Frontend.dto.BankDTO;
 import com.example.Frontend.dto.ClientDTO;
 import com.example.Frontend.dto.ClientDTOResponse;
 import com.example.Frontend.dto.OrderDTOResponse;
+import com.example.Frontend.util.ClientTypes;
 import com.example.Frontend.util.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class ClientController {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     protected final static String GET_ALL_CLIENTS = "http://localhost:8484/clients";
-    protected final static String GET_CLIENT_BY_ID = "http://localhost:8484/clients/";
+    protected final static String GET_CLIENT_BY_ID = "http://localhost:8484/clients/%d";
     protected final static String CREATE_CLIENT = GET_ALL_CLIENTS;
     protected final static String CREATE_BANK_TO_CLIENT = GET_CLIENT_BY_ID;
     protected final static String UPDATE_CLIENT = GET_CLIENT_BY_ID;
@@ -47,7 +48,7 @@ public class ClientController {
 
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("client", restTemplate.getForObject(GET_CLIENT_BY_ID + id, ClientDTO.class));
+        model.addAttribute("client", restTemplate.getForObject(String.format(GET_CLIENT_BY_ID, id), ClientDTO.class));
         model.addAttribute("orders", Objects.requireNonNull(restTemplate
                         .getForObject(String
                                         .format(OrderController
@@ -58,20 +59,30 @@ public class ClientController {
     }
 
     @GetMapping("/new")
-    public String create(@ModelAttribute("client") ClientDTO clientDTO) {
+    public String create(Model model) {
+        model.addAttribute("client", new ClientDTO());
+        model.addAttribute("types", ClientTypes.values());
         return "client/createClient";
     }
 
     @PostMapping
-    public String create(@ModelAttribute("client") @Valid ClientDTO clientDTO,
+    public String create(Model model, @ModelAttribute("client") @Valid ClientDTO clientDTO,
                          BindingResult bindingResult) {
+        model.addAttribute("types", ClientTypes.values());
         if (bindingResult.hasErrors()) {
             return "client/createClient";
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<ClientDTO> entity = new HttpEntity<>(clientDTO, headers);
-        restTemplate.exchange(CREATE_CLIENT, HttpMethod.POST, entity, HttpStatus.class);
+        try {
+            restTemplate.postForObject(CREATE_CLIENT, clientDTO, HttpStatus.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            try {
+                ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
+                errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            return "client/createClient";
+        }
         return "redirect:/clients";
     }
 
@@ -90,69 +101,52 @@ public class ClientController {
         bankDTO.setClientDTO(new ClientDTO(id));
 
         try {
-            restTemplate.postForObject(CREATE_BANK_TO_CLIENT + id, bankDTO, HttpStatus.class);
+            restTemplate.postForObject(String.format(CREATE_BANK_TO_CLIENT, id), bankDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
-            String responseBody = e.getResponseBodyAsString();
             try {
-                ErrorResponse errorResponse = objectMapper.readValue(responseBody, ErrorResponse.class);
+                ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
                 errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
             return "client/createBankToClient";
         }
-
         return "redirect:/clients/" + id;
     }
-
 
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        ClientDTO clientDTO = restTemplate.getForObject(GET_CLIENT_BY_ID + id, ClientDTO.class);
-        model.addAttribute("client", clientDTO);
+        model.addAttribute("client", restTemplate.getForObject(String.format(GET_CLIENT_BY_ID, id), ClientDTO.class));
+        model.addAttribute("types", ClientTypes.values());
         return "client/updateClient";
     }
 
     @PatchMapping("/{id}")
-    public String update(@PathVariable("id") int id,
+    public String update(@PathVariable("id") int id, Model model,
                          @ModelAttribute("client") @Valid ClientDTO clientDTO,
                          BindingResult bindingResult) {
+        model.addAttribute("types", ClientTypes.values());
         if (bindingResult.hasErrors()) {
             return "client/updateClient";
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<ClientDTO> entity = new HttpEntity<>(clientDTO, headers);
-        restTemplate.exchange(UPDATE_CLIENT + id, HttpMethod.PATCH, entity, HttpStatus.class);
+        try {
+            restTemplate.patchForObject (String.format(UPDATE_CLIENT, id), clientDTO, HttpStatus.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            try {
+                ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
+                errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            return "client/updateClient";
+        }
         return "redirect:/clients/" + id;
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id, @ModelAttribute("client") ClientDTO clientDTO) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<ClientDTO> entity = new HttpEntity<>(clientDTO, headers);
-        restTemplate.exchange(DELETE_CLIENT + id, HttpMethod.DELETE, entity, HttpStatus.class);
+    public String delete(@PathVariable("id") int id) {
+        restTemplate.delete(String.format(DELETE_CLIENT, id));
         return "redirect:/clients";
     }
-
-
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(ClientNotSaveException e) {
-//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(ClientNotFoundException e) {
-//        return new ResponseEntity<>(new ErrorResponse("Клиент не найден"), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(InvalidFormatException e) {
-//        return new ResponseEntity<>
-//                (new ErrorResponse("Тип юридического лица должен быть один из: IP, OOO, AO, ZAO, NKO, PAO, KFH")
-//                        , HttpStatus.BAD_REQUEST);
-//    }
 }

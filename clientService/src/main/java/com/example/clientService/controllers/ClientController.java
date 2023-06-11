@@ -5,11 +5,10 @@ import com.example.clientService.kafka.Producer;
 import com.example.clientService.models.Client;
 import com.example.clientService.services.BankService;
 import com.example.clientService.services.ClientService;
-import com.example.clientService.util.*;
+import com.example.clientService.util.ErrorResponse;
+import com.example.clientService.util.MethodsCodes;
+import com.example.clientService.util.ModelMapperUtil;
 import com.example.clientService.util.clientUtil.ClientDTOUniqueValidator;
-import com.example.clientService.util.clientUtil.ClientNotFoundException;
-import com.example.clientService.util.clientUtil.ClientNotSaveException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,27 +50,30 @@ public class ClientController {
     }
 
     @PostMapping
-    public int create(@RequestBody @Valid ClientDTO clientDTO) {
-
-        Client client = modelMapper.convertClientDTOToClient(clientDTO);
-        clientService.save(client);
-        return client.getId();
+    public void create(@RequestBody @Valid ClientDTO clientDTO) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        clientDTOUniqueValidator.validate(clientDTO, errorResponse);
+        if (errorResponse.getErrors().isEmpty()) {
+            clientService.save(clientDTO);
+        }
+        producer.sendMessageToClientTopicResponse(MethodsCodes.CREATE_CLIENT, errorResponse);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) {
-        clientDTO.setCreatedAt(clientService.findById(clientDTO.getId()).getResponse().get(0).getCreatedAt());
-        Client client = modelMapper.convertClientDTOToClient(clientDTO);
-        clientService.update(client);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public void update(@RequestBody @Valid ClientDTO clientDTO) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        clientDTOUniqueValidator.validate(clientDTO, errorResponse);
+        if (errorResponse.getErrors().isEmpty()) {
+            clientDTO.setCreatedAt(clientService.findById(clientDTO.getId()).getResponse().get(0).getCreatedAt());
+            clientService.update(clientDTO);
+        }
+        producer.sendMessageToClientTopicResponse(MethodsCodes.UPDATE_CLIENT, errorResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@RequestBody ClientDTO clientDTO) {
-        if (clientDTO.getBankDTO() != null) {
-            bankService.delete(clientDTO.getBankDTO().getId());
-        }
-        clientService.delete(clientDTO.getId());
+    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
+
+        clientService.delete(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }

@@ -3,17 +3,13 @@ package com.example.clientService.controllers;
 import com.example.clientService.dto.BankDTO;
 import com.example.clientService.kafka.Producer;
 import com.example.clientService.services.BankService;
-import com.example.clientService.util.*;
+import com.example.clientService.util.ErrorResponse;
+import com.example.clientService.util.MethodsCodes;
 import com.example.clientService.util.bankUtil.BankDTOUniqueValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/banks")
@@ -45,23 +41,24 @@ public class BankController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<HttpStatus> create(@RequestBody BankDTO bankDTO) {
+    public void create(@RequestBody BankDTO bankDTO) {
         ErrorResponse errorResponse = new ErrorResponse();
-        try {
-            bankDTOUniqueValidator.validate(bankDTO);
+        bankDTOUniqueValidator.validate(bankDTO, errorResponse);
+        if (errorResponse.getErrors().isEmpty()) {
             bankService.save(bankDTO);
-        } catch (ValidationException e) {
-            errorResponse.setErrors(e.getErrors());
         }
         producer.sendMessageToClientTopicResponse(MethodsCodes.CREATE_BANK, errorResponse);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody BankDTO bankDTO) {
-        bankDTO.setCreatedAt(bankService.findById(bankDTO.getId()).getResponse().get(0).getCreatedAt());
-        bankService.update(bankDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public void update(@RequestBody BankDTO bankDTO) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        bankDTOUniqueValidator.validate(bankDTO, errorResponse);
+        if (errorResponse.getErrors().isEmpty()) {
+            bankDTO.setCreatedAt(bankService.findById(bankDTO.getId()).getResponse().get(0).getCreatedAt());
+            bankService.update(bankDTO);
+        }
+        producer.sendMessageToClientTopicResponse(MethodsCodes.UPDATE_BANK, errorResponse);
     }
 
     @DeleteMapping("/{id}")

@@ -27,6 +27,10 @@
   <input type="text" th:field="*{ogrn}" id="clientOgrn"/>
   <div style="color:red" th:if="${#fields.hasErrors('ogrn')}" th:errors="*{ogrn}">OGRN error</div>
   <br/>
+  <select th:field="*{type}" id="clientType">
+    <option th:each="clientType : ${types}" th:value="${clientType}" th:text="${clientType.value}"></option>
+  </select>
+  <br>
   <input type="submit" value="Update Client"/>
 </form>
 </body>

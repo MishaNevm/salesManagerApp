@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>Create Client and Bank</title>
@@ -26,6 +26,11 @@
   <label for="clientOgrn">Client OGRN:</label>
   <input type="text" th:field="*{ogrn}" id="clientOgrn"/>
   <div style="color:red" th:if="${#fields.hasErrors('ogrn')}" th:errors="*{ogrn}">OGRN error</div>
+  <br/>
+  <label for="clientType">Client Type:</label>
+  <select th:field="*{type}" id="clientType">
+    <option th:each="clientType : ${types}" th:value="${clientType}" th:text="${clientType.value}"></option>
+  </select>
   <br/>
   <input type="submit" value="Create Client"/>
 </form>
