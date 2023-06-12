@@ -10,7 +10,6 @@ import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -47,7 +46,7 @@ public class ClientController {
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.CREATE_CLIENT, clientDTO);
-        ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.CREATE_CLIENT).poll(15, TimeUnit.SECONDS);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_CLIENT).poll(15, TimeUnit.SECONDS);
         if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
             throw new ErrorResponseException(errorResponse);
         }
@@ -60,7 +59,7 @@ public class ClientController {
         clientDTO.setId(id);
         bankDTO.setClientDTO(clientDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
-        ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
         if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
             throw new ErrorResponseException(errorResponse);
         }
@@ -71,7 +70,7 @@ public class ClientController {
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_CLIENT, clientDTO);
-        ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.UPDATE_CLIENT).poll(15, TimeUnit.SECONDS);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_CLIENT).poll(15, TimeUnit.SECONDS);
         if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
             throw new ErrorResponseException(errorResponse);
         }

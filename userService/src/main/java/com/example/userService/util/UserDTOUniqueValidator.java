@@ -8,10 +8,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Component
-public class UserDTOUniqueValidator implements Validator {
+public class UserDTOUniqueValidator {
 
     private final UserRepository userRepository;
 
@@ -20,18 +21,19 @@ public class UserDTOUniqueValidator implements Validator {
         this.userRepository = userRepository;
     }
 
-
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return clazz.equals(UserDTO.class);
+    public void validate(UserDTO userDTO, ErrorResponse errorResponse) {
+        errorResponse.setErrors(new ArrayList<>());
+        checkEmail(userDTO, errorResponse);
     }
 
-    @Override
-    public void validate(Object target, Errors errors) {
-        UserDTO userDTO = (UserDTO) target;
-        Optional<User> userFromDB = userRepository.findByEmail(userDTO.getEmail());
-        if (userFromDB.isPresent() && userFromDB.get().getId() != userDTO.getId()) {
-            errors.rejectValue("email", "0", "Данный пользователь уже зарегистрован");
+    private void checkEmail(UserDTO userToValidate, ErrorResponse errorResponse) {
+        Optional<User> userFromDB = userRepository.findByEmail(userToValidate.getEmail());
+        if (userFromDB.isPresent() && userFromDB.get().getId() != userToValidate.getId()) {
+            ValidationError validationError = new ValidationError();
+            validationError.setField("email");
+            validationError.setCode("0");
+            validationError.setMessage("Пользователь с данным email уже зарегистрирован");
+            errorResponse.getErrors().add(validationError);
         }
     }
 }

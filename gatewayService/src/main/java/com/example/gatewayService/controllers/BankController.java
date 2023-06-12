@@ -45,7 +45,7 @@ public class BankController {
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody BankDTO bankDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_BANK, bankDTO);
-        ErrorResponse errorResponse = consumer.getBindingResultResponseMap().get(MethodsCodes.UPDATE_BANK).poll(15, TimeUnit.SECONDS);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_BANK).poll(15, TimeUnit.SECONDS);
         if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
             throw new ErrorResponseException(errorResponse);
         }

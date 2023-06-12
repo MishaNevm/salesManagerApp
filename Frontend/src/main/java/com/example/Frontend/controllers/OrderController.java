@@ -139,26 +139,4 @@ public class OrderController {
         restTemplate.exchange(String.format(ADD_PRODUCT_TO_ORDER, id, productId, quantity), HttpMethod.POST, null, HttpStatus.class);
         return "redirect:/orders/" + id;
     }
-
-
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotFoundException e) {
-//        return new ResponseEntity<>(new ErrorResponse("Данный заказ не найден"), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotCreatedException e) {
-//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
-
-//    private Order checkRequest(Integer clientId, OrderDTO orderDTO, BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            throw new OrderNotCreatedException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
-//        Order order = modelMapperUtil.convertOrderDTOToOrder(orderDTO);
-//        if (clientId != null) {
-//            order.setClientId(clientId);
-//        }
-//        return order;
-//    }
 }

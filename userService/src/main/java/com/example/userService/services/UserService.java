@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 @Service
 @Transactional
@@ -62,8 +61,9 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void update(User user) {
-        userRepository.save(user);
+    public void update(UserDTO userDTO) {
+        userDTO.setCreatedAt(userRepository.findById(userDTO.getId()).orElseThrow(UserNotFoundException::new).getCreatedAt());
+        userRepository.save(modelMapper.convertUserDTOToUser(userDTO));
     }
 
     public void delete(int id) {

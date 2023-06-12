@@ -61,7 +61,6 @@ public class ProductController {
     }
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
-        productDTO.setCreatedAt(productService.findById(productDTO.getId()).getResponse().get(0).getCreatedAt());
         productService.update(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -75,7 +74,6 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
-        productService.findById(id);
         productService.delete(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -90,20 +88,5 @@ public class ProductController {
     public ResponseEntity<HttpStatus> deleteAllProductsInOrderByOrderId(@RequestParam(value = "orderId", required = false) Integer orderId) {
         productOrderService.deleteAllProductsByOrderId(orderId);
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotSaveException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotFoundException e) {
-        return new ResponseEntity<>(new ErrorResponse("Товар не найден"), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotAddException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

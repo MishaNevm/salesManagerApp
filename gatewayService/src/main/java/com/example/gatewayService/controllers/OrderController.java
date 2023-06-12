@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/orders")
@@ -44,7 +46,7 @@ public class OrderController {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(id);
         producer.sendRequestToOrderService(MethodsCodes.GET_ORDER_BY_ID, orderDTO);
-        return (OrderDTO) consumer.getResponseMap().get(MethodsCodes.GET_ORDER_BY_ID).take().getResponse().get(0);
+        return (OrderDTO) Objects.requireNonNull(consumer.getResponseMap().get(MethodsCodes.GET_ORDER_BY_ID).poll(15, TimeUnit.SECONDS)).getResponse().get(0);
     }
 
 

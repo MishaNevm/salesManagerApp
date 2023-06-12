@@ -31,59 +31,44 @@ public class UserController {
 
     @GetMapping()
     public ResponseEntity<HttpStatus> findAll() {
-        producer.sendMessage(MethodsCodes.GET_ALL_USERS.getCode(), userService.findAll());
+        producer.sendMessage(MethodsCodes.GET_ALL_USERS, userService.findAll());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
-        producer.sendMessage(MethodsCodes.GET_USER_BY_ID.getCode(), userService.findById(id));
+        producer.sendMessage(MethodsCodes.GET_USER_BY_ID, userService.findById(id));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/findByEmail")
     public ResponseEntity<HttpStatus> findByEmail(@RequestParam("email") String email) {
-        producer.sendMessage(MethodsCodes.GET_USER_BY_EMAIL.getCode(), userService.findByEmail(email));
+        producer.sendMessage(MethodsCodes.GET_USER_BY_EMAIL, userService.findByEmail(email));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserDTO user) {
-        userService.save(modelMapper.convertUserDTOToUser(user));
-        return ResponseEntity.ok(HttpStatus.OK);
+    public void create(@RequestBody @Valid UserDTO user) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        userDTOUniqueValidator.validate(user, errorResponse);
+        if (errorResponse.getErrors().isEmpty()) {
+            userService.save(modelMapper.convertUserDTOToUser(user));
+        }
+        producer.sendMessage(MethodsCodes.CREATE_USER, errorResponse);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody @Valid UserDTO user) {
-        user.setCreatedAt(userService.findById(user.getId()).getResponse().get(0).getCreatedAt());
-//        userDTOUniqueValidator.validate(user, bindingResult);
-//        if (bindingResult.hasErrors()) {
-//            throw new UserNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
-        userService.update(modelMapper.convertUserDTOToUser(user));
-        return ResponseEntity.ok(HttpStatus.OK);
+    public void update(@RequestBody @Valid UserDTO user) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        userDTOUniqueValidator.validate(user, errorResponse);
+        if (errorResponse.getErrors().isEmpty()) {
+            userService.update(user);
+        }
+        producer.sendMessage(MethodsCodes.UPDATE_USER, errorResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
-        userService.findById(id);
+    public void delete(@PathVariable("id") int id) {
         userService.delete(id);
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(UserNotSaveException e) {
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(UserNotFoundException e) {
-        return new ResponseEntity<>(new ErrorResponse("Данный пользователь не найден"), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(HttpMessageNotReadableException e) {
-        return new ResponseEntity<>(new ErrorResponse("Дата рожения должна быть в формате гггг-мм-дд")
-                , HttpStatus.BAD_REQUEST);
     }
 }

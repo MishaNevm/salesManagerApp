@@ -4,14 +4,15 @@ import com.example.gatewayService.dto.UserDTO;
 import com.example.gatewayService.dto.UserDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
+import com.example.gatewayService.util.ErrorResponse;
+import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/users")
@@ -48,16 +49,23 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserDTO user) {
+    public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserDTO user) throws InterruptedException {
         producer.sendRequestToUserService(MethodsCodes.CREATE_USER, user);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_USER).poll(15, TimeUnit.SECONDS);
+        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
+            throw new ErrorResponseException(errorResponse);
+        }
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody @Valid UserDTO user, BindingResult bindingResult) {
-        user.setId(id);
+    public ResponseEntity<HttpStatus> update(@RequestBody @Valid UserDTO user) throws InterruptedException {
         producer.sendRequestToUserService(MethodsCodes.UPDATE_USER, user);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_USER).poll(15, TimeUnit.SECONDS);
+        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
+            throw new ErrorResponseException(errorResponse);
+        }
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -67,6 +75,11 @@ public class UserController {
         userDTO.setId(id);
         producer.sendRequestToUserService(MethodsCodes.DELETE_USER, userDTO);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> exceptionHandler(ErrorResponseException e) {
+        return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
     }
 }
 
