@@ -35,7 +35,7 @@ public class UserController {
             UserDTO userDTO = new UserDTO();
             userDTO.setEmail(email);
             producer.sendRequestToUserService(MethodsCodes.GET_USER_BY_EMAIL, userDTO);
-            return (UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_EMAIL).take();
+            return (UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_EMAIL).poll(15, TimeUnit.SECONDS);
         }
     }
 

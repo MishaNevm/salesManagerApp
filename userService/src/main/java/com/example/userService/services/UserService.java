@@ -52,7 +52,7 @@ public class UserService {
                         .singletonList(modelMapper
                                 .convertUserToUserDTO(userRepository
                                         .findByEmail(email)
-                                        .orElseThrow(UserNotFoundException::new))));
+                                        .orElse(new User()))));
         return userDTOResponse;
     }
 

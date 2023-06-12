@@ -5,3 +5,4 @@ spring:
         enabled: true
 server:
   port: 8585
+secret: "Одна голова - хорошо. А две - хорошо, хорошо"

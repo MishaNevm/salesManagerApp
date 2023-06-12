@@ -23,7 +23,7 @@ public class UserController {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final String GET_ALL_USERS = "http://localhost:8484/users";
-    private final String GET_USER_BY_EMAIL = "http://localhost:8484/users?email=%s";
+    public static final String GET_USER_BY_EMAIL = "http://localhost:8484/users?email=%s";
     private final String GET_USER_BY_ID = "http://localhost:8484/users/%d";
 
     private final String CREATE_USER = GET_ALL_USERS;
