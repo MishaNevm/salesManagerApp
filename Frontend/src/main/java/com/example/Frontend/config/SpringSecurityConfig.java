@@ -27,14 +27,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+        http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/auth/login","/auth/registration","/error")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and().formLogin()
-                .loginPage("/login")
+                .loginPage("/auth/login")
                 .defaultSuccessUrl("/users")
                 .failureUrl("/auth/login?error")
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
