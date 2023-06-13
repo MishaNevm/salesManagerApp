@@ -38,22 +38,6 @@ public class Consumer {
         }
     }
 
-
-    @KafkaListener(topics = "${application.kafka.userTopicResponse}")
-    public void listenUserTopic(ConsumerRecord<Integer, byte[]> consumerRecord) {
-        try {
-            MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
-            if (methodsCodes != null) {
-                if (methodsCodes.isHasModelResponse()) {
-                    responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), UserDTOResponse.class));
-                } else
-                    errorResponseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ErrorResponse.class));
-            }
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @KafkaListener(topics = "${application.kafka.clientTopicResponse}")
     public void listenClientTopic(ConsumerRecord<Integer, byte[]> consumerRecord) {
         try {

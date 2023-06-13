@@ -4,12 +4,12 @@ import java.util.Arrays;
 
 public enum MethodsCodes {
 
-    GET_ALL_USERS(0, true, false),
-    GET_USER_BY_ID(1, true, false),
-    GET_USER_BY_EMAIL(2, true, false),
-    CREATE_USER(3, false, true),
-    UPDATE_USER(4, false, true),
-    DELETE_USER(5, false, false),
+//    GET_ALL_USERS(0, true, false),
+//    GET_USER_BY_ID(1, true, false),
+//    GET_USER_BY_EMAIL(2, true, false),
+//    CREATE_USER(3, false, true),
+//    UPDATE_USER(4, false, true),
+//    DELETE_USER(5, false, false),
     GET_ALL_CLIENTS(6, true, false),
     GET_CLIENT_BY_ID(7, true, false),
     CREATE_CLIENT(8, false, true),

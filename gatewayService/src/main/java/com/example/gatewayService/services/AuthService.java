@@ -1,9 +1,8 @@
-package com.example.Frontend.service;
+package com.example.gatewayService.services;
 
-import com.example.Frontend.security.JWTUtil;
-import com.example.Frontend.security.UserLoginDetails;
+import com.example.gatewayService.security.JWTUtil;
+import com.example.gatewayService.security.UserLoginDetails;
 import org.apache.http.auth.InvalidCredentialsException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

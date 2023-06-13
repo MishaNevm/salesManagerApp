@@ -1,4 +1,4 @@
-package com.example.gatewayService.util;
+package com.example.gatewayService.util.UserUtil;
 
 public enum UserRoles {
     ADMIN("Администратор"),
