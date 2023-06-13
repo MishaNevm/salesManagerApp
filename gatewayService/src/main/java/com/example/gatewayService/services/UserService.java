@@ -58,12 +58,14 @@ public class UserService {
     }
 
     public void save(UserDTO userDTO) {
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         User user = modelMapper.convertUserDTOToUser(userDTO);
         user.setCreatedAt(new Date());
         userRepository.save(user);
     }
 
     public void update(UserDTO userDTO) {
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userDTO.setCreatedAt(userRepository.findById(userDTO.getId()).orElseThrow(UserNotFoundException::new).getCreatedAt());
         userRepository.save(modelMapper.convertUserDTOToUser(userDTO));
     }

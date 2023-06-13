@@ -6,17 +6,15 @@ import com.example.gatewayService.security.JWTUtil;
 import com.example.gatewayService.services.UserService;
 import com.example.gatewayService.util.ErrorResponse;
 import com.example.gatewayService.util.ErrorResponseException;
-import com.example.gatewayService.util.ModelMapperUtil;
 import com.example.gatewayService.util.UserUtil.UserDTOUniqueValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 import javax.validation.Valid;
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,12 +40,16 @@ public class AuthController {
     public String login(@RequestBody UserLogin userLogin) {
         UsernamePasswordAuthenticationToken authInputToken =
                 new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword());
-        authenticationManager.authenticate(authInputToken);
-        return jwtUtil.generateToken(userLogin.getEmail());
+        try {
+            authenticationManager.authenticate(authInputToken);
+            return jwtUtil.generateToken(userLogin.getEmail());
+        } catch (BadCredentialsException e) {
+            throw new ErrorResponseException(new ErrorResponse());
+        }
     }
 
     @PostMapping("/registration")
-    public String registration(@RequestBody @Valid UserLogin userLogin) {
+    public ResponseEntity<HttpStatus> registration(@RequestBody @Valid UserLogin userLogin) {
         ErrorResponse errorResponse = new ErrorResponse();
         UserDTO userDTO = new UserDTO();
         userDTO.setEmail(userLogin.getEmail());
@@ -55,7 +57,7 @@ public class AuthController {
         if (errorResponse.getErrors().isEmpty()) {
             userDTO.setPassword(userLogin.getPassword());
             userService.save(userDTO);
-            return jwtUtil.generateToken(userLogin.getEmail());
+            return ResponseEntity.ok(HttpStatus.OK);
         }
         throw new ErrorResponseException(errorResponse);
     }

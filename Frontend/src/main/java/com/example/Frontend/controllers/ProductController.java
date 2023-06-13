@@ -3,7 +3,6 @@ package com.example.Frontend.controllers;
 
 import com.example.Frontend.dto.ProductDTO;
 import com.example.Frontend.dto.ProductDTOResponse;
-import com.example.Frontend.dto.UserDTO;
 import com.example.Frontend.util.ProductTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
