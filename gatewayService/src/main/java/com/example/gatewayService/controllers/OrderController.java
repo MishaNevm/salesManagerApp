@@ -51,9 +51,7 @@ public class OrderController {
 
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestParam(value = "client-id", required = false) int clientId) {
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setClientId(clientId);
+    public ResponseEntity<HttpStatus> create(@RequestBody OrderDTO orderDTO) {
         producer.sendRequestToOrderService(MethodsCodes.CREATE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -68,14 +66,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/update-product-quantity")
-    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId,
-                                                                   @RequestParam(value = "quantity", required = false) Integer quantity) {
-        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
-        productOrderDTO.setOrderId(orderId);
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(productId);
-        productOrderDTO.setProduct(productDTO);
-        productOrderDTO.setQuantity(quantity);
+    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, productOrderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }

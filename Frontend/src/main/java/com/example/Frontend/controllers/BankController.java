@@ -3,6 +3,7 @@ package com.example.Frontend.controllers;
 
 import com.example.Frontend.dto.BankDTO;
 import com.example.Frontend.dto.BankDTOResponse;
+import com.example.Frontend.util.CurrentUser;
 import com.example.Frontend.util.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,18 @@ import java.util.Objects;
 public class BankController {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+
+    private final CurrentUser currentUser;
     private final String GET_ALL_BANKS = "http://localhost:8484/banks";
     private final String GET_BANK_BY_ID = "http://localhost:8484/banks/%d";
     private final String UPDATE_BANK = GET_BANK_BY_ID;
     private final String DELETE_BANK = GET_BANK_BY_ID;
 
     @Autowired
-    public BankController(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public BankController(RestTemplate restTemplate, ObjectMapper objectMapper, CurrentUser currentUser) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.currentUser = currentUser;
     }
 
 
@@ -42,13 +46,13 @@ public class BankController {
 
     @GetMapping("/{id}")
     private String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("bank", restTemplate.getForObject( String.format(GET_BANK_BY_ID, id), BankDTO.class));
+        model.addAttribute("bank", restTemplate.getForObject(String.format(GET_BANK_BY_ID, id), BankDTO.class));
         return "bank/getBankById";
     }
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        BankDTO bankDTO = restTemplate.getForObject(String.format( GET_BANK_BY_ID, id), BankDTO.class);
+        BankDTO bankDTO = restTemplate.getForObject(String.format(GET_BANK_BY_ID, id), BankDTO.class);
         model.addAttribute("bank", bankDTO);
         return "bank/updateBank";
     }
@@ -59,9 +63,10 @@ public class BankController {
             return "bank/updateBank";
         }
         try {
-            restTemplate.patchForObject(String.format( UPDATE_BANK, id), bankDTO, HttpStatus.class);
+            restTemplate.patchForObject(String.format(UPDATE_BANK, id), bankDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
+                bankDTO.setUpdatedBy(currentUser.getEmail());
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
                 errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
             } catch (IOException ex) {
@@ -78,7 +83,7 @@ public class BankController {
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id,
                          @RequestParam(value = "client-id", required = false) Integer clientId) {
-        restTemplate.delete(String.format( DELETE_BANK, id));
+        restTemplate.delete(String.format(DELETE_BANK, id));
         if (clientId == null) {
             return "redirect:/banks";
         } else return "redirect:/clients/" + clientId;

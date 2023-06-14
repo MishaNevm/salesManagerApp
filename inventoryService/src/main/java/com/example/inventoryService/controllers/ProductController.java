@@ -48,9 +48,6 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<HttpStatus> save(@RequestBody @Valid ProductDTO productDTO) {
-//        if (bindingResult.hasErrors()) {
-//            throw new ProductNotSaveException(ErrorResponse.convertErrorsToMessage(bindingResult));
-//        }
         productService.save(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }

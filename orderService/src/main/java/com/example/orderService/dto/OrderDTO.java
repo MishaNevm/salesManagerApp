@@ -1,7 +1,5 @@
 package com.example.orderService.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Date;
 
 public class OrderDTO {
@@ -10,9 +8,15 @@ public class OrderDTO {
 
     private Integer clientId;
 
+    private String comment;
+
     private Date createdAt;
 
     private Date updatedAt;
+
+    private String createdBy;
+
+    private String updatedBy;
 
     public int getId() {
         return id;
@@ -30,6 +34,14 @@ public class OrderDTO {
         this.clientId = clientId;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -44,5 +56,21 @@ public class OrderDTO {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

@@ -17,7 +17,7 @@
   </thead>
   <tbody>
   <th:block th:each="product : ${products}">
-    <form th:method="PATCH" th:action="@{/orders/{id}/update-product-quantity(id=${id})}">
+    <form th:method="patch" th:action="@{/orders/{id}/update-product-quantity(id=${id})}">
       <tr>
         <td th:text="${product.name}"></td>
         <td th:text="${product.type}"></td>

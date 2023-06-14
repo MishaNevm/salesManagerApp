@@ -6,6 +6,7 @@ import com.example.Frontend.dto.ClientDTO;
 import com.example.Frontend.dto.ClientDTOResponse;
 import com.example.Frontend.dto.OrderDTOResponse;
 import com.example.Frontend.util.ClientTypes;
+import com.example.Frontend.util.CurrentUser;
 import com.example.Frontend.util.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ public class ClientController {
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final CurrentUser currentUser;
     protected final static String GET_ALL_CLIENTS = "http://localhost:8484/clients";
     protected final static String GET_CLIENT_BY_ID = "http://localhost:8484/clients/%d";
     protected final static String CREATE_CLIENT = GET_ALL_CLIENTS;
@@ -35,9 +37,10 @@ public class ClientController {
     protected final static String DELETE_CLIENT = GET_CLIENT_BY_ID;
 
     @Autowired
-    public ClientController(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public ClientController(RestTemplate restTemplate, ObjectMapper objectMapper, CurrentUser currentUser) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.currentUser = currentUser;
     }
 
     @GetMapping
@@ -76,6 +79,7 @@ public class ClientController {
             restTemplate.postForObject(CREATE_CLIENT, clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
+                clientDTO.setCreatedBy(currentUser.getEmail());
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
                 errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
             } catch (IOException ex) {
@@ -101,6 +105,7 @@ public class ClientController {
         bankDTO.setClientDTO(new ClientDTO(id));
 
         try {
+            bankDTO.setUpdatedBy(currentUser.getEmail());
             restTemplate.postForObject(String.format(CREATE_BANK_TO_CLIENT, id), bankDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
@@ -131,6 +136,7 @@ public class ClientController {
             return "client/updateClient";
         }
         try {
+            clientDTO.setCreatedBy(currentUser.getEmail());
             restTemplate.patchForObject (String.format(UPDATE_CLIENT, id), clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
