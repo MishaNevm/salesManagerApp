@@ -4,31 +4,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Objects;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-//    private final HttpServletRequest request;
-//    private final RestTemplate restTemplate;
-//
-//    @Autowired
-//    public GlobalExceptionHandler(HttpServletRequest request, RestTemplate restTemplate) {
-//        this.request = request;
-//        this.restTemplate = restTemplate;
-//    }
-//
-//    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
-//    public void handleUnauthorizedException(HttpServletResponse response, HttpClientErrorException.Unauthorized exception) throws ServletException {
-//        if (Objects.equals(exception.getMessage(), "JWT token expired")) {
-//            request.logout();
-//        }
-//    }
+    private final HttpServletRequest request;
+
+    @Autowired
+    public GlobalExceptionHandler(HttpServletRequest request) {
+        this.request = request;
+    }
+
+    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
+    public RedirectView handleUnauthorizedException()  {
+        HttpSession session = request.getSession(false);
+        session.invalidate();
+        return new RedirectView("/auth/login");
+    }
 }
 

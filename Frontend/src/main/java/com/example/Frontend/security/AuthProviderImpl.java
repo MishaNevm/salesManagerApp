@@ -30,6 +30,9 @@ public class AuthProviderImpl implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        if (!restTemplate.getInterceptors().isEmpty()) {
+            restTemplate.getInterceptors().clear();
+        }
         UserLogin userLogin = new UserLogin();
         userLogin.setEmail(authentication.getName());
         userLogin.setPassword((String) authentication.getCredentials());
@@ -37,18 +40,11 @@ public class AuthProviderImpl implements AuthenticationProvider {
         try {
             token = restTemplate.postForObject(LOGIN_URL, userLogin, String.class);
         } catch (HttpClientErrorException.BadRequest e) {
-            System.out.println(1);
             throw new BadCredentialsException("Ошибка аутентификации");
         }
         if (token == null) {
-            System.out.println(2);
             throw new BadCredentialsException("Ошибка аутентификации");
         }
-//        Cookie cookie = new Cookie("token", token);
-//        cookie.setMaxAge(2 * 60 * 60);
-//        cookie.setHttpOnly(true);
-//        cookie.setPath("/");
-//        response.addCookie(cookie);
         restTemplate.getInterceptors().add((request, body, execution) -> {
             request.getHeaders().add("Authorization", "Bearer " + token);
             return execution.execute(request, body);

@@ -20,7 +20,7 @@ public class JWTUtil {
     }
 
     public String generateToken(String username) {
-        Date expirationDate = Date.from(ZonedDateTime.now().plusHours(1).toInstant());
+        Date expirationDate = Date.from(ZonedDateTime.now().plusHours(20).toInstant());
         return JWT.create().withSubject("User details")
                 .withClaim("email", username)
                 .withIssuedAt(new Date())
