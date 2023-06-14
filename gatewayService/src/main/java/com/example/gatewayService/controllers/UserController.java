@@ -2,13 +2,13 @@ package com.example.gatewayService.controllers;
 
 import com.example.gatewayService.dto.UserDTO;
 import com.example.gatewayService.dto.UserDTOResponse;
-import com.example.gatewayService.kafka.Consumer;
-import com.example.gatewayService.kafka.Producer;
-import com.example.gatewayService.util.MethodsCodes;
+import com.example.gatewayService.services.UserService;
+import com.example.gatewayService.util.ErrorResponse;
+import com.example.gatewayService.util.ErrorResponseException;
+import com.example.gatewayService.util.UserUtil.UserDTOUniqueValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,57 +16,63 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Producer producer;
+    private final UserService userService;
+    private final UserDTOUniqueValidator userDTOUniqueValidator;
 
-    private final Consumer consumer;
-
-    public UserController(Producer producer, Consumer consumer) {
-        this.producer = producer;
-        this.consumer = consumer;
+    @Autowired
+    public UserController(UserService userService, UserDTOUniqueValidator userDTOUniqueValidator) {
+        this.userService = userService;
+        this.userDTOUniqueValidator = userDTOUniqueValidator;
     }
 
     @GetMapping()
-    public UserDTOResponse getAllUsers(@RequestParam(value = "email", required = false) String email) throws InterruptedException {
+    public UserDTOResponse getAllUsers(@RequestParam(value = "email", required = false) String email) {
         if (email == null) {
-            producer.sendRequestToUserService(MethodsCodes.GET_ALL_USERS, null);
-            return (UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_USERS).take();
+            return userService.findAll();
         } else {
-            UserDTO userDTO = new UserDTO();
-            userDTO.setEmail(email);
-            producer.sendRequestToUserService(MethodsCodes.GET_USER_BY_EMAIL, userDTO);
-            return (UserDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_EMAIL).take();
+            return userService.findByEmail(email);
         }
     }
 
     @GetMapping("/{id}")
-    public UserDTO findById(@PathVariable("id") int id) throws InterruptedException {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(id);
-        producer.sendRequestToUserService(MethodsCodes.GET_USER_BY_ID, userDTO);
-        return (UserDTO) consumer.getResponseMap().get(MethodsCodes.GET_USER_BY_ID)
-                .take().getResponse().get(0);
+    public UserDTO findById(@PathVariable("id") int id) {
+        return userService.findById(id);
     }
 
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserDTO user) {
-        producer.sendRequestToUserService(MethodsCodes.CREATE_USER, user);
-        return ResponseEntity.ok(HttpStatus.OK);
+        ErrorResponse errorResponse = new ErrorResponse();
+        userDTOUniqueValidator.validate(user, errorResponse);
+        if (errorResponse.getErrors().isEmpty()) {
+            userService.save(user);
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
+        throw new ErrorResponseException(errorResponse);
+
     }
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody @Valid UserDTO user, BindingResult bindingResult) {
+    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody @Valid UserDTO user) {
         user.setId(id);
-        producer.sendRequestToUserService(MethodsCodes.UPDATE_USER, user);
-        return ResponseEntity.ok(HttpStatus.OK);
+        ErrorResponse errorResponse = new ErrorResponse();
+        userDTOUniqueValidator.validate(user, errorResponse);
+        if (errorResponse.getErrors().isEmpty()) {
+            userService.update(user);
+            return ResponseEntity.ok(HttpStatus.OK);
+        }
+        throw new ErrorResponseException(errorResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(id);
-        producer.sendRequestToUserService(MethodsCodes.DELETE_USER, userDTO);
+        userService.delete(id);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> exceptionHandler(ErrorResponseException e) {
+        return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
     }
 }
 

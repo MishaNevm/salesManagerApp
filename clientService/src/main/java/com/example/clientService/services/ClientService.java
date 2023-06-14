@@ -1,8 +1,8 @@
 package com.example.clientService.services;
 
 
+import com.example.clientService.dto.ClientDTO;
 import com.example.clientService.dto.ClientDTOResponse;
-import com.example.clientService.models.Bank;
 import com.example.clientService.models.Client;
 import com.example.clientService.repositoryes.BankRepository;
 import com.example.clientService.util.ModelMapperUtil;
@@ -22,13 +22,15 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final ModelMapperUtil modelMapperUtil;
+    private final ModelMapperUtil modelMapper;
     private final BankRepository bankRepository;
     private ClientDTOResponse clientDTOResponse;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository, ModelMapperUtil modelMapperUtil, BankRepository bankRepository) {
+    public ClientService(ClientRepository clientRepository, ModelMapperUtil modelMapperUtil, ModelMapperUtil modelMapper, BankRepository bankRepository) {
         this.clientRepository = clientRepository;
         this.modelMapperUtil = modelMapperUtil;
+        this.modelMapper = modelMapper;
         this.bankRepository = bankRepository;
     }
 
@@ -71,14 +73,16 @@ public class ClientService {
 
 
     @Transactional
-    public void save(Client client) {
+    public void save(ClientDTO clientDTO) {
+        Client client = modelMapper.convertClientDTOToClient(clientDTO);
         client.setCreatedAt(new Date());
         clientRepository.save(client);
     }
 
 
     @Transactional
-    public void update(Client client) {
+    public void update(ClientDTO clientDTO) {
+        Client client = modelMapper.convertClientDTOToClient(clientDTO);
         client.setUpdatedAt(new Date());
         clientRepository.save(client);
     }

@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 @Service
 @Transactional
@@ -61,6 +59,7 @@ public class OrderService {
     }
 
     public void update(OrderDTO orderDTO) {
+        orderDTO.setCreatedAt(orderRepository.findById(orderDTO.getId()).orElseThrow(OrderNotFoundException::new).getCreatedAt());
         Order order = modelMapperUtil.convertOrderDTOToOrder(orderDTO);
         order.setUpdatedAt(new Date());
         orderRepository.save(order);

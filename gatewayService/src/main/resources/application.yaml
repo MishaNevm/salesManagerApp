@@ -2,8 +2,6 @@ server:
   port: 8484
 application:
   kafka:
-    userTopicRequest: "userTopicRequest"
-    userTopicResponse: "userTopicResponse"
     clientTopicRequest: "clientTopicRequest"
     clientTopicResponse: "clientTopicResponse"
     orderTopicRequest: "orderTopicRequest"
@@ -11,6 +9,14 @@ application:
     inventoryTopicRequest: "inventoryTopicRequest"
     inventoryTopicResponse: "inventoryTopicResponse"
 spring:
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5445/userDB
+    username: user
+    password: pass
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -26,14 +32,14 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
-
-#  boot:
-#    admin:
-#      client:
-#        url: http://localhost:8484/admin
-#      context-path: /admin
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
+  boot:
+    admin:
+      client:
+        url: http://localhost:8484/admin
+      context-path: /admin
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+secret: "Одна голова - хорошо. А две - хорошо, хорошо"

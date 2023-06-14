@@ -58,6 +58,7 @@ public class ProductService {
     }
 
     public void update(ProductDTO productDTO) {
+        productDTO.setCreatedAt(productRepository.findById(productDTO.getId()).orElseThrow(ProductNotFoundException::new).getCreatedAt());
         Product product = modelMapperUtil.convertProductDTOToProduct(productDTO);
         product.setUpdatedAt(new Date());
         productRepository.save(product);

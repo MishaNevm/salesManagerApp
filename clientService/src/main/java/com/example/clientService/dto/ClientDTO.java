@@ -2,9 +2,10 @@ package com.example.clientService.dto;
 
 //import com.example.salesManagerApp.util.clientUtil.ClientTypes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.example.clientService.util.clientUtil.ClientTypes;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -34,14 +35,19 @@ public class ClientDTO {
     @Pattern(regexp = "\\d{13}", message = "ОГРН должен состоять из 13 цифр")
     private String ogrn;
 
-//    @NotNull(message = "Тип юридического лица не должен быть пустым")
-//    private ClientTypes type;
+    @NotNull(message = "Тип юридического лица не должен быть пустым")
+    private ClientTypes type;
 
     private BankDTO bankDTO;
 
     private Date createdAt;
 
     private Date updatedAt;
+
+    public ClientDTO(int id) {
+        this.id = id;
+    }
+    public ClientDTO() {}
 
     public int getId() {
         return id;
@@ -91,13 +97,13 @@ public class ClientDTO {
         this.ogrn = ogrn;
     }
 
-//    public ClientTypes getType() {
-//        return type;
-//    }
-//
-//    public void setType(ClientTypes type) {
-//        this.type = type;
-//    }
+    public ClientTypes getType() {
+        return type;
+    }
+
+    public void setType(ClientTypes type) {
+        this.type = type;
+    }
 
     public BankDTO getBankDTO() {
         return bankDTO;

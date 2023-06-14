@@ -37,7 +37,7 @@ public class Consumer {
                         clientController.findById(objectMapper.readValue(consumerRecord.value(), ClientDTO.class).getId());
                 case 8 -> clientController.create(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
                 case 9 -> clientController.update(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
-                case 10 -> clientController.delete(objectMapper.readValue(consumerRecord.value(), ClientDTO.class));
+                case 10 -> clientController.delete(objectMapper.readValue(consumerRecord.value(), ClientDTO.class).getId());
                 case 15 -> bankController.findAll();
                 case 16 ->
                         bankController.findById(objectMapper.readValue(consumerRecord.value(), BankDTO.class).getId());

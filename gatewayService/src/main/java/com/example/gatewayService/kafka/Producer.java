@@ -9,29 +9,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class Producer {
 
-    private final String USER_TOPIC_REQUEST;
     private final String CLIENT_TOPIC_REQUEST;
     private final String ORDER_TOPIC_REQUEST;
     private final String INVENTORY_TOPIC_REQUEST;
     private final KafkaTemplate<Integer, Object> kafkaTemplate;
 
-    public Producer(@Value("${application.kafka.userTopicRequest}") String userTopicRequest,
-                    @Value("${application.kafka.clientTopicRequest}") String clientTopicRequest,
+    public Producer(@Value("${application.kafka.clientTopicRequest}") String clientTopicRequest,
                     @Value("${application.kafka.orderTopicRequest}") String orderTopicRequest,
                     @Value("${application.kafka.inventoryTopicRequest}") String inventoryTopicRequest, KafkaTemplate<Integer, Object> kafkaTemplate) {
-        USER_TOPIC_REQUEST = userTopicRequest;
         CLIENT_TOPIC_REQUEST = clientTopicRequest;
         ORDER_TOPIC_REQUEST = orderTopicRequest;
         INVENTORY_TOPIC_REQUEST = inventoryTopicRequest;
         this.kafkaTemplate = kafkaTemplate;
-    }
-
-    public void sendRequestToUserService(MethodsCodes methodsCodes, UserDTO userDTO) {
-        try {
-            kafkaTemplate.send(USER_TOPIC_REQUEST, methodsCodes.getCode(), userDTO);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void sendRequestToClientService(MethodsCodes methodsCodes, ClientDTO clientDTO) {

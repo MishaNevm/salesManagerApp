@@ -24,13 +24,18 @@
     <p th:text="${'Bank Address: ' + client.getBankDTO().getCountry() + ', ' + client.getBankDTO().getCity()}"></p>
     <br/>
     <a th:href="@{/banks/{id}/edit(id=${client.getBankDTO().getId()})}">Update bank</a>
+    <br/>
+    <form th:method="DELETE" th:action="@{/banks/{id}(id=${client.getBankDTO().getId()})}">
+        <input type="submit" value="Delete bank"/>
+        <input type="hidden" name="client-id" th:value="${client.getId()}"/>
+    </form>
 </div>
 <br/>
 <a th:href="@{/clients/{id}/edit(id=${client.getId()})}">Update client</a>
 <br/>
 <br/>
 <form th:method="DELETE" th:action="@{/clients/{id}(id=${client.getId()})}" th:object="${client}">
-    <input type="submit" value="Delete"/>
+    <input type="submit" value="Delete client">
 </form>
 <br/>
 <hr/>

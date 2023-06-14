@@ -3,7 +3,6 @@ package com.example.Frontend.controllers;
 
 import com.example.Frontend.dto.ProductDTO;
 import com.example.Frontend.dto.ProductDTOResponse;
-import com.example.Frontend.dto.UserDTO;
 import com.example.Frontend.util.ProductTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -56,17 +55,14 @@ public class ProductController {
         if (bindingResult.hasErrors()) {
             return "inventory/createProduct";
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<ProductDTO> entity = new HttpEntity<>(productDTO, headers);
-        restTemplate.exchange(CREATE_PRODUCT, HttpMethod.POST, entity, HttpStatus.class);
+        restTemplate.postForObject(CREATE_PRODUCT, productDTO, HttpStatus.class);
         return "redirect:/products";
     }
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
         model.addAttribute("types", ProductTypes.values());
-        model.addAttribute("product", Objects.requireNonNull(restTemplate.getForObject(GET_PRODUCT_BY_ID + id, ProductDTO.class)));
+        model.addAttribute("product", Objects.requireNonNull(restTemplate.getForObject(String.format(GET_PRODUCT_BY_ID, id), ProductDTO.class)));
         return "inventory/updateProduct";
     }
 
@@ -75,11 +71,7 @@ public class ProductController {
         if (bindingResult.hasErrors()) {
             return "inventory/updateProduct";
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<ProductDTO> entity = new HttpEntity<>(productDTO, headers);
-        restTemplate.exchange(UPDATE_PRODUCT + id, HttpMethod.PATCH, entity, HttpStatus.class);
+        restTemplate.patchForObject(String.format(UPDATE_PRODUCT, id), productDTO, HttpStatus.class);
         return "redirect:/products/" + id;
     }
 

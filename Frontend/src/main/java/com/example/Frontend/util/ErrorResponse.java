@@ -3,13 +3,13 @@ package com.example.Frontend.util;
 import java.util.List;
 
 public class ErrorResponse {
-   List<ErrorMessage> fieldErrorList;
+   List<ValidationError> errors;
 
-    public List<ErrorMessage> getFieldErrorList() {
-        return fieldErrorList;
+    public List<ValidationError> getErrors() {
+        return errors;
     }
 
-    public void setFieldErrorList(List<ErrorMessage> fieldErrorList) {
-        this.fieldErrorList = fieldErrorList;
+    public void setErrors(List<ValidationError> errors) {
+        this.errors = errors;
     }
 }
