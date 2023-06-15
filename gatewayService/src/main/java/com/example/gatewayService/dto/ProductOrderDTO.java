@@ -3,8 +3,6 @@ package com.example.gatewayService.dto;
 import java.util.Date;
 
 public class ProductOrderDTO {
-
-
     private int id;
 
     private ProductDTO product;

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -31,7 +32,7 @@ public class BankController {
     @GetMapping()
     public BankDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.GET_ALL_BANKS, new BankDTO());
-        return (BankDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_BANKS).take();
+        return (BankDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_BANKS).poll(15, TimeUnit.SECONDS);
     }
 
     @GetMapping("/{id}")
@@ -39,7 +40,7 @@ public class BankController {
         bankDTO = new BankDTO();
         bankDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_BANK_BY_ID, bankDTO);
-        return (BankDTO) consumer.getResponseMap().get(MethodsCodes.GET_BANK_BY_ID).take().getResponse().get(0);
+        return (BankDTO) Objects.requireNonNull(consumer.getResponseMap().get(MethodsCodes.GET_BANK_BY_ID).poll(15, TimeUnit.SECONDS)).getResponse().get(0);
     }
 
     @PatchMapping("/{id}")

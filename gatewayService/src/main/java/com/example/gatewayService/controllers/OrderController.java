@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -33,10 +32,10 @@ public class OrderController {
         OrderDTOResponse orderDTOResponse;
         if (clientId != null) {
             producer.sendRequestToOrderService(MethodsCodes.GET_ORDERS_BY_CLIENT_ID, clientId);
-            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ORDERS_BY_CLIENT_ID).take();
+            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ORDERS_BY_CLIENT_ID).poll(15, TimeUnit.SECONDS);
         } else {
             producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
-            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).take();
+            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).poll(15, TimeUnit.SECONDS);
         }
         return orderDTOResponse;
     }
@@ -66,7 +65,14 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/update-product-quantity")
-    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
+    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId,
+                                                                   @RequestParam(value = "quantity", required = false) Integer quantity) {
+        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
+        productOrderDTO.setOrderId(orderId);
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(productId);
+        productOrderDTO.setProduct(productDTO);
+        productOrderDTO.setQuantity(quantity);
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, productOrderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -112,14 +118,4 @@ public class OrderController {
         producer.sendRequestToInventoryService(MethodsCodes.ADD_PRODUCT_TO_ORDER, productOrderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotFoundException e) {
-//        return new ResponseEntity<>(new ErrorResponse("Данный заказ не найден"), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotCreatedException e) {
-//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
 }

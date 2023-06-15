@@ -2,7 +2,9 @@ package com.example.gatewayService.dto;
 
 //import com.example.salesManagerApp.util.clientUtil.ClientTypes;
 
-import com.example.clientService.util.clientUtil.ClientTypes;
+
+
+import com.example.gatewayService.util.ClientTypes;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

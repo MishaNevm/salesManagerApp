@@ -65,7 +65,8 @@ public class OrderController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute("order") OrderDTO orderDTO) {
+    public String create(@RequestParam(value = "client-id", required = false) Integer clientId, @ModelAttribute("order") OrderDTO orderDTO) {
+        orderDTO.setClientId(clientId);
         orderDTO.setCreatedBy(currentUser.getEmail());
         restTemplate.postForObject(CREATE_ORDER, orderDTO, HttpStatus.class);
         return "redirect:/orders";
@@ -98,21 +99,11 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/update-product-quantity")
-    public String updateProductQuantityInOrder(@PathVariable("id") int id,
-                                               @RequestParam(value = "quantity", required = false) Integer quantity,
-                                               @RequestParam(value = "product-id", required = false) Integer productId) {
-        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
-        productOrderDTO.setOrderId(id);
-        productOrderDTO.setUpdatedBy(currentUser.getEmail());
-        if (productId != null) {
-            productOrderDTO.setProduct(new ProductDTO());
-            productOrderDTO.getProduct().setId(productId);
-        }
-        if (quantity != null) {
-            productOrderDTO.setQuantity(quantity);
-            restTemplate.patchForObject(UPDATE_PRODUCT_QUANTITY_IN_ORDER, productOrderDTO, HttpStatus.class);
-        } else return "order/updateProductInOrder";
-        return "redirect:/orders/" + id;
+    public String updateProductQuantityInOrder(@PathVariable("id") int orderId,
+                                               @RequestParam(value = "product-id", required = false) Integer productId,
+                                               @RequestParam(value = "quantity", required = false) Integer quantity) {
+        restTemplate.exchange(String.format(UPDATE_PRODUCT_QUANTITY_IN_ORDER, orderId, productId, quantity), HttpMethod.PATCH, null, HttpStatus.class);
+        return "redirect:/orders/" + orderId;
     }
 
     @DeleteMapping("/{id}/delete-from-order")

@@ -1,4 +1,4 @@
-package com.example.gatewayService.util;
+package com.example.inventoryService.util;
 
 import java.util.List;
 

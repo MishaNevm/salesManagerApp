@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -31,7 +32,7 @@ public class ClientController {
     @GetMapping
     public ClientDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.GET_ALL_CLIENTS, new ClientDTO());
-        return (ClientDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_CLIENTS).take();
+        return (ClientDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_CLIENTS).poll(15, TimeUnit.SECONDS);
     }
 
     @GetMapping("/{id}")
@@ -39,7 +40,7 @@ public class ClientController {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_CLIENT_BY_ID, clientDTO);
-        return (ClientDTO) consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).take().getResponse().get(0);
+        return (ClientDTO) Objects.requireNonNull(consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).poll(15, TimeUnit.SECONDS)).getResponse().get(0);
     }
 
 

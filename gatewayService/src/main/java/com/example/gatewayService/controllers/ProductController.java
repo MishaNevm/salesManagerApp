@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/products")
@@ -31,7 +33,7 @@ public class ProductController {
     @GetMapping
     public ProductDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToInventoryService(MethodsCodes.GET_ALL_PRODUCTS, new ProductDTO());
-        return (ProductDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_PRODUCTS).take();
+        return (ProductDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_PRODUCTS).poll(15, TimeUnit.SECONDS);
     }
 
     @GetMapping("/get-products-by-order")
@@ -39,7 +41,7 @@ public class ProductController {
         ProductOrderDTO productOrderDTO = new ProductOrderDTO();
         productOrderDTO.setOrderId(orderId);
         producer.sendRequestToInventoryService(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID, productOrderDTO);
-        return (ProductDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID).take();
+        return (ProductDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID).poll(15, TimeUnit.SECONDS);
     }
 
     @GetMapping("/{id}")
@@ -47,7 +49,7 @@ public class ProductController {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(id);
         producer.sendRequestToInventoryService(MethodsCodes.GET_PRODUCT_BY_ID, productDTO);
-        return (ProductDTO) consumer.getResponseMap().get(MethodsCodes.GET_PRODUCT_BY_ID).take().getResponse().get(0);
+        return (ProductDTO) Objects.requireNonNull(consumer.getResponseMap().get(MethodsCodes.GET_PRODUCT_BY_ID).poll(15, TimeUnit.SECONDS)).getResponse().get(0);
     }
 
     @PostMapping
@@ -70,37 +72,4 @@ public class ProductController {
         producer.sendRequestToInventoryService(MethodsCodes.DELETE_PRODUCT, productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
-//    @PostMapping("/{id}/add-to-order")
-//    public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
-//                                                        @RequestParam(value = "order-id", required = false) Integer orderId,
-//                                                        @RequestParam(value = "quantity", required = false) Integer quantity) {
-//        productService.addProductToOrder(productService.findById(id), orderId, quantity);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-
-//    @PatchMapping("/{id}/change-order")
-//    public ResponseEntity<HttpStatus> changeOrderInProduct(@PathVariable("id") int id,
-//                                                           @RequestParam(value = "old-order-id", required = false) Integer oldOrderId,
-//                                                           @RequestParam(value = "new-order-id", required = false) Integer newOrderId) {
-//        productService.findById(id);
-////        productService.changeOrderInProduct(id, oldOrderId, newOrderId);
-//        return ResponseEntity.ok(HttpStatus.OK);
-//    }
-//
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotSaveException e) {
-//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotFoundException e) {
-//        return new ResponseEntity<>(new ErrorResponse("Товар не найден"), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(ProductNotAddException e) {
-//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
 }

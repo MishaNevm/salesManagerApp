@@ -1,6 +1,8 @@
 package com.example.gatewayService.dto;
 
-import com.example.inventoryService.util.ProductTypes;
+
+
+import com.example.gatewayService.util.ProductTypes;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;

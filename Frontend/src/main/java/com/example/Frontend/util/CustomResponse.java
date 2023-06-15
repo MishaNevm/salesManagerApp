@@ -2,8 +2,15 @@ package com.example.Frontend.util;
 
 import java.util.List;
 
-public interface CustomResponse<T> {
-    List<T> getResponse();
+public abstract class CustomResponse<T> {
 
-    void setResponse(List<T> response);
+    private List<T> response;
+
+    public List<T> getResponse() {
+        return response;
+    }
+
+    public void setResponse(List<T> response) {
+        this.response = response;
+    }
 }

@@ -1,18 +1,7 @@
 package com.example.clientService.dto;
 
-import java.util.List;
+import com.example.clientService.util.CustomResponse;
 
-public class BankDTOResponse implements CustomResponse<BankDTO> {
+public class BankDTOResponse extends CustomResponse<BankDTO> {
 
-    private List<BankDTO> bankDTOList;
-
-    @Override
-    public List<BankDTO> getResponse() {
-        return bankDTOList;
-    }
-
-    @Override
-    public void setResponse(List<BankDTO> response) {
-        bankDTOList = response;
-    }
 }

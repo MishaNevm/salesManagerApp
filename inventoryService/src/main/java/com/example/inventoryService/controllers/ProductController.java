@@ -5,13 +5,16 @@ import com.example.inventoryService.dto.ProductOrderDTO;
 import com.example.inventoryService.kafka.Producer;
 import com.example.inventoryService.services.ProductOrderService;
 import com.example.inventoryService.services.ProductService;
-import com.example.inventoryService.util.*;
+import com.example.inventoryService.util.ErrorResponse;
+import com.example.inventoryService.util.MethodsCodes;
+import com.example.inventoryService.util.ValidationError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/products")
@@ -51,11 +54,16 @@ public class ProductController {
         productService.save(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
     @PostMapping("/{id}/add-to-order")
-    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
-        productOrderService.save(productOrderDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ErrorResponse addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
+        ValidationError validationError = new ValidationError();
+        productOrderService.save(productOrderDTO, validationError);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrors(Collections.singletonList(validationError));
+        return errorResponse;
     }
+
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
         productService.update(productDTO);
@@ -63,9 +71,12 @@ public class ProductController {
     }
 
     @PatchMapping("/update-quantity-in-order")
-    public ResponseEntity<HttpStatus> updateProductQuantityInOrder (ProductOrderDTO productOrderDTO) {
-        productOrderService.updateProductQuantityInOrder(productOrderDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ErrorResponse updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
+        ValidationError validationError = new ValidationError();
+        productOrderService.updateProductQuantityInOrder(productOrderDTO, validationError);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrors(Collections.singletonList(validationError));
+        return errorResponse;
     }
 
 
