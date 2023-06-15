@@ -63,10 +63,10 @@ public class BankController {
             return "bank/updateBank";
         }
         try {
+            bankDTO.setUpdatedBy(currentUser.getEmail());
             restTemplate.patchForObject(String.format(UPDATE_BANK, id), bankDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
-                bankDTO.setUpdatedBy(currentUser.getEmail());
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
                 errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
             } catch (IOException ex) {

@@ -32,7 +32,8 @@ public class Consumer {
         for (MethodsCodes methodsCode : MethodsCodes.values()) {
             if (methodsCode.isHasModelResponse()) {
                 responseMap.put(methodsCode, new ArrayBlockingQueue<>(100));
-            } else if (methodsCode.isHasErrorResponse()){
+            }
+            if (methodsCode.isHasErrorResponse()) {
                 errorResponseMap.put(methodsCode, new ArrayBlockingQueue<>(100));
             }
         }
@@ -75,7 +76,11 @@ public class Consumer {
         try {
             MethodsCodes methodsCodes = MethodsCodes.searchByCode(consumerRecord.key());
             if (methodsCodes != null) {
-                responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ProductDTOResponse.class));
+                if (methodsCodes.isHasErrorResponse()) {
+                    errorResponseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ErrorResponse.class));
+                } else {
+                    responseMap.get(methodsCodes).put(objectMapper.readValue(consumerRecord.value(), ProductDTOResponse.class));
+                }
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

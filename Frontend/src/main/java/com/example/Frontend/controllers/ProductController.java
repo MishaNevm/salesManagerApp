@@ -72,9 +72,13 @@ public class ProductController {
 
     @PatchMapping("/{id}")
     public String update(@PathVariable("id") int id, @ModelAttribute("product") @Valid ProductDTO productDTO, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
+            System.out.println(1);
+            bindingResult.getFieldErrors().forEach(a -> System.out.println(a.getField()));
             return "inventory/updateProduct";
         }
+
         productDTO.setUpdatedBy(currentUser.getEmail());
         restTemplate.patchForObject(String.format(UPDATE_PRODUCT, id), productDTO, HttpStatus.class);
         return "redirect:/products/" + id;

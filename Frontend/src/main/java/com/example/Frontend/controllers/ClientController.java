@@ -76,10 +76,10 @@ public class ClientController {
             return "client/createClient";
         }
         try {
+            clientDTO.setCreatedBy(currentUser.getEmail());
             restTemplate.postForObject(CREATE_CLIENT, clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
-                clientDTO.setCreatedBy(currentUser.getEmail());
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
                 errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
             } catch (IOException ex) {
@@ -105,7 +105,7 @@ public class ClientController {
         bankDTO.setClientDTO(new ClientDTO(id));
 
         try {
-            bankDTO.setUpdatedBy(currentUser.getEmail());
+            bankDTO.setCreatedBy(currentUser.getEmail());
             restTemplate.postForObject(String.format(CREATE_BANK_TO_CLIENT, id), bankDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
@@ -136,8 +136,8 @@ public class ClientController {
             return "client/updateClient";
         }
         try {
-            clientDTO.setCreatedBy(currentUser.getEmail());
-            restTemplate.patchForObject (String.format(UPDATE_CLIENT, id), clientDTO, HttpStatus.class);
+            clientDTO.setUpdatedBy(currentUser.getEmail());
+            restTemplate.patchForObject(String.format(UPDATE_CLIENT, id), clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);

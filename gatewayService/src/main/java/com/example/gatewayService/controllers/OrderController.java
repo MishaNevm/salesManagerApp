@@ -7,6 +7,8 @@ import com.example.gatewayService.dto.ProductDTO;
 import com.example.gatewayService.dto.ProductOrderDTO;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
+import com.example.gatewayService.util.ErrorResponse;
+import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,7 +68,7 @@ public class OrderController {
 
     @PatchMapping("/{id}/update-product-quantity")
     public ResponseEntity<HttpStatus> updateProductQuantityInOrder(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId,
-                                                                   @RequestParam(value = "quantity", required = false) Integer quantity) {
+                                                                   @RequestParam(value = "quantity", required = false) Integer quantity) throws InterruptedException {
         ProductOrderDTO productOrderDTO = new ProductOrderDTO();
         productOrderDTO.setOrderId(orderId);
         ProductDTO productDTO = new ProductDTO();
@@ -74,6 +76,8 @@ public class OrderController {
         productOrderDTO.setProduct(productDTO);
         productOrderDTO.setQuantity(quantity);
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, productOrderDTO);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER).poll(15, TimeUnit.SECONDS);
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -108,7 +112,7 @@ public class OrderController {
     @PostMapping("/{id}/add-product")
     public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
                                                         @RequestParam("product-id") Integer productId,
-                                                        @RequestParam("quantity") Integer quantity) {
+                                                        @RequestParam("quantity") Integer quantity) throws InterruptedException {
         ProductOrderDTO productOrderDTO = new ProductOrderDTO();
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(productId);
@@ -116,6 +120,8 @@ public class OrderController {
         productOrderDTO.setOrderId(id);
         productOrderDTO.setQuantity(quantity);
         producer.sendRequestToInventoryService(MethodsCodes.ADD_PRODUCT_TO_ORDER, productOrderDTO);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.ADD_PRODUCT_TO_ORDER).poll(15, TimeUnit.SECONDS);
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }

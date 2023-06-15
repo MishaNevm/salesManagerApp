@@ -48,9 +48,7 @@ public class ClientController {
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.CREATE_CLIENT, clientDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_CLIENT).poll(15, TimeUnit.SECONDS);
-        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
-            throw new ErrorResponseException(errorResponse);
-        }
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -61,9 +59,7 @@ public class ClientController {
         bankDTO.setClientDTO(clientDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
-        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
-            throw new ErrorResponseException(errorResponse);
-        }
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return HttpStatus.OK;
     }
 
@@ -72,9 +68,7 @@ public class ClientController {
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_CLIENT, clientDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_CLIENT).poll(15, TimeUnit.SECONDS);
-        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
-            throw new ErrorResponseException(errorResponse);
-        }
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -84,10 +78,5 @@ public class ClientController {
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.DELETE_CLIENT, clientDTO);
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ErrorResponseException e) {
-        return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
     }
 }

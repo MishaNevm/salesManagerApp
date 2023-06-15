@@ -8,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -92,17 +93,20 @@ public class OrderController {
     @GetMapping("/{id}/update-product-quantity")
     public String updateProductQuantityInOrder(@PathVariable("id") int id, Model model) {
         model.addAttribute("id", id);
-        model.addAttribute("products", Objects.requireNonNull(restTemplate
-                .getForObject(String
-                        .format(GET_PRODUCTS_BY_ORDER_ID, id), ProductDTOResponse.class)).getResponse());
-        return "order/updateProductInOrder";
+        model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(GET_ALL_PRODUCTS, ProductDTOResponse.class)).getResponse());        return "order/updateProductInOrder";
     }
 
     @PatchMapping("/{id}/update-product-quantity")
     public String updateProductQuantityInOrder(@PathVariable("id") int orderId,
                                                @RequestParam(value = "product-id", required = false) Integer productId,
-                                               @RequestParam(value = "quantity", required = false) Integer quantity) {
-        restTemplate.exchange(String.format(UPDATE_PRODUCT_QUANTITY_IN_ORDER, orderId, productId, quantity), HttpMethod.PATCH, null, HttpStatus.class);
+                                               @RequestParam(value = "quantity", required = false) Integer quantity, Model model) {
+        try {
+            restTemplate.patchForObject(String.format(UPDATE_PRODUCT_QUANTITY_IN_ORDER, orderId, productId, quantity), null, HttpStatus.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            model.addAttribute("error", 1);
+            model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(GET_ALL_PRODUCTS, ProductDTOResponse.class)).getResponse());
+            return "order/updateProductInOrder";
+        }
         return "redirect:/orders/" + orderId;
     }
 
@@ -137,8 +141,14 @@ public class OrderController {
     @PostMapping("/{id}/add-product")
     public String addProductToOrder(@PathVariable("id") int id,
                                     @RequestParam(value = "product-id", required = false) Integer productId,
-                                    @RequestParam(value = "quantity", required = false) Integer quantity) {
-        restTemplate.exchange(String.format(ADD_PRODUCT_TO_ORDER, id, productId, quantity), HttpMethod.POST, null, HttpStatus.class);
+                                    @RequestParam(value = "quantity", required = false) Integer quantity, Model model) {
+        try {
+            restTemplate.postForObject(String.format(ADD_PRODUCT_TO_ORDER, id, productId, quantity), null, HttpStatus.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            model.addAttribute("error", 1);
+            model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(GET_ALL_PRODUCTS, ProductDTOResponse.class)).getResponse());
+            return "order/addProductToOrder";
+        }
         return "redirect:/orders/" + id;
     }
 }

@@ -3,13 +3,6 @@ package com.example.gatewayService.util;
 import java.util.Arrays;
 
 public enum MethodsCodes {
-
-//    GET_ALL_USERS(0, true, false),
-//    GET_USER_BY_ID(1, true, false),
-//    GET_USER_BY_EMAIL(2, true, false),
-//    CREATE_USER(3, false, true),
-//    UPDATE_USER(4, false, true),
-//    DELETE_USER(5, false, false),
     GET_ALL_CLIENTS(6, true, false),
     GET_CLIENT_BY_ID(7, true, false),
     CREATE_CLIENT(8, false, true),
@@ -35,11 +28,11 @@ public enum MethodsCodes {
     CREATE_PRODUCT(28, false, true),
     UPDATE_PRODUCT(29, false, true),
     DELETE_PRODUCT(30, false, false),
-    ADD_PRODUCT_TO_ORDER(31, false, false),
+    ADD_PRODUCT_TO_ORDER(31, false, true),
     GET_PRODUCTS_BY_ORDER_ID(32, true, false),
     DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID(33, false, false),
     DELETE_PRODUCT_BY_ORDER_ID_AND_PRODUCT_ID(34, false, false),
-    UPDATE_PRODUCT_QUANTITY_IN_ORDER(35, false, false),
+    UPDATE_PRODUCT_QUANTITY_IN_ORDER(35, false, true),
     GET_ORDERS_BY_CLIENT_ID(36, true, false);
     private final Integer code;
     private final boolean hasModelResponse;

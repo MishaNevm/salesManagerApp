@@ -33,19 +33,19 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<HttpStatus> findAll() {
-        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_ALL_PRODUCTS.getCode(), productService.findAll());
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_ALL_PRODUCTS, productService.findAll());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/get-products-by-order")
     public ResponseEntity<HttpStatus> findAllProductsByOrderId(@RequestParam(value = "order-id", required = false) Integer orderId) {
-        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID.getCode(), productOrderService.findByOrderId(orderId));
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID, productOrderService.findByOrderId(orderId));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
-        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCT_BY_ID.getCode(), productService.findById(id));
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCT_BY_ID, productService.findById(id));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -56,12 +56,11 @@ public class ProductController {
     }
 
     @PostMapping("/{id}/add-to-order")
-    public ErrorResponse addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
-        ValidationError validationError = new ValidationError();
-        productOrderService.save(productOrderDTO, validationError);
+    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setErrors(Collections.singletonList(validationError));
-        return errorResponse;
+        productOrderService.save(productOrderDTO, errorResponse);
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.ADD_PRODUCT_TO_ORDER, errorResponse);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
@@ -71,12 +70,11 @@ public class ProductController {
     }
 
     @PatchMapping("/update-quantity-in-order")
-    public ErrorResponse updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
-        ValidationError validationError = new ValidationError();
-        productOrderService.updateProductQuantityInOrder(productOrderDTO, validationError);
+    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setErrors(Collections.singletonList(validationError));
-        return errorResponse;
+        productOrderService.updateProductQuantityInOrder(productOrderDTO, errorResponse);
+        producer.sendMessageToInventoryResponseTopic(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, errorResponse);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 

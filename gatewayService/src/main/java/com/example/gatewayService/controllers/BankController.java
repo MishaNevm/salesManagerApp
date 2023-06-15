@@ -47,9 +47,7 @@ public class BankController {
     public ResponseEntity<HttpStatus> update(@RequestBody BankDTO bankDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_BANK, bankDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_BANK).poll(15, TimeUnit.SECONDS);
-        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
-            throw new ErrorResponseException(errorResponse);
-        }
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -59,10 +57,5 @@ public class BankController {
         bankDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.DELETE_BANK, bankDTO);
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandle(ErrorResponseException e) {
-        return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
     }
 }
