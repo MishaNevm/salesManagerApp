@@ -47,9 +47,9 @@ public class Producer {
         }
     }
 
-    public void sendRequestToOrderService(MethodsCodes methodsCodes, Integer id) {
+    public void sendRequestToOrderService(MethodsCodes methodsCodes, String clientShortName) {
         try {
-            kafkaTemplate.send(ORDER_TOPIC_REQUEST, methodsCodes.getCode(), id);
+            kafkaTemplate.send(ORDER_TOPIC_REQUEST, methodsCodes.getCode(), clientShortName);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

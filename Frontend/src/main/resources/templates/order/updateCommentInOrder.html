@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update comment</title>
+</head>
+<body>
+<h1>Редактирование комментария</h1>
+<br/>
+<form th:method="PATCH" th:action="@{/orders/{id}(id=${id})}" th:object="${order}">
+    <input type="hidden" name="client-short-name" th:value="${order.getClientShortName()}">
+    <input type="hidden" name="created-by" th:value="${order.createdBy}">
+    <label for="comment">Comment: </label>
+    <input type="text" id="comment" name="comment">
+    <button type="submit">Обновить заказ</button>
+</form>
+</body>
+</html>

@@ -27,10 +27,9 @@
         <td th:text="${client.ogrn}"></td>
         <td>
             <form th:method="PATCH" th:action="@{/orders/{id}(id=${id})}" th:object="${order}">
-                <input type="hidden" name="client-id" th:field="*{clientId}" th:value="${client.id}">
-                <input type="hidden" name="created-by" th:field="*{createdBy}" th:value="${order.createdBy}">
-                <label for="comment"></label>
-                <input type="text" th:field="*{comment}" id="comment">
+                <input type="hidden" name="client-short-name" th:value="${client.getShortName()}">
+                <input type="hidden" name="created-by" th:value="${order.createdBy}">
+                <input type="hidden" name="comment" th:value="${order.comment}">
                 <button type="submit">Обновить заказ</button>
             </form>
         </td>

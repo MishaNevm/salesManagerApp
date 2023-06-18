@@ -12,8 +12,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "client_id")
-    private Integer clientId;
+    @Column(name = "client_short_name")
+    private String clientShortName;
 
     @Column(name = "comment")
     private String comment;
@@ -40,12 +40,12 @@ public class Order {
         this.id = id;
     }
 
-    public Integer getClientId() {
-        return clientId;
+    public String getClientShortName() {
+        return clientShortName;
     }
 
-    public void setClientId (Integer clientId) {
-        this.clientId = clientId;
+    public void setClientShortName(String clientEmail) {
+        this.clientShortName = clientEmail;
     }
 
     public String getComment() {

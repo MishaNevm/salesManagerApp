@@ -51,13 +51,16 @@ public class ClientController {
 
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("client", restTemplate.getForObject(String.format(GET_CLIENT_BY_ID, id), ClientDTO.class));
-        model.addAttribute("orders", Objects.requireNonNull(restTemplate
-                        .getForObject(String
-                                        .format(OrderController
-                                                .GET_ORDERS_BY_CLIENT_ID, id),
-                                OrderDTOResponse.class))
-                .getResponse());
+        ClientDTO clientDTO = restTemplate.getForObject(String.format(GET_CLIENT_BY_ID, id), ClientDTO.class);
+        model.addAttribute("client", clientDTO);
+        if (clientDTO != null) {
+            model.addAttribute("orders", Objects.requireNonNull(restTemplate
+                            .getForObject(String
+                                            .format(OrderController
+                                                    .GET_ORDERS_BY_CLIENT_ID, clientDTO.getShortName()),
+                                    OrderDTOResponse.class))
+                    .getResponse());
+        }
         return "client/getClientById";
     }
 

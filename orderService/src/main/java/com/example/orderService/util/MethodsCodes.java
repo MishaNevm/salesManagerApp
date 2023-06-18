@@ -6,7 +6,7 @@ public enum MethodsCodes {
     GET_ORDERS_BY_USER(22, true),
     CREATE_ORDER(23, false),
     UPDATE_ORDER(24, false),
-    GET_ORDERS_BY_CLIENT_ID(36, true);
+    GET_ORDERS_BY_CLIENT_SHORT_NAME(36, true);
 
     private final Integer code;
 

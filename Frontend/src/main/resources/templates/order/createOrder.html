@@ -27,7 +27,7 @@
         <td th:text="${client.ogrn}"></td>
         <td>
             <form method="post" th:action="@{/orders}" th:object="${order}">
-                <input type="hidden" name="client-id" th:value="${client.getId()}" />
+                <input type="hidden" name="client-short-name" th:value="${client.getShortName()}">
                 <label for="comment"></label>
                 <input type="text" th:field="*{comment}" id="comment">
                 <button type="submit">Создать заказ</button>

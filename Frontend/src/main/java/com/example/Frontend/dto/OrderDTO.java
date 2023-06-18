@@ -6,7 +6,7 @@ public class OrderDTO {
 
     private int id;
 
-    private Integer clientId;
+    private String clientShortName;
 
     private String comment;
 
@@ -26,12 +26,12 @@ public class OrderDTO {
         this.id = id;
     }
 
-    public Integer getClientId() {
-        return clientId;
+    public String getClientShortName() {
+        return clientShortName;
     }
 
-    public void setClientId(Integer clientId) {
-        this.clientId = clientId;
+    public void setClientShortName(String clientShortName) {
+        this.clientShortName = clientShortName;
     }
 
     public String getComment() {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>All orders</title>
@@ -8,7 +8,7 @@
 <br/>
 <p th:if="${orders.isEmpty()}">No orders</p>
 <div th:unless="${orders.isEmpty()}" th:each="order : ${orders}">
-    <a th:href="@{/orders/{id}(id=${order.getId()})}" th:text="${order.getClientId() + ', ' + order.getCreatedAt()}">VALUE</a>
+    <a th:href="@{/orders/{id}(id=${order.getId()})}" th:text="${order.getClientShortName() + ', ' + order.getCreatedAt()}">VALUE</a>
 </div>
 <br/>
 <hr/>

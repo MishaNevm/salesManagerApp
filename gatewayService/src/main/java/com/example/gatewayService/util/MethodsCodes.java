@@ -33,7 +33,7 @@ public enum MethodsCodes {
     DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID(33, false, false),
     DELETE_PRODUCT_BY_ORDER_ID_AND_PRODUCT_ID(34, false, false),
     UPDATE_PRODUCT_QUANTITY_IN_ORDER(35, false, true),
-    GET_ORDERS_BY_CLIENT_ID(36, true, false);
+    GET_ORDERS_BY_CLIENT_SHORT_NAME(36, true, false);
     private final Integer code;
     private final boolean hasModelResponse;
     private final boolean hasErrorResponse;

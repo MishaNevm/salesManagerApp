@@ -29,8 +29,8 @@ public class OrderController {
     }
 
     @GetMapping("/find")
-    public ResponseEntity<HttpStatus> findByClientId(@RequestParam(value = "client-id", required = false) int clientId) {
-        producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ORDERS_BY_CLIENT_ID.getCode(), orderService.findByClientId(clientId));
+    public ResponseEntity<HttpStatus> findByClientShortName(@RequestParam(value = "client-short-name", required = false) String clientShortName) {
+        producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ORDERS_BY_CLIENT_SHORT_NAME.getCode(), orderService.findByClientShortName(clientShortName));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

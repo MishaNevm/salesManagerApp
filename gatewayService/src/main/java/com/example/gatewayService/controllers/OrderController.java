@@ -30,14 +30,17 @@ public class OrderController {
     }
 
     @GetMapping
-    public OrderDTOResponse findAll(@RequestParam(value = "client-id", required = false) Integer clientId) throws InterruptedException {
+    public OrderDTOResponse findAll(@RequestParam(value = "client-short-name", required = false) String clientShortName) throws InterruptedException {
         OrderDTOResponse orderDTOResponse;
-        if (clientId != null) {
-            producer.sendRequestToOrderService(MethodsCodes.GET_ORDERS_BY_CLIENT_ID, clientId);
-            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ORDERS_BY_CLIENT_ID).poll(15, TimeUnit.SECONDS);
+        if (clientShortName != null) {
+            producer.sendRequestToOrderService(MethodsCodes.GET_ORDERS_BY_CLIENT_SHORT_NAME, clientShortName);
+            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ORDERS_BY_CLIENT_SHORT_NAME).poll(15, TimeUnit.SECONDS);
         } else {
             producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
             orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).poll(15, TimeUnit.SECONDS);
+        }
+        if (orderDTOResponse != null) {
+            orderDTOResponse.getResponse().forEach(a -> System.out.println(a.getClientShortName()));
         }
         return orderDTOResponse;
     }
@@ -58,10 +61,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int orderId, @RequestParam(value = "client-id", required = false) int clientId) {
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setId(orderId);
-        orderDTO.setClientId(clientId);
+    public ResponseEntity<HttpStatus> update(@RequestBody OrderDTO orderDTO) {
         producer.sendRequestToOrderService(MethodsCodes.UPDATE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
