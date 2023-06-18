@@ -3,6 +3,7 @@ package com.example.Frontend.controllers;
 
 import com.example.Frontend.dto.ProductDTO;
 import com.example.Frontend.dto.ProductDTOResponse;
+import com.example.Frontend.util.CurrentUser;
 import com.example.Frontend.util.ProductTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -20,6 +21,7 @@ import java.util.Objects;
 public class ProductController {
 
     private final RestTemplate restTemplate;
+    private final CurrentUser currentUser;
     private final String GET_ALL_PRODUCTS = "http://localhost:8484/products";
     private final String GET_PRODUCT_BY_ID = "http://localhost:8484/products/%d";
     private final String CREATE_PRODUCT = GET_ALL_PRODUCTS;
@@ -27,8 +29,9 @@ public class ProductController {
     private final String DELETE_PRODUCT = GET_PRODUCT_BY_ID;
 
     @Autowired
-    public ProductController(RestTemplate restTemplate) {
+    public ProductController(RestTemplate restTemplate, CurrentUser currentUser) {
         this.restTemplate = restTemplate;
+        this.currentUser = currentUser;
     }
 
     @GetMapping
@@ -55,6 +58,7 @@ public class ProductController {
         if (bindingResult.hasErrors()) {
             return "inventory/createProduct";
         }
+        productDTO.setCreatedBy(currentUser.getEmail());
         restTemplate.postForObject(CREATE_PRODUCT, productDTO, HttpStatus.class);
         return "redirect:/products";
     }
@@ -68,9 +72,14 @@ public class ProductController {
 
     @PatchMapping("/{id}")
     public String update(@PathVariable("id") int id, @ModelAttribute("product") @Valid ProductDTO productDTO, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
+            System.out.println(1);
+            bindingResult.getFieldErrors().forEach(a -> System.out.println(a.getField()));
             return "inventory/updateProduct";
         }
+
+        productDTO.setUpdatedBy(currentUser.getEmail());
         restTemplate.patchForObject(String.format(UPDATE_PRODUCT, id), productDTO, HttpStatus.class);
         return "redirect:/products/" + id;
     }

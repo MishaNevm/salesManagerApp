@@ -3,6 +3,7 @@ package com.example.inventoryService.models;
 import com.example.inventoryService.util.ProductTypes;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -22,6 +23,8 @@ public class Product {
     @Column(name = "quantity")
     private int quantity;
 
+    @Column(name = "price")
+    private BigDecimal price;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -30,6 +33,12 @@ public class Product {
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     public int getId() {
         return id;
@@ -77,5 +86,29 @@ public class Product {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

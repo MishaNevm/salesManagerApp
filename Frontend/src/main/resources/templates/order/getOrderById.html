@@ -6,14 +6,21 @@
 </head>
 <body>
 <p th:text="${'Order ID: ' + order.id}">VALUE</p>
-<p th:text="${'Client ID: ' + order.clientId}">VALUE</p>
+<p th:text="${'Client ID: ' + order.clientShortName}">VALUE</p>
 <p th:text="${'Created At: ' + order.createdAt}">VALUE</p>
-<p th:text="${'Updated At: ' + order.updatedAt}">VALUE</p>
+<div th:if="${order.updatedBy!=null}">
+    <p th:text="${'Updated At: ' + order.updatedAt}">VALUE</p></div>
+<p th:text="${'Created By: ' + order.createdBy}">VALUE</p>
+<div th:if="${not order.getComment().isBlank()}">
+    <p th:text="${'Comment: ' + order.comment}"></p>
+</div>
 <br/>
 <hr/>
 <a href="/orders">All orders</a>
 <br/>
 <a th:href="@{/orders/{id}/edit(id=${order.id})}">Update</a>
+<br/>
+<a th:href="@{/orders/{id}/update-comment(id=${order.id})}">Update comment</a>
 <br/>
 <a th:href="@{/orders/{id}/add-product(id=${order.id})}">Add product</a>
 <br/>

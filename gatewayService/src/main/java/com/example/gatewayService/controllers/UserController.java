@@ -69,10 +69,5 @@ public class UserController {
         userService.delete(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ErrorResponseException e) {
-        return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
-    }
 }
 

@@ -7,7 +7,6 @@
 <body>
 <form th:method="PATCH" th:action="@{/products/{id}(id=${product.id})}" th:object="${product}">
     <input type="hidden" th:field="*{id}"/>
-    <input type="hidden" th:field="*{createdAt}"/>
     <label for="name">Name: </label>
     <input type="text" th:field="*{name}" id="name"/>
     <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</div>

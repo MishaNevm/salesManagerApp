@@ -5,7 +5,10 @@ create table products
     type       varchar(20),
     quantity   int,
     created_at timestamp,
-    updated_at timestamp
+    updated_at timestamp,
+    created_by varchar(100),
+    updated_by varchar(100),
+    price      money
 
 );
 
@@ -16,5 +19,7 @@ create table products_orders
     order_id   int,
     quantity   int,
     created_at timestamp,
-    updated_at timestamp
+    updated_at timestamp,
+    created_by varchar(100),
+    updated_by varchar(100)
 )

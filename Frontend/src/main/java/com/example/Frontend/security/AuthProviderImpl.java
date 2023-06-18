@@ -1,6 +1,7 @@
 package com.example.Frontend.security;
 
 import com.example.Frontend.dto.UserLogin;
+import com.example.Frontend.util.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,14 +18,16 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthProviderImpl implements AuthenticationProvider {
 
     private final RestTemplate restTemplate;
+    private final CurrentUser currentUser;
 
     private String LOGIN_URL = "http://localhost:8484/auth/login";
 
     private final HttpServletResponse response;
 
     @Autowired
-    public AuthProviderImpl(RestTemplate restTemplate, HttpServletResponse response) {
+    public AuthProviderImpl(RestTemplate restTemplate, CurrentUser currentUser, HttpServletResponse response) {
         this.restTemplate = restTemplate;
+        this.currentUser = currentUser;
         this.response = response;
     }
 
@@ -45,6 +48,7 @@ public class AuthProviderImpl implements AuthenticationProvider {
         if (token == null) {
             throw new BadCredentialsException("Ошибка аутентификации");
         }
+        currentUser.setEmail(userLogin.getEmail());
         restTemplate.getInterceptors().add((request, body, execution) -> {
             request.getHeaders().add("Authorization", "Bearer " + token);
             return execution.execute(request, body);

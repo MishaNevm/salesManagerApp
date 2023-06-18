@@ -9,6 +9,8 @@ create table clients
     type       varchar(10),
     created_at timestamp,
     updated_at timestamp,
+    created_by varchar(100),
+    updated_by varchar(100),
     user_id    int
 );
 
@@ -23,7 +25,10 @@ create table banks
     country           varchar(100),
     client_id         int references clients (id) on delete cascade,
     created_at        timestamp,
-    updated_at        timestamp
+    updated_at        timestamp,
+    created_by        varchar(100),
+    updated_by        varchar(100)
 );
 
-insert into clients(short_name) values ('Пустой')
+insert into clients(short_name)
+values ('Пустой')

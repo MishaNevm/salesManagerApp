@@ -46,9 +46,9 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderDTOResponse findByClientId(int clientId) {
+    public OrderDTOResponse findByClientShortName(String clientShortName) {
         OrderDTOResponse orderDTOResponse = new OrderDTOResponse();
-        orderDTOResponse.setResponse(orderRepository.findByClientId(clientId).stream().map(modelMapperUtil::convertOrderToOrderDTO).toList());
+        orderDTOResponse.setResponse(orderRepository.findByClientShortName(clientShortName).stream().map(modelMapperUtil::convertOrderToOrderDTO).toList());
         return orderDTOResponse;
     }
 

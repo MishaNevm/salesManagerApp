@@ -14,6 +14,7 @@
         <th>ИНН</th>
         <th>КПП</th>
         <th>ОГРН</th>
+        <th>Комментарий</th>
         <th>Действие</th>
     </tr>
     </thead>
@@ -25,8 +26,10 @@
         <td th:text="${client.kpp}"></td>
         <td th:text="${client.ogrn}"></td>
         <td>
-            <form th:method="PATCH" th:action="@{/orders/{id}(id=${id})}">
-                <input type="hidden" name="client-id" th:value="${client.id}">
+            <form th:method="PATCH" th:action="@{/orders/{id}(id=${id})}" th:object="${order}">
+                <input type="hidden" name="client-short-name" th:value="${client.getShortName()}">
+                <input type="hidden" name="created-by" th:value="${order.createdBy}">
+                <input type="hidden" name="comment" th:value="${order.comment}">
                 <button type="submit">Обновить заказ</button>
             </form>
         </td>

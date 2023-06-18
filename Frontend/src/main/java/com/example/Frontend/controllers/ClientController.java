@@ -6,6 +6,7 @@ import com.example.Frontend.dto.ClientDTO;
 import com.example.Frontend.dto.ClientDTOResponse;
 import com.example.Frontend.dto.OrderDTOResponse;
 import com.example.Frontend.util.ClientTypes;
+import com.example.Frontend.util.CurrentUser;
 import com.example.Frontend.util.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ public class ClientController {
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final CurrentUser currentUser;
     protected final static String GET_ALL_CLIENTS = "http://localhost:8484/clients";
     protected final static String GET_CLIENT_BY_ID = "http://localhost:8484/clients/%d";
     protected final static String CREATE_CLIENT = GET_ALL_CLIENTS;
@@ -35,9 +37,10 @@ public class ClientController {
     protected final static String DELETE_CLIENT = GET_CLIENT_BY_ID;
 
     @Autowired
-    public ClientController(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public ClientController(RestTemplate restTemplate, ObjectMapper objectMapper, CurrentUser currentUser) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.currentUser = currentUser;
     }
 
     @GetMapping
@@ -48,13 +51,16 @@ public class ClientController {
 
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("client", restTemplate.getForObject(String.format(GET_CLIENT_BY_ID, id), ClientDTO.class));
-        model.addAttribute("orders", Objects.requireNonNull(restTemplate
-                        .getForObject(String
-                                        .format(OrderController
-                                                .GET_ORDERS_BY_CLIENT_ID, id),
-                                OrderDTOResponse.class))
-                .getResponse());
+        ClientDTO clientDTO = restTemplate.getForObject(String.format(GET_CLIENT_BY_ID, id), ClientDTO.class);
+        model.addAttribute("client", clientDTO);
+        if (clientDTO != null) {
+            model.addAttribute("orders", Objects.requireNonNull(restTemplate
+                            .getForObject(String
+                                            .format(OrderController
+                                                    .GET_ORDERS_BY_CLIENT_ID, clientDTO.getShortName()),
+                                    OrderDTOResponse.class))
+                    .getResponse());
+        }
         return "client/getClientById";
     }
 
@@ -73,6 +79,7 @@ public class ClientController {
             return "client/createClient";
         }
         try {
+            clientDTO.setCreatedBy(currentUser.getEmail());
             restTemplate.postForObject(CREATE_CLIENT, clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
@@ -101,6 +108,7 @@ public class ClientController {
         bankDTO.setClientDTO(new ClientDTO(id));
 
         try {
+            bankDTO.setCreatedBy(currentUser.getEmail());
             restTemplate.postForObject(String.format(CREATE_BANK_TO_CLIENT, id), bankDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
@@ -131,7 +139,8 @@ public class ClientController {
             return "client/updateClient";
         }
         try {
-            restTemplate.patchForObject (String.format(UPDATE_CLIENT, id), clientDTO, HttpStatus.class);
+            clientDTO.setUpdatedBy(currentUser.getEmail());
+            restTemplate.patchForObject(String.format(UPDATE_CLIENT, id), clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);

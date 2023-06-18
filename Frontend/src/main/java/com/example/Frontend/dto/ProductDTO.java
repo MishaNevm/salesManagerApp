@@ -2,11 +2,11 @@ package com.example.Frontend.dto;
 
 
 
-
 import com.example.Frontend.util.ProductTypes;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class ProductDTO {
@@ -23,6 +23,12 @@ public class ProductDTO {
     private Date createdAt;
 
     private Date updatedAt;
+
+    private String createdBy;
+
+    private String updatedBy;
+
+    private BigDecimal price;
 
     public int getId() {
         return id;
@@ -70,5 +76,29 @@ public class ProductDTO {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

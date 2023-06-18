@@ -27,6 +27,9 @@
                 </td>
                 <td>
                     <input type="hidden" name="product-id" th:value="${product.id}" id="product-id">
+                    <div th:if="${error != null}" style="color: red">
+                        Количество добавляемого товара меньше наличия на складе
+                    </div>
                     <button type="submit">Добавить</button>
                 </td>
             </tr>

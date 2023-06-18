@@ -7,12 +7,13 @@ import com.example.gatewayService.dto.ProductDTO;
 import com.example.gatewayService.dto.ProductOrderDTO;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
+import com.example.gatewayService.util.ErrorResponse;
+import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -29,14 +30,17 @@ public class OrderController {
     }
 
     @GetMapping
-    public OrderDTOResponse findAll(@RequestParam(value = "client-id", required = false) Integer clientId) throws InterruptedException {
+    public OrderDTOResponse findAll(@RequestParam(value = "client-short-name", required = false) String clientShortName) throws InterruptedException {
         OrderDTOResponse orderDTOResponse;
-        if (clientId != null) {
-            producer.sendRequestToOrderService(MethodsCodes.GET_ORDERS_BY_CLIENT_ID, clientId);
-            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ORDERS_BY_CLIENT_ID).take();
+        if (clientShortName != null) {
+            producer.sendRequestToOrderService(MethodsCodes.GET_ORDERS_BY_CLIENT_SHORT_NAME, clientShortName);
+            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ORDERS_BY_CLIENT_SHORT_NAME).poll(15, TimeUnit.SECONDS);
         } else {
             producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
-            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).take();
+            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).poll(15, TimeUnit.SECONDS);
+        }
+        if (orderDTOResponse != null) {
+            orderDTOResponse.getResponse().forEach(a -> System.out.println(a.getClientShortName()));
         }
         return orderDTOResponse;
     }
@@ -51,25 +55,20 @@ public class OrderController {
 
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestParam(value = "client-id", required = false) int clientId) {
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setClientId(clientId);
+    public ResponseEntity<HttpStatus> create(@RequestBody OrderDTO orderDTO) {
         producer.sendRequestToOrderService(MethodsCodes.CREATE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int orderId, @RequestParam(value = "client-id", required = false) int clientId) {
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setId(orderId);
-        orderDTO.setClientId(clientId);
+    public ResponseEntity<HttpStatus> update(@RequestBody OrderDTO orderDTO) {
         producer.sendRequestToOrderService(MethodsCodes.UPDATE_ORDER, orderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/update-product-quantity")
     public ResponseEntity<HttpStatus> updateProductQuantityInOrder(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId,
-                                                                   @RequestParam(value = "quantity", required = false) Integer quantity) {
+                                                                   @RequestParam(value = "quantity", required = false) Integer quantity) throws InterruptedException {
         ProductOrderDTO productOrderDTO = new ProductOrderDTO();
         productOrderDTO.setOrderId(orderId);
         ProductDTO productDTO = new ProductDTO();
@@ -77,6 +76,8 @@ public class OrderController {
         productOrderDTO.setProduct(productDTO);
         productOrderDTO.setQuantity(quantity);
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, productOrderDTO);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER).poll(15, TimeUnit.SECONDS);
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -111,7 +112,7 @@ public class OrderController {
     @PostMapping("/{id}/add-product")
     public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
                                                         @RequestParam("product-id") Integer productId,
-                                                        @RequestParam("quantity") Integer quantity) {
+                                                        @RequestParam("quantity") Integer quantity) throws InterruptedException {
         ProductOrderDTO productOrderDTO = new ProductOrderDTO();
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(productId);
@@ -119,16 +120,8 @@ public class OrderController {
         productOrderDTO.setOrderId(id);
         productOrderDTO.setQuantity(quantity);
         producer.sendRequestToInventoryService(MethodsCodes.ADD_PRODUCT_TO_ORDER, productOrderDTO);
+        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.ADD_PRODUCT_TO_ORDER).poll(15, TimeUnit.SECONDS);
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotFoundException e) {
-//        return new ResponseEntity<>(new ErrorResponse("Данный заказ не найден"), HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> exceptionHandler(OrderNotCreatedException e) {
-//        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-//    }
 }

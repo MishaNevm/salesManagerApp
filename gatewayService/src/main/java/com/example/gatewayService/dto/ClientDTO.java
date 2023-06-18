@@ -2,6 +2,8 @@ package com.example.gatewayService.dto;
 
 //import com.example.salesManagerApp.util.clientUtil.ClientTypes;
 
+
+
 import com.example.gatewayService.util.ClientTypes;
 
 import javax.validation.constraints.NotEmpty;
@@ -44,10 +46,16 @@ public class ClientDTO {
 
     private Date updatedAt;
 
+    private String createdBy;
+
+    private String updatedBy;
+
     public ClientDTO(int id) {
         this.id = id;
     }
-    public ClientDTO() {}
+
+    public ClientDTO() {
+    }
 
     public int getId() {
         return id;
@@ -127,5 +135,21 @@ public class ClientDTO {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

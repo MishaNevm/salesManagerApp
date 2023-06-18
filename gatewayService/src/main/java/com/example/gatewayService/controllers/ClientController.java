@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -31,7 +32,7 @@ public class ClientController {
     @GetMapping
     public ClientDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.GET_ALL_CLIENTS, new ClientDTO());
-        return (ClientDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_CLIENTS).take();
+        return (ClientDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_CLIENTS).poll(15, TimeUnit.SECONDS);
     }
 
     @GetMapping("/{id}")
@@ -39,7 +40,7 @@ public class ClientController {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_CLIENT_BY_ID, clientDTO);
-        return (ClientDTO) consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).take().getResponse().get(0);
+        return (ClientDTO) Objects.requireNonNull(consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).poll(15, TimeUnit.SECONDS)).getResponse().get(0);
     }
 
 
@@ -47,9 +48,7 @@ public class ClientController {
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.CREATE_CLIENT, clientDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_CLIENT).poll(15, TimeUnit.SECONDS);
-        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
-            throw new ErrorResponseException(errorResponse);
-        }
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -60,9 +59,7 @@ public class ClientController {
         bankDTO.setClientDTO(clientDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
-        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
-            throw new ErrorResponseException(errorResponse);
-        }
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return HttpStatus.OK;
     }
 
@@ -71,9 +68,7 @@ public class ClientController {
     public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_CLIENT, clientDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_CLIENT).poll(15, TimeUnit.SECONDS);
-        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
-            throw new ErrorResponseException(errorResponse);
-        }
+        ErrorResponseException.checkErrorResponse(errorResponse);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -83,10 +78,5 @@ public class ClientController {
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.DELETE_CLIENT, clientDTO);
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> exceptionHandler(ErrorResponseException e) {
-        return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
     }
 }

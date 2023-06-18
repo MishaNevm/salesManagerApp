@@ -1,18 +1,22 @@
 package com.example.orderService.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Date;
 
 public class OrderDTO {
 
     private int id;
 
-    private Integer clientId;
+    private String clientShortName;
+
+    private String comment;
 
     private Date createdAt;
 
     private Date updatedAt;
+
+    private String createdBy;
+
+    private String updatedBy;
 
     public int getId() {
         return id;
@@ -22,12 +26,20 @@ public class OrderDTO {
         this.id = id;
     }
 
-    public Integer getClientId() {
-        return clientId;
+    public String getClientShortName() {
+        return clientShortName;
     }
 
-    public void setClientId(Integer clientId) {
-        this.clientId = clientId;
+    public void setClientShortName(String clientShortName) {
+        this.clientShortName = clientShortName;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public Date getCreatedAt() {
@@ -44,5 +56,21 @@ public class OrderDTO {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

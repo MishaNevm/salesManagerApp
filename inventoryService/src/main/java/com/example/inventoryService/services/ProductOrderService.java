@@ -7,12 +7,15 @@ import com.example.inventoryService.models.Product;
 import com.example.inventoryService.models.ProductOrder;
 import com.example.inventoryService.repositoryes.ProductOrderRepository;
 import com.example.inventoryService.repositoryes.ProductRepository;
+import com.example.inventoryService.util.ErrorResponse;
 import com.example.inventoryService.util.ModelMapperUtil;
+import com.example.inventoryService.util.ValidationError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,26 +49,45 @@ public class ProductOrderService {
         return productDTOResponse;
     }
 
-    public void save(ProductOrderDTO productOrderDTO) {
+    public void save(ProductOrderDTO productOrderDTO, ErrorResponse errorResponse) {
+        ValidationError validationError = new ValidationError();
         Optional<ProductOrder> productOrderOptional = productOrderRepository.findByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId());
         if (productOrderOptional.isPresent()) {
             ProductOrder productOrder = productOrderOptional.get();
             Product product = productOrder.getProduct();
-            product.setQuantity(product.getQuantity() - productOrderDTO.getQuantity());
-            productOrder.setQuantity(productOrder.getQuantity() + productOrderDTO.getQuantity());
+            checkQuantity(product.getQuantity(), productOrderDTO.getQuantity(), validationError);
+            if (validationError.getField() == null) {
+                product.setQuantity(product.getQuantity() - productOrderDTO.getQuantity());
+                productOrder.setQuantity(productOrder.getQuantity() + productOrderDTO.getQuantity());
+            }
         } else {
-            productRepository.findById(productOrderDTO.getProduct().getId()).ifPresent(a -> a.setQuantity(a.getQuantity() - productOrderDTO.getQuantity()));
-            productOrderRepository.save(modelMapperUtil.convertProductOrderDTOToProductOrder(productOrderDTO));
+            productRepository.findById(productOrderDTO.getProduct().getId()).ifPresent(a -> {
+                checkQuantity(a.getQuantity(), productOrderDTO.getQuantity(), validationError);
+                if (validationError.getField() == null) {
+                    a.setQuantity(a.getQuantity() - productOrderDTO.getQuantity());
+                    productOrderRepository.save(modelMapperUtil.convertProductOrderDTOToProductOrder(productOrderDTO));
+                }
+            });
         }
+        if (validationError.getField() != null) {
+            errorResponse.setErrors(Collections.singletonList(validationError));
+        } else errorResponse.setErrors(new ArrayList<>());
     }
 
 
-    public void updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
+    public void updateProductQuantityInOrder(ProductOrderDTO productOrderDTO, ErrorResponse errorResponse) {
+        ValidationError validationError = new ValidationError();
         productOrderRepository.findByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId()).ifPresent(a -> {
             Product product = a.getProduct();
-            product.setQuantity(product.getQuantity() + a.getQuantity() - productOrderDTO.getQuantity());
-            a.setQuantity(productOrderDTO.getQuantity());
+            checkQuantity(a.getQuantity() + product.getQuantity(), productOrderDTO.getQuantity(), validationError);
+            if (validationError.getField() == null) {
+                product.setQuantity(product.getQuantity() + a.getQuantity() - productOrderDTO.getQuantity());
+                a.setQuantity(productOrderDTO.getQuantity());
+            }
         });
+        if (validationError.getField() != null) {
+            errorResponse.setErrors(Collections.singletonList(validationError));
+        } else errorResponse.setErrors(new ArrayList<>());
     }
 
     public void deleteAllProductsByOrderId(int orderId) {
@@ -85,5 +107,13 @@ public class ProductOrderService {
             product.setQuantity(product.getQuantity() + a.getQuantity());
             productOrderRepository.deleteById(a.getId());
         });
+    }
+
+    private void checkQuantity(int quantityInProduct, int quantityInProductOrder, ValidationError validationError) {
+        if (quantityInProduct < quantityInProductOrder) {
+            validationError.setField("quantity");
+            validationError.setCode("0");
+            validationError.setMessage("Количество добавляемого товара меньше товара в наличии");
+        }
     }
 }
