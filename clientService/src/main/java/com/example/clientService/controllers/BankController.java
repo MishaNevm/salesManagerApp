@@ -7,12 +7,9 @@ import com.example.clientService.util.ErrorResponse;
 import com.example.clientService.util.MethodsCodes;
 import com.example.clientService.util.bankUtil.BankDTOUniqueValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("/banks")
+@Service
 public class BankController {
 
     private final Producer producer;
@@ -27,21 +24,15 @@ public class BankController {
         this.bankDTOUniqueValidator = bankDTOUniqueValidator;
     }
 
-
-    @GetMapping()
-    public ResponseEntity<HttpStatus> findAll() {
+    public void findAll() {
         producer.sendMessageToClientTopicResponse(MethodsCodes.GET_ALL_BANKS, bankService.findAll());
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
+    public void findById(int id) {
         producer.sendMessageToClientTopicResponse(MethodsCodes.GET_BANK_BY_ID, bankService.findById(id));
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PostMapping("/{id}")
-    public void create(@RequestBody BankDTO bankDTO) {
+    public void create(BankDTO bankDTO) {
         ErrorResponse errorResponse = new ErrorResponse();
         bankDTOUniqueValidator.validate(bankDTO, errorResponse);
         if (errorResponse.getErrors().isEmpty()) {
@@ -50,8 +41,7 @@ public class BankController {
         producer.sendMessageToClientTopicResponse(MethodsCodes.CREATE_BANK, errorResponse);
     }
 
-    @PatchMapping("/{id}")
-    public void update(@RequestBody BankDTO bankDTO) {
+    public void update(BankDTO bankDTO) {
         ErrorResponse errorResponse = new ErrorResponse();
         bankDTOUniqueValidator.validate(bankDTO, errorResponse);
         if (errorResponse.getErrors().isEmpty()) {
@@ -61,10 +51,8 @@ public class BankController {
         producer.sendMessageToClientTopicResponse(MethodsCodes.UPDATE_BANK, errorResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
+    public void delete(int id) {
         bankService.findById(id);
         bankService.delete(id);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

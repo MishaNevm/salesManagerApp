@@ -1,42 +1,25 @@
 package com.example.clientService.dto;
 
-//import com.example.salesManagerApp.util.clientUtil.ClientTypes;
 
 import com.example.clientService.util.clientUtil.ClientTypes;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.Date;
 
 public class ClientDTO {
 
     private int id;
 
-    @NotEmpty(message = "Сокращенное наименование должно быть не пустым")
-    @Size(min = 2, max = 30, message = "Сокращенное наименование должно быть в диапозоне от 2 до 30")
     private String shortName;
 
-    @NotEmpty(message = "Полное наименование должно быть не пустым")
-    @Size(min = 2, max = 50, message = "Полное наименование должно быть в диапозоне от 2 до 50")
     private String fullName;
 
-    @NotEmpty(message = "ИНН должен быть не пустым")
-    @Pattern(regexp = "\\d{10}", message = "ИНН должен состоять из 10 цифр")
     private String inn;
 
     // У ИП кпп отсутвует
-    @NotEmpty(message = "КПП должно быть не пустым")
-    @Pattern(regexp = "\\d{9}|-", message = "КПП должно сосятоить из 9 цифр, либо '-'")
     private String kpp;
 
-    @NotEmpty(message = "ОГРН должен быть не пустым")
-    @Pattern(regexp = "\\d{13}", message = "ОГРН должен состоять из 13 цифр")
     private String ogrn;
 
-    @NotNull(message = "Тип юридического лица не должен быть пустым")
     private ClientTypes type;
 
     private BankDTO bankDTO;

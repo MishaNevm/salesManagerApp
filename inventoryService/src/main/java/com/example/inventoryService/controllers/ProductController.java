@@ -8,12 +8,9 @@ import com.example.inventoryService.services.ProductService;
 import com.example.inventoryService.util.ErrorResponse;
 import com.example.inventoryService.util.MethodsCodes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
-@RestController
-@RequestMapping("/products")
+@Service
 public class ProductController {
 
     private final ProductService productService;
@@ -27,68 +24,48 @@ public class ProductController {
         this.productOrderService = productOrderService;
     }
 
-    @GetMapping
-    public ResponseEntity<HttpStatus> findAll() {
+    public void findAll() {
         producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_ALL_PRODUCTS, productService.findAll());
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/get-products-by-order")
-    public ResponseEntity<HttpStatus> findAllProductsByOrderId(@RequestParam(value = "order-id", required = false) Integer orderId) {
+    public void findAllProductsByOrderId(int orderId) {
         producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCTS_BY_ORDER_ID, productOrderService.findByOrderId(orderId));
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<HttpStatus> findById(@PathVariable("id") int id) {
+    public void findById(int id) {
         producer.sendMessageToInventoryResponseTopic(MethodsCodes.GET_PRODUCT_BY_ID, productService.findById(id));
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<HttpStatus> save(@RequestBody ProductDTO productDTO) {
+    public void save(ProductDTO productDTO) {
         productService.save(productDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/add-to-order")
-    public ResponseEntity<HttpStatus> addProductToOrder(@RequestBody ProductOrderDTO productOrderDTO) {
+    public void addProductToOrder(ProductOrderDTO productOrderDTO) {
         ErrorResponse errorResponse = new ErrorResponse();
         productOrderService.save(productOrderDTO, errorResponse);
         producer.sendMessageToInventoryResponseTopic(MethodsCodes.ADD_PRODUCT_TO_ORDER, errorResponse);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody ProductDTO productDTO) {
+    public void update( ProductDTO productDTO) {
         productService.update(productDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PatchMapping("/update-quantity-in-order")
-    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
+    public void updateProductQuantityInOrder(ProductOrderDTO productOrderDTO) {
         ErrorResponse errorResponse = new ErrorResponse();
         productOrderService.updateProductQuantityInOrder(productOrderDTO, errorResponse);
         producer.sendMessageToInventoryResponseTopic(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, errorResponse);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
+    public void delete(int id) {
         productService.delete(id);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}/delete-from-order")
-    public ResponseEntity<HttpStatus> deleteByOrderIdAndProductId(@RequestParam(value = "orderId", required = false) Integer orderId, @PathVariable("id") int productId) {
+    public void deleteByOrderIdAndProductId(int orderId, int productId) {
         productOrderService.deleteByOrderIdAndProductId(orderId, productId);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @DeleteMapping()
-    public ResponseEntity<HttpStatus> deleteAllProductsInOrderByOrderId(@RequestParam(value = "orderId", required = false) Integer orderId) {
+    public void deleteAllProductsInOrderByOrderId(int orderId) {
         productOrderService.deleteAllProductsByOrderId(orderId);
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

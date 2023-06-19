@@ -1,38 +1,22 @@
 package com.example.clientService.dto;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.Date;
 
 public class BankDTO {
 
     private int id;
 
-    @NotEmpty(message = "Наименование банка должно быть не пустым")
-    @Size(min = 2, max = 90, message = "Наименование банка должно быть от 2 до 90 символов")
     private String name;
 
-    @NotEmpty(message = "БИК должен быть не пустым")
-    @Pattern(regexp = "\\d{9}", message = "БИК должен состоять из 9 цифр")
     private String bik;
 
-    @NotEmpty(message = "Рассчетный счет должен быть не пустым")
-    @Pattern(regexp = "\\d{20}", message = "Рассчетный счет должен состоять из 20 цирф")
     private String checkingAccount;
 
-    @NotEmpty(message = "Корпоративный счет должен быть не пустым")
-    @Pattern(regexp = "\\d{20}", message = "Корпоративный счет должен состоять из 20 цифр")
     private String corporateAccount;
 
-    @NotEmpty(message = "Город должен быть не пустым")
-    @Pattern(regexp = "[А-Я][а-я]+", message = "Город должен называться с большой буквы")
-    @Size(min = 2, max = 50, message = "Город должен быть от 2 до 50 символов")
+
     private String city;
 
-    @NotEmpty(message = "Страна должна быть не пустой")
-    @Pattern(regexp = "[А-Я][а-я]+", message = "Страна должна называться с большой буквы")
-    @Size(min = 2, max = 50, message = "Страна должна быть от 2 до 50 символов")
     private String country;
 
     private ClientDTO clientDTO;

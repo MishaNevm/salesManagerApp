@@ -1,13 +1,12 @@
 package com.example.clientService.util;
 
-import com.example.clientService.dto.*;
-import com.example.clientService.models.*;
+import com.example.clientService.dto.BankDTO;
+import com.example.clientService.dto.ClientDTO;
+import com.example.clientService.models.Bank;
+import com.example.clientService.models.Client;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ModelMapperUtil {
