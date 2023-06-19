@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -53,13 +52,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid ProductDTO productDTO) {
+    public ResponseEntity<HttpStatus> create(@RequestBody ProductDTO productDTO) {
         producer.sendRequestToInventoryService(MethodsCodes.CREATE_PRODUCT, productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
+    public ResponseEntity<HttpStatus> update(@RequestBody ProductDTO productDTO) {
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT, productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }

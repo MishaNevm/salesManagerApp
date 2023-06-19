@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -40,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserDTO user) {
+    public ResponseEntity<HttpStatus> create(@RequestBody UserDTO user) {
         ErrorResponse errorResponse = new ErrorResponse();
         userDTOUniqueValidator.validate(user, errorResponse);
         if (errorResponse.getErrors().isEmpty()) {
@@ -53,7 +52,7 @@ public class UserController {
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody @Valid UserDTO user) {
+    public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody UserDTO user) {
         user.setId(id);
         ErrorResponse errorResponse = new ErrorResponse();
         userDTOUniqueValidator.validate(user, errorResponse);

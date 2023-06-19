@@ -2,20 +2,17 @@ package com.example.inventoryService.dto;
 
 import com.example.inventoryService.util.ProductTypes;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class ProductDTO {
     private int id;
 
-    @NotEmpty(message = "Наименование товара не должно быть пустым")
     private String name;
 
     private ProductTypes type;
 
-    @Min(value = 0, message = "Количество товара не может быть меньше 0")
     private int quantity;
 
     private Date createdAt;

@@ -1,11 +1,10 @@
 package com.example.Frontend.dto;
 
+
+import com.example.Frontend.util.UserRoles;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 public class UserDTO {
@@ -32,9 +31,10 @@ public class UserDTO {
     @Pattern(regexp = "[a-z]*[A-Z][a-z]*[0-9]{3,}[a-z]*", message = "Пароль должен быть из латинских букв и содержать 1 заглавную букву и 3 цифры")
     private String password;
 
+    private UserRoles userRole;
+
     private Date createdAt;
 
-    //    @NotEmpty(message = "Дата рождения должна быть не пустой")
     @Past(message = "Дата рождения должна быть в прошлом")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
@@ -87,6 +87,14 @@ public class UserDTO {
         this.password = password;
     }
 
+    public UserRoles getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRoles userRole) {
+        this.userRole = userRole;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -101,18 +109,5 @@ public class UserDTO {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-    }
-
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", patronymic='" + patronymic + '\'' +
-                ", email='" + email + '\'' +
-                ", createdAt=" + createdAt +
-                ", dateOfBirth=" + dateOfBirth +
-                '}';
     }
 }

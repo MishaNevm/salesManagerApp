@@ -19,15 +19,5 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
       value-serializer: com.example.inventoryService.kafka.JsonSerializer
-  boot:
-    admin:
-      client:
-        url: http://localhost:8383/admin
-      context-path: /admin
   jpa:
     show-sql: true
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"

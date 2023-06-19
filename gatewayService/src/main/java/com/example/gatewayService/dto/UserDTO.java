@@ -1,39 +1,27 @@
 package com.example.gatewayService.dto;
 
+import com.example.gatewayService.util.UserUtil.UserRoles;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 public class UserDTO {
 
     int id;
 
-    @NotEmpty(message = "Имя должно быть не пустым")
-    @Pattern(regexp = "[А-Я][а-я]{1,29}", message = "Имя должно начинаться с большой буквы и быть от 2 до 30 букв")
     private String name;
 
-    @NotEmpty(message = "Фамилия должна быть не пустой")
-    @Pattern(regexp = "[А-Я][а-я]{1,29}", message = "Фамилия должна начинаться с большой буквы и быть от 2 до 30 букв")
     private String surname;
 
-    @NotEmpty(message = "Отчество должно быть не пустым")
-    @Pattern(regexp = "[А-Я][а-я]{1,29}", message = "Отчество должно начинаться с большой буквы и быть от 2 до 30 букв")
     private String patronymic;
 
-    @NotEmpty(message = "Почта должна быть не пустой")
-    @Email(message = "Почта должна быть в формате текст@текст.com/ru")
     private String email;
 
     private String password;
 
+    private UserRoles userRole;
+
     private Date createdAt;
 
-    //    @NotEmpty(message = "Дата рождения должна быть не пустой")
-    @Past(message = "Дата рождения должна быть в прошлом")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
 
@@ -85,6 +73,14 @@ public class UserDTO {
         this.password = password;
     }
 
+    public UserRoles getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRoles userRole) {
+        this.userRole = userRole;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -99,18 +95,5 @@ public class UserDTO {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-    }
-
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", patronymic='" + patronymic + '\'' +
-                ", email='" + email + '\'' +
-                ", createdAt=" + createdAt +
-                ", dateOfBirth=" + dateOfBirth +
-                '}';
     }
 }

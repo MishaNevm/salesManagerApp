@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>All users</title>
+    <meta charset="UTF-8">
+    <title>All users</title>
 </head>
 <body>
 <br/>
 <p th:if="${users.isEmpty()}">No users</p>
 <div th:unless="${users.isEmpty()}" th:each="user : ${users}">
-  <a th:href="@{/users/{id}(id=${user.getId()})}" th:text="${user.getName() + ', ' + user.getSurname()}">VALUE</a>
+    <a th:href="@{/users/{id}(id=${user.getId()})}" th:text="${user.getName() + ', ' + user.getSurname()}">VALUE</a>
 </div>
 <br/>
 <hr/>
-<a href="/users/new">Add user</a>
-<br/>
+<div th:if="${role.equals('ROLE_ADMIN')}">
+    <a href="/users/new">Add user</a>
+    <br/>
+</div>
 <form th:method="post" th:action="@{/logout}">
-  <input type="submit" value="Logout">
+    <input type="submit" value="Logout">
 </form>
 </body>
 </html>

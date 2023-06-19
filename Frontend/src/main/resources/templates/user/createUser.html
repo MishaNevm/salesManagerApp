@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Create User</title>
@@ -26,6 +26,9 @@
     <input type="password" th:field="*{password}" id="password"/>
     <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</div>
     <br/>
+    <select th:field="*{userRole}" id="role">
+        <option th:each="role : ${roles}" th:value="${role}" th:text="${role.getValue()}"></option>
+    </select>
     <label for="dateOfBirth">Date of Birth: </label>
     <input type="date" th:field="*{dateOfBirth}" id="dateOfBirth"/>
     <div style="color:red" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}">Error</div>

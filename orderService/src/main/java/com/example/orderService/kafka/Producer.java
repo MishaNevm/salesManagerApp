@@ -1,13 +1,10 @@
 package com.example.orderService.kafka;
 
-import com.example.orderService.dto.OrderDTO;
 import com.example.orderService.dto.OrderDTOResponse;
-import com.example.orderService.util.MethodsCodes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.validation.Valid;
 
 @Component
 public class Producer {

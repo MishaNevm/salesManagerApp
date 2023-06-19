@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title th:text="${client.getShortName()}">VALUE</title>
@@ -33,16 +33,18 @@
 <br/>
 <a th:href="@{/clients/{id}/edit(id=${client.getId()})}">Update client</a>
 <br/>
-<br/>
-<form th:method="DELETE" th:action="@{/clients/{id}(id=${client.getId()})}" th:object="${client}">
-    <input type="submit" value="Delete client">
-</form>
-<br/>
+<div th:if="${role.equals('ROLE_ADMIN')}">
+    <br/>
+    <form th:method="DELETE" th:action="@{/clients/{id}(id=${client.getId()})}" th:object="${client}">
+        <input type="submit" value="Delete client">
+    </form>
+    <br/>
+</div>
 <hr/>
 <br/>
 <p th:if="${orders.isEmpty()}">No orders</p>
 <div th:unless="${orders.isEmpty()}" th:each="order : ${orders}">
-    <a th:href="@{/orders/{id}(id=${order.getId()})}" th:text="${order.getClientId() + ', ' + order.getCreatedAt()}">VALUE</a>
+    <a th:href="@{/orders/{id}(id=${order.getId()})}" th:text="${order.getClientShortName() + ', ' + order.getCreatedAt()}">VALUE</a>
 </div>
 <br/>
 <hr/>

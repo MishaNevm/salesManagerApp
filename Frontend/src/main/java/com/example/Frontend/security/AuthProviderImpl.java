@@ -13,6 +13,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class AuthProviderImpl implements AuthenticationProvider {
@@ -20,7 +22,7 @@ public class AuthProviderImpl implements AuthenticationProvider {
     private final RestTemplate restTemplate;
     private final CurrentUser currentUser;
 
-    private String LOGIN_URL = "http://localhost:8484/auth/login";
+    private final String LOGIN_URL = "http://localhost:8484/auth/login";
 
     private final HttpServletResponse response;
 
@@ -39,20 +41,22 @@ public class AuthProviderImpl implements AuthenticationProvider {
         UserLogin userLogin = new UserLogin();
         userLogin.setEmail(authentication.getName());
         userLogin.setPassword((String) authentication.getCredentials());
-        String token;
+        HashMap<String, String> authMap;
         try {
-            token = restTemplate.postForObject(LOGIN_URL, userLogin, String.class);
+            authMap = restTemplate.postForObject(LOGIN_URL, userLogin, HashMap.class);
         } catch (HttpClientErrorException.BadRequest e) {
             throw new BadCredentialsException("Ошибка аутентификации");
         }
-        if (token == null) {
+        if (authMap == null) {
             throw new BadCredentialsException("Ошибка аутентификации");
         }
         currentUser.setEmail(userLogin.getEmail());
         restTemplate.getInterceptors().add((request, body, execution) -> {
-            request.getHeaders().add("Authorization", "Bearer " + token);
+            request.getHeaders().add("Authorization", "Bearer " + authMap.get("token"));
             return execution.execute(request, body);
         });
+        userLogin.setUserRole(authMap.get("role"));
+        currentUser.setRole(userLogin.getUserRole());
         UserLoginDetails userLoginDetails = new UserLoginDetails(userLogin);
         return new UsernamePasswordAuthenticationToken(userLoginDetails, userLoginDetails.getPassword(), userLoginDetails.getAuthorities());
     }

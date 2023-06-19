@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +44,7 @@ public class ClientController {
 
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
+    public ResponseEntity<HttpStatus> create(@RequestBody ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.CREATE_CLIENT, clientDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_CLIENT).poll(15, TimeUnit.SECONDS);
         ErrorResponseException.checkErrorResponse(errorResponse);
@@ -53,7 +52,7 @@ public class ClientController {
     }
 
     @PostMapping("/{id}")
-    public HttpStatus createBankToClient(@PathVariable("id") int id, @RequestBody @Valid BankDTO bankDTO) throws InterruptedException {
+    public HttpStatus createBankToClient(@PathVariable("id") int id, @RequestBody  BankDTO bankDTO) throws InterruptedException {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         bankDTO.setClientDTO(clientDTO);
@@ -65,7 +64,7 @@ public class ClientController {
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ClientDTO clientDTO) throws InterruptedException {
+    public ResponseEntity<HttpStatus> update(@RequestBody ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_CLIENT, clientDTO);
         ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_CLIENT).poll(15, TimeUnit.SECONDS);
         ErrorResponseException.checkErrorResponse(errorResponse);

@@ -7,14 +7,10 @@ import com.example.inventoryService.services.ProductOrderService;
 import com.example.inventoryService.services.ProductService;
 import com.example.inventoryService.util.ErrorResponse;
 import com.example.inventoryService.util.MethodsCodes;
-import com.example.inventoryService.util.ValidationError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/products")
@@ -50,7 +46,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> save(@RequestBody @Valid ProductDTO productDTO) {
+    public ResponseEntity<HttpStatus> save(@RequestBody ProductDTO productDTO) {
         productService.save(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -64,7 +60,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@RequestBody @Valid ProductDTO productDTO) {
+    public ResponseEntity<HttpStatus> update(@RequestBody ProductDTO productDTO) {
         productService.update(productDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }

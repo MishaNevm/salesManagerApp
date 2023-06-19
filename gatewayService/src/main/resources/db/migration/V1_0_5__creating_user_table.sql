@@ -7,5 +7,6 @@ create table users
     email         varchar(100) unique,
     password      varchar(100),
     created_at    date,
-    date_of_birth date
+    date_of_birth date,
+    role          varchar(15)
 )

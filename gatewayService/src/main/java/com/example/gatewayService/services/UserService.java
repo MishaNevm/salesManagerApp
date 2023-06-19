@@ -7,13 +7,16 @@ import com.example.gatewayService.repositoryes.UserRepository;
 ;
 import com.example.gatewayService.util.ModelMapperUtil;
 import com.example.gatewayService.util.UserUtil.UserNotFoundException;
+import com.example.gatewayService.util.UserUtil.UserRoles;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -24,10 +27,18 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapperUtil modelMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, ModelMapperUtil modelMapper, PasswordEncoder passwordEncoder, @Value("${admin-pass}") String adminPass) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
+        Optional<User> userOptional = userRepository.findByEmail("admin");
+        if (userOptional.isEmpty()) {
+            User user = new User();
+            user.setEmail("admin");
+            user.setPassword(passwordEncoder.encode(adminPass));
+            user.setRole(UserRoles.ROLE_ADMIN);
+            userRepository.save(user);
+        }
     }
 
     @Transactional(readOnly = true)

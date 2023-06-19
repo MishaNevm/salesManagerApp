@@ -1,5 +1,6 @@
 package com.example.gatewayService.models;
 
+import com.example.gatewayService.util.UserUtil.UserRoles;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -28,6 +29,9 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private UserRoles role;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.DATE)
@@ -69,6 +73,14 @@ public class User {
 
     public void setPatronymic(String patronymic) {
         this.patronymic = patronymic;
+    }
+
+    public UserRoles getRole() {
+        return role;
+    }
+
+    public void setRole(UserRoles userRole) {
+        this.role = userRole;
     }
 
     public Date getCreatedAt() {

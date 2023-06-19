@@ -5,6 +5,7 @@ import com.example.Frontend.dto.ProductDTO;
 import com.example.Frontend.dto.ProductDTOResponse;
 import com.example.Frontend.util.CurrentUser;
 import com.example.Frontend.util.ProductTypes;
+import com.example.Frontend.util.Urls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -22,11 +23,6 @@ public class ProductController {
 
     private final RestTemplate restTemplate;
     private final CurrentUser currentUser;
-    private final String GET_ALL_PRODUCTS = "http://localhost:8484/products";
-    private final String GET_PRODUCT_BY_ID = "http://localhost:8484/products/%d";
-    private final String CREATE_PRODUCT = GET_ALL_PRODUCTS;
-    private final String UPDATE_PRODUCT = GET_PRODUCT_BY_ID;
-    private final String DELETE_PRODUCT = GET_PRODUCT_BY_ID;
 
     @Autowired
     public ProductController(RestTemplate restTemplate, CurrentUser currentUser) {
@@ -36,13 +32,18 @@ public class ProductController {
 
     @GetMapping
     public String findAll(Model model) {
-        model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(GET_ALL_PRODUCTS, ProductDTOResponse.class)).getResponse());
+        model.addAttribute("products",
+                Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(),
+                        ProductDTOResponse.class))
+                        .getResponse());
         return "inventory/getAllProducts";
     }
 
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("product", Objects.requireNonNull(restTemplate.getForObject(String.format(GET_PRODUCT_BY_ID, id), ProductDTO.class)));
+        model.addAttribute("product",
+                Objects.requireNonNull(restTemplate.getForObject(String.format(Urls.GET_PRODUCT_BY_ID.getUrl(), id),
+                        ProductDTO.class)));
         return "inventory/getProductById";
     }
 
@@ -59,34 +60,37 @@ public class ProductController {
             return "inventory/createProduct";
         }
         productDTO.setCreatedBy(currentUser.getEmail());
-        restTemplate.postForObject(CREATE_PRODUCT, productDTO, HttpStatus.class);
+        restTemplate.postForObject(Urls.CREATE_PRODUCT.getUrl(), productDTO, HttpStatus.class);
         return "redirect:/products";
     }
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
         model.addAttribute("types", ProductTypes.values());
-        model.addAttribute("product", Objects.requireNonNull(restTemplate.getForObject(String.format(GET_PRODUCT_BY_ID, id), ProductDTO.class)));
+        model.addAttribute("product",
+                Objects.requireNonNull(restTemplate.getForObject(String.format(Urls.GET_PRODUCT_BY_ID.getUrl(), id),
+                        ProductDTO.class)));
         return "inventory/updateProduct";
     }
 
     @PatchMapping("/{id}")
-    public String update(@PathVariable("id") int id, @ModelAttribute("product") @Valid ProductDTO productDTO, BindingResult bindingResult) {
-
+    public String update(@PathVariable("id") int id,
+                         @ModelAttribute("product") @Valid ProductDTO productDTO,
+                         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            System.out.println(1);
-            bindingResult.getFieldErrors().forEach(a -> System.out.println(a.getField()));
             return "inventory/updateProduct";
         }
-
         productDTO.setUpdatedBy(currentUser.getEmail());
-        restTemplate.patchForObject(String.format(UPDATE_PRODUCT, id), productDTO, HttpStatus.class);
+        restTemplate.patchForObject(String.format(Urls.UPDATE_PRODUCT.getUrl(), id), productDTO, HttpStatus.class);
         return "redirect:/products/" + id;
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        restTemplate.exchange(DELETE_PRODUCT + id, HttpMethod.DELETE, null, HttpStatus.class);
+        restTemplate.exchange( String.format(Urls.DELETE_PRODUCT.getUrl(), id),
+                HttpMethod.DELETE,
+                null,
+                HttpStatus.class);
         return "redirect:/products";
     }
 }

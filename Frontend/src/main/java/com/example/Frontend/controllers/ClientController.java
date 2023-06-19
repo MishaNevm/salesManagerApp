@@ -8,9 +8,11 @@ import com.example.Frontend.dto.OrderDTOResponse;
 import com.example.Frontend.util.ClientTypes;
 import com.example.Frontend.util.CurrentUser;
 import com.example.Frontend.util.ErrorResponse;
+import com.example.Frontend.util.Urls;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,12 +31,7 @@ public class ClientController {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final CurrentUser currentUser;
-    protected final static String GET_ALL_CLIENTS = "http://localhost:8484/clients";
-    protected final static String GET_CLIENT_BY_ID = "http://localhost:8484/clients/%d";
-    protected final static String CREATE_CLIENT = GET_ALL_CLIENTS;
-    protected final static String CREATE_BANK_TO_CLIENT = GET_CLIENT_BY_ID;
-    protected final static String UPDATE_CLIENT = GET_CLIENT_BY_ID;
-    protected final static String DELETE_CLIENT = GET_CLIENT_BY_ID;
+
 
     @Autowired
     public ClientController(RestTemplate restTemplate, ObjectMapper objectMapper, CurrentUser currentUser) {
@@ -45,19 +42,19 @@ public class ClientController {
 
     @GetMapping
     public String findAll(Model model) {
-        model.addAttribute("clients", Objects.requireNonNull(restTemplate.getForObject(GET_ALL_CLIENTS, ClientDTOResponse.class)).getResponse());
+        model.addAttribute("clients", Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_CLIENTS.getUrl(), ClientDTOResponse.class)).getResponse());
         return "client/getAllClients";
     }
 
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
-        ClientDTO clientDTO = restTemplate.getForObject(String.format(GET_CLIENT_BY_ID, id), ClientDTO.class);
-        model.addAttribute("client", clientDTO);
+        model.addAttribute("role", currentUser.getRole());
+        ClientDTO clientDTO = restTemplate.getForObject(String.format(Urls.GET_CLIENT_BY_ID.getUrl(), id), ClientDTO.class);
         if (clientDTO != null) {
+            model.addAttribute("client", clientDTO);
             model.addAttribute("orders", Objects.requireNonNull(restTemplate
                             .getForObject(String
-                                            .format(OrderController
-                                                    .GET_ORDERS_BY_CLIENT_ID, clientDTO.getShortName()),
+                                            .format(Urls.GET_ORDERS_BY_CLIENT_SHORT_NAME.getUrl(), clientDTO.getShortName()),
                                     OrderDTOResponse.class))
                     .getResponse());
         }
@@ -80,7 +77,7 @@ public class ClientController {
         }
         try {
             clientDTO.setCreatedBy(currentUser.getEmail());
-            restTemplate.postForObject(CREATE_CLIENT, clientDTO, HttpStatus.class);
+            restTemplate.postForObject(Urls.CREATE_CLIENT.getUrl(), clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
@@ -109,7 +106,7 @@ public class ClientController {
 
         try {
             bankDTO.setCreatedBy(currentUser.getEmail());
-            restTemplate.postForObject(String.format(CREATE_BANK_TO_CLIENT, id), bankDTO, HttpStatus.class);
+            restTemplate.postForObject(String.format(Urls.CREATE_BANK_TO_CLIENT.getUrl(), id), bankDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
@@ -125,7 +122,7 @@ public class ClientController {
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
-        model.addAttribute("client", restTemplate.getForObject(String.format(GET_CLIENT_BY_ID, id), ClientDTO.class));
+        model.addAttribute("client", restTemplate.getForObject(String.format(Urls.GET_CLIENT_BY_ID.getUrl(), id), ClientDTO.class));
         model.addAttribute("types", ClientTypes.values());
         return "client/updateClient";
     }
@@ -140,7 +137,7 @@ public class ClientController {
         }
         try {
             clientDTO.setUpdatedBy(currentUser.getEmail());
-            restTemplate.patchForObject(String.format(UPDATE_CLIENT, id), clientDTO, HttpStatus.class);
+            restTemplate.patchForObject(String.format(Urls.UPDATE_CLIENT.getUrl(), id), clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             try {
                 ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
@@ -153,9 +150,10 @@ public class ClientController {
         return "redirect:/clients/" + id;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        restTemplate.delete(String.format(DELETE_CLIENT, id));
+        restTemplate.delete(String.format(Urls.DELETE_CLIENT.getUrl(), id));
         return "redirect:/clients";
     }
 }
