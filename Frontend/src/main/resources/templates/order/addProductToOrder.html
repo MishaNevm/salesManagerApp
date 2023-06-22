@@ -3,6 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Create Order</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        table {
+            background-color: #222222;
+            border-collapse: collapse;
+            width: 80%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #444444;
+        }
+
+        th {
+            background-color: #555555;
+            color: white;
+        }
+
+        input[type="text"] {
+            padding: 4px;
+            border: none;
+            border-radius: 3px;
+            background-color: #444444;
+            color: white;
+        }
+
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        div[style="color:red"] {
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
 <table>
@@ -11,6 +65,7 @@
         <th>Название товара</th>
         <th>Тип товара</th>
         <th>Общее количество</th>
+        <th>Стоимость за штуку</th>
         <th>Количество для добавления</th>
         <th>Действие</th>
     </tr>
@@ -22,6 +77,7 @@
                 <td th:text="${product.name}"></td>
                 <td th:text="${product.type}"></td>
                 <td th:text="${product.quantity}"></td>
+                <td th:text="${product.price}"></td>
                 <td>
                     <input type="text" name="quantity" min="0" id="quantity">
                 </td>
@@ -39,3 +95,4 @@
 </table>
 </body>
 </html>
+

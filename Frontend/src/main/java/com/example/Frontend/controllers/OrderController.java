@@ -1,13 +1,9 @@
 package com.example.Frontend.controllers;
 
 
-import com.example.Frontend.dto.ClientDTOResponse;
-import com.example.Frontend.dto.OrderDTO;
-import com.example.Frontend.dto.OrderDTOResponse;
-import com.example.Frontend.dto.ProductDTOResponse;
+import com.example.Frontend.dto.*;
 import com.example.Frontend.util.CurrentUser;
 import com.example.Frontend.util.Urls;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -16,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -26,8 +24,6 @@ public class OrderController {
     private final RestTemplate restTemplate;
     private final CurrentUser currentUser;
 
-
-    @Autowired
     public OrderController(RestTemplate restTemplate, CurrentUser currentUser) {
         this.restTemplate = restTemplate;
         this.currentUser = currentUser;
@@ -35,27 +31,30 @@ public class OrderController {
 
     @GetMapping
     public String findAll(Model model) {
-        model.addAttribute("orders",
-                Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_ORDERS.getUrl(), OrderDTOResponse.class))
-                        .getResponse());
+        OrderDTOResponse orderDTOResponse = restTemplate.getForObject(Urls.GET_ALL_ORDERS.getUrl(), OrderDTOResponse.class);
+        model.addAttribute("orders", Objects.requireNonNull(orderDTOResponse).getResponse());
         return "order/getAllOrders";
     }
 
     @GetMapping("/{id}")
     public String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("order", restTemplate.getForObject(String.format(Urls.GET_ORDER_BY_ID.getUrl(), id), OrderDTO.class));
-        model.addAttribute("products", Objects.requireNonNull(restTemplate
-                .getForObject(String
-                        .format(Urls.GET_PRODUCTS_BY_ORDER_ID.getUrl(), id), ProductDTOResponse.class)).getResponse());
+        OrderDTO orderDTO = restTemplate.getForObject(String.format(Urls.GET_ORDER_BY_ID.getUrl(), id), OrderDTO.class);
+        List<ProductDTO> productDTOLists = Objects.requireNonNull(restTemplate.getForObject(String.format(Urls.GET_PRODUCTS_BY_ORDER_ID.getUrl(), id), ProductDTOResponse.class)).getResponse();
+        if (orderDTO != null) {
+            orderDTO.setTotalCost(BigDecimal.ZERO);
+            if (productDTOLists != null) {
+                productDTOLists.forEach(a -> orderDTO.setTotalCost(orderDTO.getTotalCost().add(a.getPrice().multiply(BigDecimal.valueOf(a.getQuantity())))));
+            }
+        }
+        model.addAttribute("products", productDTOLists);
+        model.addAttribute("order", orderDTO);
         return "order/getOrderById";
     }
 
     @GetMapping("/new")
     public String create(Model model) {
-        model.addAttribute("clients", Objects
-                .requireNonNull(restTemplate
-                        .getForObject(Urls.GET_ALL_CLIENTS.getUrl(), ClientDTOResponse.class))
-                .getResponse());
+        ClientDTOResponse clientDTOResponse = restTemplate.getForObject(Urls.GET_ALL_CLIENTS.getUrl(), ClientDTOResponse.class);
+        model.addAttribute("clients", Objects.requireNonNull(clientDTOResponse).getResponse());
         model.addAttribute("order", new OrderDTO());
         return "order/createOrder";
     }
@@ -70,20 +69,19 @@ public class OrderController {
 
     @GetMapping("/{id}/edit")
     public String updateClient(@PathVariable("id") int id, Model model) {
-        model.addAttribute("order", restTemplate.getForObject(String.format(Urls.GET_ORDER_BY_ID.getUrl(), id), OrderDTO.class));
-        model.addAttribute("clients", Objects
-                .requireNonNull(restTemplate
-                        .getForObject(Urls.GET_ALL_CLIENTS.getUrl(), ClientDTOResponse.class))
-                .getResponse());
+        OrderDTO orderDTO = restTemplate.getForObject(String.format(Urls.GET_ORDER_BY_ID.getUrl(), id), OrderDTO.class);
+        model.addAttribute("order", orderDTO);
+        ClientDTOResponse clientDTOResponse = restTemplate.getForObject(Urls.GET_ALL_CLIENTS.getUrl(), ClientDTOResponse.class);
+        model.addAttribute("clients", Objects.requireNonNull(clientDTOResponse).getResponse());
         return "order/updateClientInOrder";
     }
 
     @PatchMapping("/{id}")
     public String updateClient(@PathVariable("id") int id,
-                         @ModelAttribute("order") OrderDTO orderDTO,
-                         @RequestParam(value = "client-short-name", required = false) String clientShortName,
-                         @RequestParam(value = "created-by", required = false) String createdBy,
-                         @RequestParam(value = "comment", required = false) String comment) {
+                               @ModelAttribute("order") OrderDTO orderDTO,
+                               @RequestParam(value = "client-short-name", required = false) String clientShortName,
+                               @RequestParam(value = "created-by", required = false) String createdBy,
+                               @RequestParam(value = "comment", required = false) String comment) {
         orderDTO.setUpdatedBy(createdBy);
         orderDTO.setComment(comment);
         orderDTO.setClientShortName(clientShortName);
@@ -94,7 +92,8 @@ public class OrderController {
 
     @GetMapping("/{id}/update-comment")
     public String updateComment(@PathVariable("id") int id, Model model) {
-        model.addAttribute("order", restTemplate.getForObject(String.format(Urls.GET_ORDER_BY_ID.getUrl(), id), OrderDTO.class));
+        OrderDTO orderDTO = restTemplate.getForObject(String.format(Urls.GET_ORDER_BY_ID.getUrl(), id), OrderDTO.class);
+        model.addAttribute("order", orderDTO);
         return "order/updateCommentInOrder";
     }
 
@@ -115,7 +114,8 @@ public class OrderController {
     @GetMapping("/{id}/update-product-quantity")
     public String updateProductQuantityInOrder(@PathVariable("id") int id, Model model) {
         model.addAttribute("id", id);
-        model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(), ProductDTOResponse.class)).getResponse());
+        ProductDTOResponse productDTOResponse = restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(), ProductDTOResponse.class);
+        model.addAttribute("products", Objects.requireNonNull(productDTOResponse).getResponse());
         return "order/updateProductInOrder";
     }
 
@@ -127,7 +127,8 @@ public class OrderController {
             restTemplate.patchForObject(String.format(Urls.UPDATE_PRODUCT_QUANTITY_IN_ORDER.getUrl(), orderId, productId, quantity), null, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             model.addAttribute("error", 1);
-            model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(), ProductDTOResponse.class)).getResponse());
+            ProductDTOResponse productDTOResponse = restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(), ProductDTOResponse.class);
+            model.addAttribute("products", Objects.requireNonNull(productDTOResponse).getResponse());
             return "order/updateProductInOrder";
         }
         return "redirect:/orders/" + orderId;
@@ -156,10 +157,10 @@ public class OrderController {
     @GetMapping("/{id}/add-product")
     public String addProductToOrder(@PathVariable("id") int id, Model model) {
         model.addAttribute("id", id);
-        model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(), ProductDTOResponse.class)).getResponse());
+        ProductDTOResponse productDTOResponse = restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(), ProductDTOResponse.class);
+        model.addAttribute("products", Objects.requireNonNull(productDTOResponse).getResponse());
         return "order/addProductToOrder";
     }
-
 
     @PostMapping("/{id}/add-product")
     public String addProductToOrder(@PathVariable("id") int id,
@@ -169,9 +170,12 @@ public class OrderController {
             restTemplate.postForObject(String.format(Urls.ADD_PRODUCT_TO_ORDER.getUrl(), id, productId, quantity), null, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
             model.addAttribute("error", 1);
-            model.addAttribute("products", Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(), ProductDTOResponse.class)).getResponse());
+            ProductDTOResponse productDTOResponse = restTemplate.getForObject(Urls.GET_ALL_PRODUCTS.getUrl(), ProductDTOResponse.class);
+            model.addAttribute("products", Objects.requireNonNull(productDTOResponse).getResponse());
             return "order/addProductToOrder";
         }
         return "redirect:/orders/" + id;
     }
 }
+
+

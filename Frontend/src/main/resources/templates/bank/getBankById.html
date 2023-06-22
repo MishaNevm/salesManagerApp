@@ -3,6 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <title th:text="${bank.getName()}">VALUE</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #333333;
+      font-family: Arial, sans-serif;
+      color: #ffffff;
+    }
+
+    p {
+      text-align: center;
+    }
+
+    hr {
+      margin: 20px 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+
+    a {
+      margin: 5px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    form {
+      display: inline;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 <p th:text="${'Name' + ', ' + bank.getName()}"></p>
@@ -28,4 +71,5 @@
 </form>
 </body>
 </html>
+
 

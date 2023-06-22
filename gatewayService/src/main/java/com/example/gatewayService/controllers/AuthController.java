@@ -2,7 +2,6 @@ package com.example.gatewayService.controllers;
 
 import com.example.gatewayService.dto.UserLogin;
 import com.example.gatewayService.security.JWTUtil;
-import com.example.gatewayService.services.UserLoginDetailsService;
 import com.example.gatewayService.services.UserService;
 import com.example.gatewayService.util.ErrorResponse;
 import com.example.gatewayService.util.ErrorResponseException;

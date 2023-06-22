@@ -7,11 +7,9 @@ import com.example.Frontend.dto.ClientDTOResponse;
 import com.example.Frontend.dto.OrderDTOResponse;
 import com.example.Frontend.util.ClientTypes;
 import com.example.Frontend.util.CurrentUser;
-import com.example.Frontend.util.ErrorResponse;
 import com.example.Frontend.util.Urls;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
-import java.io.IOException;
+import java.util.Collections;
 import java.util.Objects;
 
 @Controller
@@ -29,34 +27,33 @@ import java.util.Objects;
 public class ClientController {
 
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
     private final CurrentUser currentUser;
 
-
     @Autowired
-    public ClientController(RestTemplate restTemplate, ObjectMapper objectMapper, CurrentUser currentUser) {
+    public ClientController(RestTemplate restTemplate, CurrentUser currentUser) {
         this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
         this.currentUser = currentUser;
     }
 
     @GetMapping
-    public String findAll(Model model) {
-        model.addAttribute("clients", Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_CLIENTS.getUrl(), ClientDTOResponse.class)).getResponse());
+    public String getAll(Model model) {
+        ClientDTOResponse response = restTemplate.getForObject(Urls.GET_ALL_CLIENTS.getUrl(), ClientDTOResponse.class);
+        model.addAttribute("clients", response != null ? response.getResponse() : Collections.emptyList());
         return "client/getAllClients";
     }
 
     @GetMapping("/{id}")
-    public String findById(@PathVariable("id") int id, Model model) {
+    public String getById(@PathVariable("id") int id, Model model) {
         model.addAttribute("role", currentUser.getRole());
         ClientDTO clientDTO = restTemplate.getForObject(String.format(Urls.GET_CLIENT_BY_ID.getUrl(), id), ClientDTO.class);
         if (clientDTO != null) {
             model.addAttribute("client", clientDTO);
             model.addAttribute("orders", Objects.requireNonNull(restTemplate
-                            .getForObject(String
-                                            .format(Urls.GET_ORDERS_BY_CLIENT_SHORT_NAME.getUrl(), clientDTO.getShortName()),
-                                    OrderDTOResponse.class))
-                    .getResponse());
+                            .getForObject
+                                    (String.format(Urls.GET_ORDERS_BY_CLIENT_SHORT_NAME.getUrl(),
+                                                    clientDTO.getShortName()),
+                                                    OrderDTOResponse.class))
+                                                    .getResponse());
         }
         return "client/getClientById";
     }
@@ -79,18 +76,13 @@ public class ClientController {
             clientDTO.setCreatedBy(currentUser.getEmail());
             restTemplate.postForObject(Urls.CREATE_CLIENT.getUrl(), clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
-            try {
-                ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
-                errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            GlobalExceptionHandler.handleBadRequestException(e, bindingResult);
             return "client/createClient";
         }
         return "redirect:/clients";
     }
 
-    @GetMapping("/{id}/addBank")
+    @GetMapping("/{id}/add-bank")
     public String createBankToClient(@PathVariable("id") int id, Model model, @ModelAttribute("bank") BankDTO bankDTO) {
         model.addAttribute("id", id);
         return "client/createBankToClient";
@@ -108,17 +100,11 @@ public class ClientController {
             bankDTO.setCreatedBy(currentUser.getEmail());
             restTemplate.postForObject(String.format(Urls.CREATE_BANK_TO_CLIENT.getUrl(), id), bankDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
-            try {
-                ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
-                errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            GlobalExceptionHandler.handleBadRequestException(e, bindingResult);
             return "client/createBankToClient";
         }
         return "redirect:/clients/" + id;
     }
-
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
@@ -139,12 +125,7 @@ public class ClientController {
             clientDTO.setUpdatedBy(currentUser.getEmail());
             restTemplate.patchForObject(String.format(Urls.UPDATE_CLIENT.getUrl(), id), clientDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {
-            try {
-                ErrorResponse errorResponse = objectMapper.readValue(e.getResponseBodyAsByteArray(), ErrorResponse.class);
-                errorResponse.getErrors().forEach(a -> bindingResult.rejectValue(a.getField(), a.getCode(), a.getMessage()));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            GlobalExceptionHandler.handleBadRequestException(e, bindingResult);
             return "client/updateClient";
         }
         return "redirect:/clients/" + id;

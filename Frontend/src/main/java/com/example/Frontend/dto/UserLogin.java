@@ -15,6 +15,14 @@ public class UserLogin {
 
     private String userRole;
 
+    public UserLogin(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public UserLogin() {
+    }
+
     public String getEmail() {
         return email;
     }

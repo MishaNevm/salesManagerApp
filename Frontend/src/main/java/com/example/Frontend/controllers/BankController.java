@@ -24,7 +24,6 @@ import java.util.Objects;
 public class BankController {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-
     private final CurrentUser currentUser;
 
     @Autowired
@@ -35,17 +34,23 @@ public class BankController {
     }
 
 
+
     @GetMapping()
     public String findAll(Model model) {
-        model.addAttribute("banks", Objects.requireNonNull(restTemplate.getForObject(Urls.GET_ALL_BANKS.getUrl(), BankDTOResponse.class)).getResponse());
+        BankDTOResponse bankDTOResponse = restTemplate.getForObject(Urls.GET_ALL_BANKS.getUrl(), BankDTOResponse.class);
+        model.addAttribute("banks", Objects.requireNonNull(bankDTOResponse).getResponse());
         return "bank/getAllBanks";
     }
 
+
     @GetMapping("/{id}")
     private String findById(@PathVariable("id") int id, Model model) {
-        model.addAttribute("bank", restTemplate.getForObject(String.format(Urls.GET_BANK_BY_ID.getUrl(), id), BankDTO.class));
+        BankDTO bankDTO = restTemplate.getForObject(String.format(Urls.GET_BANK_BY_ID.getUrl(), id), BankDTO.class);
+        model.addAttribute("bank", bankDTO);
         return "bank/getBankById";
     }
+
+
 
     @GetMapping("/{id}/edit")
     public String update(@PathVariable("id") int id, Model model) throws InterruptedException {
@@ -53,6 +58,8 @@ public class BankController {
         model.addAttribute("bank", bankDTO);
         return "bank/updateBank";
     }
+
+
 
     @PatchMapping("/{id}")
     public String update(@PathVariable("id") int id, @ModelAttribute("bank") BankDTO bankDTO, BindingResult bindingResult) {
@@ -73,16 +80,21 @@ public class BankController {
         }
         if (bankDTO.getClientDTO() != null) {
             return "redirect:/clients/" + bankDTO.getClientDTO().getId();
-        } else return "redirect:/banks/" + id;
+        } else {
+            return "redirect:/banks/" + id;
+        }
     }
+
 
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id,
-                         @RequestParam(value = "client-id", required = false) Integer clientId) {
+    public String delete(@PathVariable("id") int id, @RequestParam(value = "client-id", required = false) Integer clientId) {
         restTemplate.delete(String.format(Urls.DELETE_BANK.getUrl(), id));
         if (clientId == null) {
             return "redirect:/banks";
-        } else return "redirect:/clients/" + clientId;
+        } else {
+            return "redirect:/clients/" + clientId;
+        }
     }
 }
+

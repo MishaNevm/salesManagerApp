@@ -1,5 +1,6 @@
 package com.example.orderService.dto;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class OrderDTO {
@@ -17,6 +18,8 @@ public class OrderDTO {
     private String createdBy;
 
     private String updatedBy;
+
+    private BigDecimal totalCost;
 
     public int getId() {
         return id;
@@ -64,6 +67,14 @@ public class OrderDTO {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public BigDecimal getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(BigDecimal totalCost) {
+        this.totalCost = totalCost;
     }
 
     public String getUpdatedBy() {

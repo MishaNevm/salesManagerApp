@@ -1,4 +1,4 @@
-package com.example.Frontend.dto;
+package com.example.gatewayService.controllers;
 
 import java.math.BigDecimal;
 import java.util.Date;

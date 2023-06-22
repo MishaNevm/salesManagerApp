@@ -3,37 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Create User</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: #222222;
+            padding: 20px;
+            text-align: center;
+        }
+
+        label {
+            color: white;
+            margin-right: 10px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"],
+        select {
+            padding: 4px;
+            border: none;
+            border-radius: 3px;
+            background-color: #444444;
+            color: white;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        div.error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
 <form th:method="POST" th:action="@{/users}" th:object="${user}">
     <label for="name">Name: </label>
     <input type="text" th:field="*{name}" id="name"/>
-    <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</div>
+    <div class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</div>
     <br/>
     <label for="surname">Surname: </label>
     <input type="text" th:field="*{surname}" id="surname"/>
-    <div style="color:red" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">Error</div>
+    <div class="error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">Error</div>
     <br/>
     <label for="patronymic">Patronymic: </label>
     <input type="text" th:field="*{patronymic}" id="patronymic"/>
-    <div style="color:red" th:if="${#fields.hasErrors('patronymic')}" th:errors="*{patronymic}">Error</div>
+    <div class="error" th:if="${#fields.hasErrors('patronymic')}" th:errors="*{patronymic}">Error</div>
     <br/>
     <label for="email">Email: </label>
     <input type="email" th:field="*{email}" id="email"/>
-    <div style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Error</div>
+    <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Error</div>
     <br/>
     <label for="password">Password: </label>
     <input type="password" th:field="*{password}" id="password"/>
-    <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</div>
+    <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</div>
     <br/>
+    <label for="role">Должность: </label>
     <select th:field="*{userRole}" id="role">
         <option th:each="role : ${roles}" th:value="${role}" th:text="${role.getValue()}"></option>
     </select>
-    <label for="dateOfBirth">Date of Birth: </label>
+    <br/>
+    <label for="dateOfBirth">Дата рождения: </label>
     <input type="date" th:field="*{dateOfBirth}" id="dateOfBirth"/>
-    <div style="color:red" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}">Error</div>
+    <div class="error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}">Error</div>
     <br/>
     <input type="submit" value="Create"/>
 </form>
 </body>
 </html>
+
+

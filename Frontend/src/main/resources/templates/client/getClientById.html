@@ -3,6 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${client.getShortName()}">VALUE</title>
+    <style>
+        body {
+            background-color: #333333;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        p, div {
+            margin-bottom: 10px;
+        }
+
+        a {
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 5px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ffffff;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
 <p th:text="${client.getFullName() + ', ' + client.getShortName()}"></p>
@@ -14,7 +39,7 @@
 <div th:if="${client.getBankDTO() == null}">
     <p th:text="${client.getShortName() + 's bank information is not available'}"></p>
     <br/>
-    <a th:href="@{/clients/{id}/addBank(id=${client.getId()})}">Add bank</a>
+    <a th:href="@{/clients/{id}/add-bank(id=${client.getId()})}">Add bank</a>
 </div>
 <div th:if="${client.getBankDTO() != null}">
     <p th:text="${'Bank Name: ' + client.getBankDTO().getName()}"></p>
@@ -44,10 +69,12 @@
 <br/>
 <p th:if="${orders.isEmpty()}">No orders</p>
 <div th:unless="${orders.isEmpty()}" th:each="order : ${orders}">
-    <a th:href="@{/orders/{id}(id=${order.getId()})}" th:text="${order.getClientShortName() + ', ' + order.getCreatedAt()}">VALUE</a>
+    <a th:href="@{/orders/{id}(id=${order.getId()})}"
+       th:text="${order.getClientShortName() + ', ' + order.getCreatedAt()}"></a>
 </div>
 <br/>
 <hr/>
 <a href="/orders/new">Add order</a>
 </body>
 </html>
+

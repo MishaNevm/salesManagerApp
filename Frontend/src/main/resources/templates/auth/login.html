@@ -3,6 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #222;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        label {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #eee;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 15px;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        a {
+            margin-top: 10px;
+            text-decoration: none;
+            color: #0645AD;
+        }
+    </style>
 </head>
 <body>
 <form form action="/process_login" method="POST">
@@ -14,12 +72,11 @@
     <input type="password" id="password" name="password">
     <br/>
 
-    <div th:if="${param.error}" style="color: red">
+    <div th:if="${param.error}" class="error-message">
         Неверный логин или пароль
     </div>
     <button type="submit">Login</button>
-    <br/>
-    <a href="/auth/registration">Registration</a>
 </form>
 </body>
 </html>
+

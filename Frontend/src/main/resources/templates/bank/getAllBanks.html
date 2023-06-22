@@ -3,11 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>All banks</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #333333;
+            font-family: Arial, sans-serif;
+        }
+
+        p {
+            text-align: center;
+            color: #ffffff;
+        }
+
+        div {
+            display: flex;
+            justify-content: center;
+        }
+
+        a {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
 <p th:if="${banks.isEmpty()}">No banks</p>
 <div th:unless="${banks.isEmpty()}" th:each="bank : ${banks}">
-    <a th:href="@{/banks/{id}(id=${bank.getId()})}" th:text="${bank.name + ', ' + bank.city}">VALUE</a>
+    <a th:href="@{/banks/{id}(id=${bank.getId()})}" th:text="${bank.name + ', ' + bank.city}"></a>
 </div>
 <br/>
 <hr/>
@@ -16,3 +51,4 @@
 <a href="/clients">Client list</a>
 </body>
 </html>
+

@@ -1,10 +1,20 @@
 package com.example.Frontend.util;
 
 public enum ProductTypes {
-    АКСЕСУАРЫ,
-    НИВЕЛИРЫ,
-    ЛАЗЕРНЫЙ_СКАНЕР,
-    ПРИЕМНИК,
-    ГЕОРАДАР,
-    ТЕОДОЛИТ
+    АКСЕСУАРЫ("Аксессуары"),
+    НИВЕЛИРЫ("Нивелиры"),
+    ЛАЗЕРНЫЙ_СКАНЕР ("Лазерный сканер"),
+    ПРИЕМНИК("Приемник"),
+    ГЕОРАДАР("Георадар"),
+    ТЕОДОЛИТ("Теодолит");
+
+    private final String value;
+
+    ProductTypes(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

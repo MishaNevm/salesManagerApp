@@ -1,17 +1,87 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>All Products</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            margin: 20px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #555555;
+            color: white;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #80c8e5;
+        }
+
+        a.button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        a.button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-<br/>
-<p th:if="${products.isEmpty()}">No products</p>
-<div th:unless="${products.isEmpty()}" th:each="product : ${products}">
-    <a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name + ', Quantity: ' + product.quantity}">Product Details</a>
-</div>
-<br/>
-<a href="/products/new">Add Product</a>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${products.isEmpty()}">
+        <td colspan="3">No products</td>
+    </tr>
+    <tr th:unless="${products.isEmpty()}" th:each="product : ${products}">
+        <td><a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name}">Product Details</a></td>
+        <td th:text="${product.quantity}"></td>
+        <td th:text="${product.price}"></td>
+    </tr>
+    </tbody>
+</table>
+<a href="/products/new" class="button">Add Product</a>
 </body>
 </html>
 
