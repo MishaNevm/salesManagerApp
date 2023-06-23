@@ -7,8 +7,6 @@ import com.example.gatewayService.dto.ProductDTO;
 import com.example.gatewayService.dto.ProductOrderDTO;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
-import com.example.gatewayService.util.ErrorResponse;
-import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +22,12 @@ public class OrderController {
     private final Producer producer;
     private final Consumer consumer;
 
-    public OrderController(Producer producer, Consumer consumer) {
+    private final GlobalExceptionHandler globalExceptionHandler;
+
+    public OrderController(Producer producer, Consumer consumer, GlobalExceptionHandler globalExceptionHandler) {
         this.producer = producer;
         this.consumer = consumer;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
     @GetMapping
@@ -38,9 +39,6 @@ public class OrderController {
         } else {
             producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
             orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).poll(15, TimeUnit.SECONDS);
-        }
-        if (orderDTOResponse != null) {
-            orderDTOResponse.getResponse().forEach(a -> System.out.println(a.getClientShortName()));
         }
         return orderDTOResponse;
     }
@@ -76,8 +74,7 @@ public class OrderController {
         productOrderDTO.setProduct(productDTO);
         productOrderDTO.setQuantity(quantity);
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, productOrderDTO);
-        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER).poll(15, TimeUnit.SECONDS);
-        ErrorResponseException.checkErrorResponse(errorResponse);
+        globalExceptionHandler.checkErrorResponse(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -120,8 +117,7 @@ public class OrderController {
         productOrderDTO.setOrderId(id);
         productOrderDTO.setQuantity(quantity);
         producer.sendRequestToInventoryService(MethodsCodes.ADD_PRODUCT_TO_ORDER, productOrderDTO);
-        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.ADD_PRODUCT_TO_ORDER).poll(15, TimeUnit.SECONDS);
-        ErrorResponseException.checkErrorResponse(errorResponse);
+        globalExceptionHandler.checkErrorResponse(MethodsCodes.ADD_PRODUCT_TO_ORDER);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }

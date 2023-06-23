@@ -62,23 +62,23 @@
 <form th:method="POST" th:action="@{/clients}" th:object="${client}">
   <label for="clientShortName">Client Short Name:</label>
   <input type="text" th:field="*{shortName}" id="clientShortName"/>
-  <div th:if="${#fields.hasErrors('shortName')}">Short Name error</div>
+  <div th:if="${#fields.hasErrors('shortName')}" th:errors="*{shortName}">Short Name error</div>
   <br/>
   <label for="clientFullName">Client Full Name:</label>
   <input type="text" th:field="*{fullName}" id="clientFullName"/>
-  <div th:if="${#fields.hasErrors('fullName')}">Full Name error</div>
+  <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full Name error</div>
   <br/>
   <label for="clientInn">Client INN:</label>
   <input type="text" th:field="*{inn}" id="clientInn"/>
-  <div th:if="${#fields.hasErrors('inn')}">INN error</div>
+  <div th:if="${#fields.hasErrors('inn')}" th:errors="*{inn}">INN error</div>
   <br/>
   <label for="clientKpp">Client KPP:</label>
   <input type="text" th:field="*{kpp}" id="clientKpp"/>
-  <div th:if="${#fields.hasErrors('kpp')}">KPP error</div>
+  <div th:if="${#fields.hasErrors('kpp')}" th:errors="*{kpp}">KPP error</div>
   <br/>
   <label for="clientOgrn">Client OGRN:</label>
   <input type="text" th:field="*{ogrn}" id="clientOgrn"/>
-  <div th:if="${#fields.hasErrors('ogrn')}">OGRN error</div>
+  <div th:if="${#fields.hasErrors('ogrn')}" th:errors="*{ogrn}">OGRN error</div>
   <br/>
   <label for="clientType">Client Type:</label>
   <select th:field="*{type}" id="clientType">

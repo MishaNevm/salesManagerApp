@@ -66,22 +66,25 @@ public class ClientDTOUniqueValidator {
     //У ИП нет КПП
     private void checkKpp(List<Client> clientList, ClientDTO clientToValidate, ErrorResponse errorResponse) {
         ValidationError validationError = new ValidationError();
+        String kpp = clientToValidate.getKpp();
+        int clientId = clientToValidate.getId();
+
+        if ((kpp.equals("-") && !clientToValidate.getType().equals(ClientTypes.IP))
+                || (!kpp.equals("-") && clientToValidate.getType().equals(ClientTypes.IP))) {
+            validationError.setMessage("КПП отсутствует только у ИП");
+            return;
+        }
+
         validationError.setField("kpp");
         validationError.setCode("0");
+
         for (Client client : clientList) {
-            if (clientToValidate.getKpp().equals("-") && !clientToValidate.getType().equals(ClientTypes.IP)) {
-                validationError.setMessage("КПП отсутствует только у ИП");
-                return;
-            }
-            if (!clientToValidate.getKpp().equals("-")) {
-                if (clientToValidate.getType().equals(ClientTypes.IP)) {
-                    validationError.setMessage("У ИП отсутсвует КПП");
-                } else if (client.getKpp().equals(clientToValidate.getKpp())
-                        && client.getId() != clientToValidate.getId()) {
-                    validationError.setMessage("Клиент с этим КПП уже зарегистрирован");
-                }
+            if (client.getKpp().equals(kpp) && client.getId() != clientId) {
+                validationError.setMessage("Клиент с этим КПП уже зарегистрирован");
+                break;
             }
         }
+
         if (validationError.getMessage() != null) {
             errorResponse.getErrors().add(validationError);
         }

@@ -5,8 +5,6 @@ import com.example.gatewayService.dto.BankDTO;
 import com.example.gatewayService.dto.BankDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
-import com.example.gatewayService.util.ErrorResponse;
-import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +18,14 @@ import java.util.concurrent.TimeUnit;
 public class BankController {
     private final Producer producer;
     private final Consumer consumer;
+    private final GlobalExceptionHandler globalExceptionHandler;
 
     private BankDTO bankDTO;
 
-    public BankController(Producer producer, Consumer consumer) {
+    public BankController(Producer producer, Consumer consumer, GlobalExceptionHandler globalExceptionHandler) {
         this.producer = producer;
         this.consumer = consumer;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
 
@@ -46,8 +46,7 @@ public class BankController {
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody BankDTO bankDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_BANK, bankDTO);
-        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_BANK).poll(15, TimeUnit.SECONDS);
-        ErrorResponseException.checkErrorResponse(errorResponse);
+        globalExceptionHandler.checkErrorResponse(MethodsCodes.UPDATE_BANK);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

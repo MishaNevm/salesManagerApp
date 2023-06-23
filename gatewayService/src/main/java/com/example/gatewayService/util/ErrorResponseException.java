@@ -10,10 +10,4 @@ public class ErrorResponseException extends RuntimeException {
     public ErrorResponse getErrorResponse() {
         return errorResponse;
     }
-
-    public static void checkErrorResponse(ErrorResponse errorResponse) {
-        if (errorResponse != null && !errorResponse.getErrors().isEmpty()) {
-            throw new ErrorResponseException(errorResponse);
-        }
-    }
 }

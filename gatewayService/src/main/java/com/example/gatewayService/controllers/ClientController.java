@@ -5,8 +5,6 @@ import com.example.gatewayService.dto.ClientDTO;
 import com.example.gatewayService.dto.ClientDTOResponse;
 import com.example.gatewayService.kafka.Consumer;
 import com.example.gatewayService.kafka.Producer;
-import com.example.gatewayService.util.ErrorResponse;
-import com.example.gatewayService.util.ErrorResponseException;
 import com.example.gatewayService.util.MethodsCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +20,12 @@ public class ClientController {
     private final Consumer consumer;
     private final Producer producer;
 
-    public ClientController(Consumer consumer, Producer producer) {
+    private final GlobalExceptionHandler globalExceptionHandler;
+
+    public ClientController(Consumer consumer, Producer producer, GlobalExceptionHandler globalExceptionHandler) {
         this.consumer = consumer;
         this.producer = producer;
+        this.globalExceptionHandler = globalExceptionHandler;
     }
 
 
@@ -46,8 +47,7 @@ public class ClientController {
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.CREATE_CLIENT, clientDTO);
-        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_CLIENT).poll(15, TimeUnit.SECONDS);
-        ErrorResponseException.checkErrorResponse(errorResponse);
+        globalExceptionHandler.checkErrorResponse(MethodsCodes.CREATE_CLIENT);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -57,8 +57,7 @@ public class ClientController {
         clientDTO.setId(id);
         bankDTO.setClientDTO(clientDTO);
         producer.sendRequestToClientService(MethodsCodes.CREATE_BANK, bankDTO);
-        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.CREATE_BANK).poll(15, TimeUnit.SECONDS);
-        ErrorResponseException.checkErrorResponse(errorResponse);
+        globalExceptionHandler.checkErrorResponse(MethodsCodes.CREATE_BANK);
         return HttpStatus.OK;
     }
 
@@ -66,8 +65,7 @@ public class ClientController {
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody ClientDTO clientDTO) throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.UPDATE_CLIENT, clientDTO);
-        ErrorResponse errorResponse = consumer.getErrorResponseMap().get(MethodsCodes.UPDATE_CLIENT).poll(15, TimeUnit.SECONDS);
-        ErrorResponseException.checkErrorResponse(errorResponse);
+        globalExceptionHandler.checkErrorResponse(MethodsCodes.UPDATE_CLIENT);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

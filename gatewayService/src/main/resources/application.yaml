@@ -28,5 +28,5 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
       value-serializer: com.example.gatewayService.kafka.JsonSerializer
       client-id: 'gateway-group-id'
-secret: "Одна голова - хорошо. А две - хорошо, хорошо"
+secret: "Одна голова - хорошо, а две - хорошо, хорошо"
 admin-pass: "admin"
