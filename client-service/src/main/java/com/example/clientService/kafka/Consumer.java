@@ -20,10 +20,10 @@ public class Consumer {
     private final BankController bankController;
 
     @Autowired
-    public Consumer(ObjectMapper objectMapper, ClientController clientController, BankController bankController) {
-        this.objectMapper = objectMapper;
+    public Consumer( ClientController clientController, BankController bankController) {
         this.clientController = clientController;
         this.bankController = bankController;
+        objectMapper = new ObjectMapper();
     }
 
     @KafkaListener(topics = "${application.kafka.clientTopicRequest}")

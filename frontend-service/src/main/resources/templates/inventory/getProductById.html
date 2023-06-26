@@ -104,11 +104,13 @@
 <div class="button-container">
     <a href="/products">All Products</a>
     <br/>
+    <div th:if="${role.equals('ROLE_ADMIN')}">
     <a th:href="@{/products/{id}/edit(id=${product.id})}">Update</a>
     <br/>
     <form th:method="DELETE" th:action="@{/products/{id}(id=${product.id})}" th:object="${product}">
         <input type="submit" value="Delete">
     </form>
+        </div>
 </div>
 </body>
 </html>

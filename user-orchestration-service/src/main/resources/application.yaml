@@ -23,10 +23,10 @@ spring:
       group-id: 'gateway-group-id'
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
-      value-deserializer: com.example.UserOrchestrationService.kafka.JsonDeserializer
+      value-deserializer: com.example.userOrchestrationService.kafka.JsonDeserializer
     producer:
       key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
-      value-serializer: com.example.UserOrchestrationService.kafka.JsonSerializer
+      value-serializer: com.example.userOrchestrationService.kafka.JsonSerializer
       client-id: 'gateway-group-id'
 secret: "Одна голова - хорошо, а две - хорошо, хорошо"
 admin-pass: "admin"

@@ -81,7 +81,9 @@
     </tr>
     </tbody>
 </table>
-<a href="/products/new" class="button">Add Product</a>
+<div th:if="${role.equals('ROLE_ADMIN')}">
+    <a href="/products/new" class="button">Add Product</a>
+</div>
 </body>
 </html>
 
