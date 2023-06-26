@@ -21,11 +21,13 @@ public class BankDTOUniqueValidator {
         this.bankRepository = bankRepository;
     }
 
-    public void validate(BankDTO bankDTO, ErrorResponse errorResponse) {
+    public ErrorResponse validate(BankDTO bankDTO) {
+        ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrors(new ArrayList<>());
         List<Bank> bankList = bankRepository.findByBikOrCheckingAccount(bankDTO.getBik(), bankDTO.getCheckingAccount());
         checkBik(bankList, bankDTO, errorResponse);
         checkCheckingAccount(bankList, bankDTO, errorResponse);
+        return errorResponse;
     }
 
     private void checkBik(List<Bank> bankList, BankDTO bankToValidate, ErrorResponse errorResponse) {

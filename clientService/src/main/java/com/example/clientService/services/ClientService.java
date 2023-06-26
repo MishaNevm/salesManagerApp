@@ -4,17 +4,15 @@ package com.example.clientService.services;
 import com.example.clientService.dto.ClientDTO;
 import com.example.clientService.dto.ClientDTOResponse;
 import com.example.clientService.models.Client;
-import com.example.clientService.repositoryes.BankRepository;
+import com.example.clientService.repositoryes.ClientRepository;
 import com.example.clientService.util.ModelMapperUtil;
 import com.example.clientService.util.clientUtil.ClientNotFoundException;
-import com.example.clientService.repositoryes.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,15 +21,13 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final ModelMapperUtil modelMapperUtil;
     private final ModelMapperUtil modelMapper;
-    private final BankRepository bankRepository;
     private ClientDTOResponse clientDTOResponse;
 
     @Autowired
-    public ClientService(ClientRepository clientRepository, ModelMapperUtil modelMapperUtil, ModelMapperUtil modelMapper, BankRepository bankRepository) {
+    public ClientService(ClientRepository clientRepository, ModelMapperUtil modelMapperUtil, ModelMapperUtil modelMapper) {
         this.clientRepository = clientRepository;
         this.modelMapperUtil = modelMapperUtil;
         this.modelMapper = modelMapper;
-        this.bankRepository = bankRepository;
     }
 
     public ClientDTOResponse findAll() {
@@ -55,23 +51,6 @@ public class ClientService {
         return clientDTOResponse;
     }
 
-    public Client findByShortName(String shortName) {
-        return clientRepository.findByShortName(shortName).orElseThrow(ClientNotFoundException::new);
-    }
-
-    public Optional<Client> findByInn(Client client) {
-        return clientRepository.findByInn(client.getInn());
-    }
-
-    public Optional<Client> findByKpp(Client client) {
-        return clientRepository.findByKpp(client.getKpp());
-    }
-
-    public Optional<Client> findByOgrn(Client client) {
-        return clientRepository.findByOgrn(client.getOgrn());
-    }
-
-
     @Transactional
     public void save(ClientDTO clientDTO) {
         Client client = modelMapper.convertClientDTOToClient(clientDTO);
@@ -82,6 +61,7 @@ public class ClientService {
 
     @Transactional
     public void update(ClientDTO clientDTO) {
+        clientDTO.setCreatedAt(findById(clientDTO.getId()).getResponse().get(0).getCreatedAt());
         Client client = modelMapper.convertClientDTOToClient(clientDTO);
         client.setUpdatedAt(new Date());
         clientRepository.save(client);

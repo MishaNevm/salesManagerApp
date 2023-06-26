@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Date;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class BankService {
 
     private final BankRepository bankRepository;
@@ -27,13 +27,15 @@ public class BankService {
         this.modelMapperUtil = modelMapperUtil;
     }
 
-    public BankDTOResponse findAll () {
+    @Transactional(readOnly = true)
+    public BankDTOResponse findAll() {
         bankDTOResponse = new BankDTOResponse();
         bankDTOResponse.setResponse(bankRepository.findAll().stream().map(modelMapperUtil::convertBankToBankDTO).toList());
         return bankDTOResponse;
     }
 
-    public BankDTOResponse findById (int id) {
+    @Transactional(readOnly = true)
+    public BankDTOResponse findById(int id) {
         bankDTOResponse = new BankDTOResponse();
         bankDTOResponse
                 .setResponse(Collections
@@ -44,24 +46,21 @@ public class BankService {
         return bankDTOResponse;
     }
 
-    @Transactional
-    public void save (BankDTO bankDTO) {
+    public void save(BankDTO bankDTO) {
         Bank bank = modelMapperUtil.convertBankDTOToBank(bankDTO);
         bank.setCreated_at(new Date());
         bankRepository.save(bank);
     }
 
-    @Transactional
-    public void update (BankDTO bankDTO) {
+    public void update(BankDTO bankDTO) {
+        bankDTO.setCreatedAt(findById(bankDTO.getId()).getResponse().get(0).getCreatedAt());
         Bank bank = modelMapperUtil.convertBankDTOToBank(bankDTO);
         bank.setUpdated_at(new Date());
         bankRepository.save(bank);
     }
 
-    @Transactional
-    public void delete (int id) {
+    public void delete(int id) {
+        findById(id);
         bankRepository.deleteById(id);
     }
-
-
 }

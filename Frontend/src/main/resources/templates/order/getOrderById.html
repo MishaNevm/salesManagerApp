@@ -64,12 +64,14 @@
             <th>Client Name</th>
             <th>Order Date</th>
             <th>Created By</th>
+            <th>Comment</th>
         </tr>
         <tr>
             <td th:text="${order.id}"></td>
             <td th:text="${order.clientShortName}"></td>
             <td th:text="${order.createdAt}"></td>
             <td th:text="${order.createdBy}"></td>
+            <td th:text="${order.getComment()}"></td>
         </tr>
     </table>
 </div>

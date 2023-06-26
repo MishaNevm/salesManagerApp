@@ -34,8 +34,7 @@ public class ClientController {
     }
 
     public void create(ClientDTO clientDTO) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        clientDTOUniqueValidator.validate(clientDTO, errorResponse);
+        ErrorResponse errorResponse = clientDTOUniqueValidator.validate(clientDTO);
         if (errorResponse.getErrors().isEmpty()) {
             clientService.save(clientDTO);
         }
@@ -43,10 +42,8 @@ public class ClientController {
     }
 
     public void update(ClientDTO clientDTO) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        clientDTOUniqueValidator.validate(clientDTO, errorResponse);
+        ErrorResponse errorResponse = clientDTOUniqueValidator.validate(clientDTO);
         if (errorResponse.getErrors().isEmpty()) {
-            clientDTO.setCreatedAt(clientService.findById(clientDTO.getId()).getResponse().get(0).getCreatedAt());
             clientService.update(clientDTO);
         }
         producer.sendMessageToClientTopicResponse(MethodsCodes.UPDATE_CLIENT, errorResponse);

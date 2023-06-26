@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class ClientDTOUniqueValidator {
@@ -23,7 +22,8 @@ public class ClientDTOUniqueValidator {
     }
 
 
-    public void validate(ClientDTO clientDTO, ErrorResponse errorResponse) {
+    public ErrorResponse validate(ClientDTO clientDTO) {
+        ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrors(new ArrayList<>());
         List<Client> clientList = clientRepository
                 .findByAnyParameter(clientDTO.getShortName(),
@@ -34,6 +34,7 @@ public class ClientDTOUniqueValidator {
         checkInn(clientList, clientDTO, errorResponse);
         checkKpp(clientList, clientDTO, errorResponse);
         checkOgrn(clientList, clientDTO, errorResponse);
+        return errorResponse;
     }
 
     private void checkShortName(List<Client> clientList, ClientDTO clientToValidate, ErrorResponse errorResponse) {

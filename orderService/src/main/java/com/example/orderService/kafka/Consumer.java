@@ -17,9 +17,9 @@ public class Consumer {
     private final OrderController orderController;
 
     @Autowired
-    public Consumer(ObjectMapper objectMapper, OrderController orderController) {
-        this.objectMapper = objectMapper;
+    public Consumer(OrderController orderController) {
         this.orderController = orderController;
+        objectMapper = new ObjectMapper();
     }
 
     @KafkaListener(topics = "${application.kafka.orderTopicRequest}")
@@ -38,5 +38,4 @@ public class Consumer {
             throw new RuntimeException(e);
         }
     }
-
 }

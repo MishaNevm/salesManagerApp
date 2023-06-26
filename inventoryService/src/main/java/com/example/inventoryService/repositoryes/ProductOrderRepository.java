@@ -10,10 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductOrderRepository extends JpaRepository<ProductOrder, Integer> {
-    List<ProductOrder> findByProductId(int productId);
     List<ProductOrder> findByOrderId(int orderId);
     Optional<ProductOrder> findByOrderIdAndProductId(int orderId, int productId);
-
     @Modifying
     @Query("DELETE FROM ProductOrder po WHERE po.orderId = :orderId")
     void deleteByOrderId(@Param("orderId") int orderId);

@@ -19,9 +19,9 @@ public class Consumer {
 
 
     @Autowired
-    public Consumer(ProductController productController, ObjectMapper objectMapper) {
+    public Consumer(ProductController productController) {
         this.productController = productController;
-        this.objectMapper = objectMapper;
+        objectMapper = new ObjectMapper();
     }
 
     @KafkaListener(topics = "${application.kafka.inventoryTopicRequest}")

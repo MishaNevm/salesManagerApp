@@ -4,7 +4,6 @@ import com.example.clientService.controllers.BankController;
 import com.example.clientService.controllers.ClientController;
 import com.example.clientService.dto.BankDTO;
 import com.example.clientService.dto.ClientDTO;
-import com.example.clientService.dto.ClientDTOResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -41,7 +41,6 @@ public class OrderController {
 
 
     public void delete(int id) {
-        orderService.findById(id);
         orderService.delete(id);
     }
 }

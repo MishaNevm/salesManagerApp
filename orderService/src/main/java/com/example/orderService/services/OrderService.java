@@ -6,12 +6,13 @@ import com.example.orderService.models.Order;
 import com.example.orderService.repositoryes.OrderRepository;
 import com.example.orderService.util.ModelMapperUtil;
 import com.example.orderService.util.OrderNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -20,7 +21,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ModelMapperUtil modelMapperUtil;
 
-    @Autowired
     public OrderService(OrderRepository orderRepository, ModelMapperUtil modelMapperUtil) {
         this.orderRepository = orderRepository;
         this.modelMapperUtil = modelMapperUtil;
@@ -28,28 +28,25 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public OrderDTOResponse findAll() {
-        OrderDTOResponse orderDTOResponse = new OrderDTOResponse();
-        orderDTOResponse.setResponse(orderRepository.findAll().stream().map(modelMapperUtil::convertOrderToOrderDTO).toList());
-        return orderDTOResponse;
+        List<OrderDTO> orderDTOs = orderRepository.findAll().stream()
+                .map(modelMapperUtil::convertOrderToOrderDTO)
+                .collect(Collectors.toList());
+        return createOrderDTOResponse(orderDTOs);
     }
 
     @Transactional(readOnly = true)
     public OrderDTOResponse findById(int id) {
-        OrderDTOResponse orderDTOResponse = new OrderDTOResponse();
-        orderDTOResponse
-                .setResponse(Collections
-                        .singletonList(modelMapperUtil
-                                .convertOrderToOrderDTO(orderRepository
-                                        .findById(id)
-                                        .orElseThrow(OrderNotFoundException::new))));
-        return orderDTOResponse;
+        Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
+        OrderDTO orderDTO = modelMapperUtil.convertOrderToOrderDTO(order);
+        return createOrderDTOResponse(Collections.singletonList(orderDTO));
     }
 
     @Transactional(readOnly = true)
     public OrderDTOResponse findByClientShortName(String clientShortName) {
-        OrderDTOResponse orderDTOResponse = new OrderDTOResponse();
-        orderDTOResponse.setResponse(orderRepository.findByClientShortName(clientShortName).stream().map(modelMapperUtil::convertOrderToOrderDTO).toList());
-        return orderDTOResponse;
+        List<OrderDTO> orderDTOs = orderRepository.findByClientShortName(clientShortName).stream()
+                .map(modelMapperUtil::convertOrderToOrderDTO)
+                .collect(Collectors.toList());
+        return createOrderDTOResponse(orderDTOs);
     }
 
     public void save(OrderDTO orderDTO) {
@@ -59,68 +56,21 @@ public class OrderService {
     }
 
     public void update(OrderDTO orderDTO) {
-        orderDTO.setCreatedAt(orderRepository.findById(orderDTO.getId()).orElseThrow(OrderNotFoundException::new).getCreatedAt());
-        Order order = modelMapperUtil.convertOrderDTOToOrder(orderDTO);
-        order.setUpdatedAt(new Date());
-        orderRepository.save(order);
+        Order order = orderRepository.findById(orderDTO.getId()).orElseThrow(OrderNotFoundException::new);
+        orderDTO.setCreatedAt(order.getCreatedAt());
+        orderDTO.setUpdatedAt(new Date());
+        orderRepository.save(modelMapperUtil.convertOrderDTOToOrder(orderDTO));
     }
 
     public void delete(int id) {
-        orderRepository.deleteById(id);
+        Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
+        orderRepository.delete(order);
     }
 
-//    public void addProductToOrder(Order order, int productId, int quantity) {
-//        if (quantity == 0) {
-//            throw new ProductNotAddException("Количество товара указано 0, для удаления воспользуйтесь другой командой");
-//        }
-//        if (productId == 0) {
-//            throw new ProductNotFoundException();
-//        }
-//        ProductOrder productOrder = new ProductOrder();
-//        productOrder.setOrder(order);
-//        Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
-//        if (product.getQuantity() < quantity) {
-//            throw new ProductNotAddException("Количество добавляемого товара в счет меньше наличия товара");
-//        } else product.setQuantity(product.getQuantity() - quantity);
-//        productOrder.setProduct(product);
-//        productOrder.setQuantity(quantity);
-//        productOrder.setCreatedAt(new Date());
-//        productOrderRepository.save(productOrder);
-//    }
-
-
-//    public void setQuantityProductInOrder(int orderId, int productId, int quantity) {
-//        if (quantity == 0) {
-//            throw new ProductNotAddException("Количество товара указано 0, для удаления воспользуйтесь другой командой");
-//        }
-//        if (productId == 0) {
-//            throw new ProductNotFoundException();
-//        }
-//        ProductOrder productOrder = productOrderRepository.findByOrderId(orderId)
-//                .stream().filter(a -> a.getProduct().getId() == productId).findAny().orElseThrow(ProductNotFoundException::new);
-//        Product product = productOrder.getProduct();
-//        if (product.getQuantity() + productOrder.getQuantity() < quantity) {
-//            throw new ProductNotAddException("Количество добавляемого товара меньше общего наличия");
-//        }
-//        product.setQuantity(product.getQuantity() + productOrder.getQuantity() - quantity);
-//        productOrder.setQuantity(quantity);
-//        productOrder.setUpdatedAt(new Date());
-//        productOrderRepository.save(productOrder);
-//    }
-
-//    public void deleteProductFromOrder(int orderId, int productId) {
-//        ProductOrder productOrder = productOrderRepository.findByOrderId(orderId)
-//                .stream().filter(a -> a.getProduct().getId() == productId).findFirst().orElseThrow(ProductNotFoundException::new);
-//        Product product = productOrder.getProduct();
-//        product.setQuantity(product.getQuantity() + productOrder.getQuantity());
-//        productOrderRepository.deleteById(productOrder.getId());
-//    }
-//
-//    public void deleteAllProductsFromOrder(int orderId) {
-//        for (ProductOrder productOrder : productOrderRepository.findByOrderId(orderId)) {
-//            Product product = productOrder.getProduct();
-//            product.setQuantity(product.getQuantity() + productOrder.getQuantity());
-//            productOrderRepository.deleteById(productOrder.getId());
-//        }
-//    }
+    private OrderDTOResponse createOrderDTOResponse(List<OrderDTO> orderDTOs) {
+        OrderDTOResponse orderDTOResponse = new OrderDTOResponse();
+        orderDTOResponse.setResponse(orderDTOs);
+        return orderDTOResponse;
+    }
 }
+

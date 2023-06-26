@@ -1,6 +1,5 @@
 package com.example.clientService.kafka;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
 

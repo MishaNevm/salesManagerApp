@@ -33,8 +33,7 @@ public class BankController {
     }
 
     public void create(BankDTO bankDTO) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        bankDTOUniqueValidator.validate(bankDTO, errorResponse);
+        ErrorResponse errorResponse = bankDTOUniqueValidator.validate(bankDTO);
         if (errorResponse.getErrors().isEmpty()) {
             bankService.save(bankDTO);
         }
@@ -42,17 +41,14 @@ public class BankController {
     }
 
     public void update(BankDTO bankDTO) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        bankDTOUniqueValidator.validate(bankDTO, errorResponse);
+        ErrorResponse errorResponse = bankDTOUniqueValidator.validate(bankDTO);
         if (errorResponse.getErrors().isEmpty()) {
-            bankDTO.setCreatedAt(bankService.findById(bankDTO.getId()).getResponse().get(0).getCreatedAt());
             bankService.update(bankDTO);
         }
         producer.sendMessageToClientTopicResponse(MethodsCodes.UPDATE_BANK, errorResponse);
     }
 
     public void delete(int id) {
-        bankService.findById(id);
         bankService.delete(id);
     }
 }

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -25,7 +26,6 @@ public class ProductOrderService {
 
     private final ProductOrderRepository productOrderRepository;
     private final ModelMapperUtil modelMapperUtil;
-
     private final ProductRepository productRepository;
 
     @Autowired
@@ -38,14 +38,16 @@ public class ProductOrderService {
     @Transactional(readOnly = true)
     public ProductDTOResponse findByOrderId(int orderId) {
         List<ProductOrder> productOrders = productOrderRepository.findByOrderId(orderId);
-        if (productOrders.isEmpty()) return new ProductDTOResponse();
         ProductDTOResponse productDTOResponse = new ProductDTOResponse();
-        productDTOResponse.setResponse(new ArrayList<>());
-        for (ProductOrder productOrder : productOrders) {
-            ProductDTO productDTO = modelMapperUtil.convertProductToProductDTO(productOrder.getProduct());
-            productDTO.setQuantity(productOrder.getQuantity());
-            productDTOResponse.getResponse().add(productDTO);
+        if (productOrders.isEmpty()) {
+            return productDTOResponse;
         }
+
+        List<ProductDTO> productDTOs = productOrders.stream()
+                .map(this::mapProductOrderToDTO)
+                .collect(Collectors.toList());
+
+        productDTOResponse.setResponse(productDTOs);
         return productDTOResponse;
     }
 
@@ -61,33 +63,28 @@ public class ProductOrderService {
                 productOrder.setQuantity(productOrder.getQuantity() + productOrderDTO.getQuantity());
             }
         } else {
-            productRepository.findById(productOrderDTO.getProduct().getId()).ifPresent(a -> {
-                checkQuantity(a.getQuantity(), productOrderDTO.getQuantity(), validationError);
+            productRepository.findById(productOrderDTO.getProduct().getId()).ifPresent(product -> {
+                checkQuantity(product.getQuantity(), productOrderDTO.getQuantity(), validationError);
                 if (validationError.getField() == null) {
-                    a.setQuantity(a.getQuantity() - productOrderDTO.getQuantity());
+                    product.setQuantity(product.getQuantity() - productOrderDTO.getQuantity());
                     productOrderRepository.save(modelMapperUtil.convertProductOrderDTOToProductOrder(productOrderDTO));
                 }
             });
         }
-        if (validationError.getField() != null) {
-            errorResponse.setErrors(Collections.singletonList(validationError));
-        } else errorResponse.setErrors(new ArrayList<>());
+        setErrorResponse(errorResponse, validationError);
     }
-
 
     public void updateProductQuantityInOrder(ProductOrderDTO productOrderDTO, ErrorResponse errorResponse) {
         ValidationError validationError = new ValidationError();
-        productOrderRepository.findByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId()).ifPresent(a -> {
-            Product product = a.getProduct();
-            checkQuantity(a.getQuantity() + product.getQuantity(), productOrderDTO.getQuantity(), validationError);
+        productOrderRepository.findByOrderIdAndProductId(productOrderDTO.getOrderId(), productOrderDTO.getProduct().getId()).ifPresent(productOrder -> {
+            Product product = productOrder.getProduct();
+            checkQuantity(product.getQuantity() + productOrder.getQuantity(), productOrderDTO.getQuantity(), validationError);
             if (validationError.getField() == null) {
-                product.setQuantity(product.getQuantity() + a.getQuantity() - productOrderDTO.getQuantity());
-                a.setQuantity(productOrderDTO.getQuantity());
+                product.setQuantity(product.getQuantity() + productOrder.getQuantity() - productOrderDTO.getQuantity());
+                productOrder.setQuantity(productOrderDTO.getQuantity());
             }
         });
-        if (validationError.getField() != null) {
-            errorResponse.setErrors(Collections.singletonList(validationError));
-        } else errorResponse.setErrors(new ArrayList<>());
+        setErrorResponse(errorResponse, validationError);
     }
 
     public void deleteAllProductsByOrderId(int orderId) {
@@ -102,10 +99,10 @@ public class ProductOrderService {
     }
 
     public void deleteByOrderIdAndProductId(int orderId, int productId) {
-        productOrderRepository.findByOrderIdAndProductId(orderId, productId).ifPresent(a -> {
-            Product product = a.getProduct();
-            product.setQuantity(product.getQuantity() + a.getQuantity());
-            productOrderRepository.deleteById(a.getId());
+        productOrderRepository.findByOrderIdAndProductId(orderId, productId).ifPresent(productOrder -> {
+            Product product = productOrder.getProduct();
+            product.setQuantity(product.getQuantity() + productOrder.getQuantity());
+            productOrderRepository.deleteById(productOrder.getId());
         });
     }
 
@@ -116,4 +113,19 @@ public class ProductOrderService {
             validationError.setMessage("Количество добавляемого товара меньше товара в наличии");
         }
     }
+
+    private ProductDTO mapProductOrderToDTO(ProductOrder productOrder) {
+        ProductDTO productDTO = modelMapperUtil.convertProductToProductDTO(productOrder.getProduct());
+        productDTO.setQuantity(productOrder.getQuantity());
+        return productDTO;
+    }
+
+    private void setErrorResponse(ErrorResponse errorResponse, ValidationError validationError) {
+        if (validationError.getField() != null) {
+            errorResponse.setErrors(Collections.singletonList(validationError));
+        } else {
+            errorResponse.setErrors(new ArrayList<>());
+        }
+    }
 }
+
