@@ -10,17 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/banks")
+@RequestMapping("/api/v1/banks")
 public class BankController {
     private final Producer producer;
     private final Consumer consumer;
     private final GlobalExceptionHandler globalExceptionHandler;
-
-    private BankDTO bankDTO;
 
     public BankController(Producer producer, Consumer consumer, GlobalExceptionHandler globalExceptionHandler) {
         this.producer = producer;
@@ -28,19 +25,18 @@ public class BankController {
         this.globalExceptionHandler = globalExceptionHandler;
     }
 
-
-    @GetMapping()
+    @GetMapping
     public BankDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.GET_ALL_BANKS, new BankDTO());
-        return (BankDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_BANKS).poll(15, TimeUnit.SECONDS);
+        return waitForResponse(MethodsCodes.GET_ALL_BANKS);
     }
 
     @GetMapping("/{id}")
-    private BankDTO findById(@PathVariable("id") int id) throws InterruptedException {
-        bankDTO = new BankDTO();
+    public BankDTO findById(@PathVariable("id") int id) throws InterruptedException {
+        BankDTO bankDTO = new BankDTO();
         bankDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_BANK_BY_ID, bankDTO);
-        return (BankDTO) Objects.requireNonNull(consumer.getResponseMap().get(MethodsCodes.GET_BANK_BY_ID).poll(15, TimeUnit.SECONDS)).getResponse().get(0);
+        return waitForResponse(MethodsCodes.GET_BANK_BY_ID).getResponse().get(0);
     }
 
     @PatchMapping("/{id}")
@@ -52,9 +48,13 @@ public class BankController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
-        bankDTO = new BankDTO();
+        BankDTO bankDTO = new BankDTO();
         bankDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.DELETE_BANK, bankDTO);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    private BankDTOResponse waitForResponse(MethodsCodes methodCode) throws InterruptedException {
+        return (BankDTOResponse) consumer.getResponseMap().get(methodCode).poll(15, TimeUnit.SECONDS);
     }
 }

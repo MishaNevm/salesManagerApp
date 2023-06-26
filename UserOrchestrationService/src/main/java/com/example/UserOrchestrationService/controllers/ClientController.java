@@ -10,16 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/clients")
+@RequestMapping("/api/v1/clients")
 public class ClientController {
 
     private final Consumer consumer;
     private final Producer producer;
-
     private final GlobalExceptionHandler globalExceptionHandler;
 
     public ClientController(Consumer consumer, Producer producer, GlobalExceptionHandler globalExceptionHandler) {
@@ -28,11 +26,10 @@ public class ClientController {
         this.globalExceptionHandler = globalExceptionHandler;
     }
 
-
     @GetMapping
     public ClientDTOResponse findAll() throws InterruptedException {
         producer.sendRequestToClientService(MethodsCodes.GET_ALL_CLIENTS, new ClientDTO());
-        return (ClientDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_CLIENTS).poll(15, TimeUnit.SECONDS);
+        return waitForResponse(MethodsCodes.GET_ALL_CLIENTS);
     }
 
     @GetMapping("/{id}")
@@ -40,9 +37,8 @@ public class ClientController {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.GET_CLIENT_BY_ID, clientDTO);
-        return (ClientDTO) Objects.requireNonNull(consumer.getResponseMap().get(MethodsCodes.GET_CLIENT_BY_ID).poll(15, TimeUnit.SECONDS)).getResponse().get(0);
+        return waitForResponse(MethodsCodes.GET_CLIENT_BY_ID).getResponse().get(0);
     }
-
 
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody ClientDTO clientDTO) throws InterruptedException {
@@ -52,7 +48,7 @@ public class ClientController {
     }
 
     @PostMapping("/{id}")
-    public HttpStatus createBankToClient(@PathVariable("id") int id, @RequestBody  BankDTO bankDTO) throws InterruptedException {
+    public HttpStatus createBankToClient(@PathVariable("id") int id, @RequestBody BankDTO bankDTO) throws InterruptedException {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setId(id);
         bankDTO.setClientDTO(clientDTO);
@@ -60,7 +56,6 @@ public class ClientController {
         globalExceptionHandler.checkErrorResponse(MethodsCodes.CREATE_BANK);
         return HttpStatus.OK;
     }
-
 
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@RequestBody ClientDTO clientDTO) throws InterruptedException {
@@ -75,5 +70,9 @@ public class ClientController {
         clientDTO.setId(id);
         producer.sendRequestToClientService(MethodsCodes.DELETE_CLIENT, clientDTO);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    private ClientDTOResponse waitForResponse(MethodsCodes methodCode) throws InterruptedException {
+        return (ClientDTOResponse) consumer.getResponseMap().get(methodCode).poll(15, TimeUnit.SECONDS);
     }
 }

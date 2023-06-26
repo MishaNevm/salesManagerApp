@@ -4,11 +4,9 @@ import com.example.UserOrchestrationService.dto.UserDTO;
 import com.example.UserOrchestrationService.dto.UserDTOResponse;
 import com.example.UserOrchestrationService.models.User;
 import com.example.UserOrchestrationService.repositoryes.UserRepository;
-;
 import com.example.UserOrchestrationService.util.ModelMapperUtil;
 import com.example.UserOrchestrationService.util.UserUtil.UserNotFoundException;
 import com.example.UserOrchestrationService.util.UserUtil.UserRoles;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+;
 
 @Service
 @Transactional
@@ -26,11 +28,18 @@ public class UserService {
     private final ModelMapperUtil modelMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
+    private final String adminPass;
+
     public UserService(UserRepository userRepository, ModelMapperUtil modelMapper, PasswordEncoder passwordEncoder, @Value("${admin-pass}") String adminPass) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
+        this.adminPass = adminPass;
+
+        initializeAdminUser();
+    }
+
+    private void initializeAdminUser() {
         Optional<User> userOptional = userRepository.findByEmail("admin");
         if (userOptional.isEmpty()) {
             User user = new User();
@@ -43,28 +52,28 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserDTOResponse findAll() {
+        List<UserDTO> userDTOs = userRepository.findAll()
+                .stream()
+                .map(modelMapper::convertUserToUserDTO)
+                .collect(Collectors.toList());
         UserDTOResponse userDTOResponse = new UserDTOResponse();
-        userDTOResponse.setResponse(userRepository.findAll().stream().map(modelMapper::convertUserToUserDTO).toList());
+        userDTOResponse.setResponse(userDTOs);
         return userDTOResponse;
     }
 
     @Transactional(readOnly = true)
     public UserDTO findById(int id) {
-        return modelMapper
-                .convertUserToUserDTO(userRepository
-                        .findById(id)
-                        .orElseThrow(UserNotFoundException::new));
+        User user = userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+        return modelMapper.convertUserToUserDTO(user);
     }
 
     @Transactional(readOnly = true)
     public UserDTOResponse findByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElse(new User());
+        UserDTO userDTO = modelMapper.convertUserToUserDTO(user);
         UserDTOResponse userDTOResponse = new UserDTOResponse();
-        userDTOResponse
-                .setResponse(Collections
-                        .singletonList(modelMapper
-                                .convertUserToUserDTO(userRepository
-                                        .findByEmail(email)
-                                        .orElse(new User()))));
+        userDTOResponse.setResponse(Collections.singletonList(userDTO));
         return userDTOResponse;
     }
 
@@ -76,9 +85,14 @@ public class UserService {
     }
 
     public void update(UserDTO userDTO) {
+        User existingUser = userRepository.findById(userDTO.getId())
+                .orElseThrow(UserNotFoundException::new);
+
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        userDTO.setCreatedAt(userRepository.findById(userDTO.getId()).orElseThrow(UserNotFoundException::new).getCreatedAt());
-        userRepository.save(modelMapper.convertUserDTOToUser(userDTO));
+        userDTO.setCreatedAt(existingUser.getCreatedAt());
+
+        User updatedUser = modelMapper.convertUserDTOToUser(userDTO);
+        userRepository.save(updatedUser);
     }
 
     public void delete(int id) {

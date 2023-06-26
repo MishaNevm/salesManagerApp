@@ -2,6 +2,7 @@ package com.example.Frontend.security;
 
 import com.example.Frontend.dto.UserLogin;
 import com.example.Frontend.util.CurrentUser;
+import com.example.Frontend.util.Urls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,8 +20,6 @@ public class AuthProviderImpl implements AuthenticationProvider {
 
     private final RestTemplate restTemplate;
     private final CurrentUser currentUser;
-
-    private static final String LOGIN_URL = "http://localhost:8484/auth/login";
 
     @Autowired
     public AuthProviderImpl(RestTemplate restTemplate, CurrentUser currentUser) {
@@ -59,7 +58,7 @@ public class AuthProviderImpl implements AuthenticationProvider {
 
     private HashMap<String, String> performLoginRequest(UserLogin userLogin) {
         try {
-            return restTemplate.postForObject(LOGIN_URL, userLogin, HashMap.class);
+            return restTemplate.postForObject(Urls.LOGIN_URL.getUrl(), userLogin, HashMap.class);
         } catch (HttpClientErrorException.BadRequest e) {
             throw new BadCredentialsException("Ошибка аутентификации");
         }

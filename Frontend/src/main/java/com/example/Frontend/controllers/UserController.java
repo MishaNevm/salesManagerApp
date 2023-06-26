@@ -61,11 +61,11 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
-    public String create(@ModelAttribute("user") @Valid UserDTO userDTO, BindingResult bindingResult) {
+    public String create(Model model ,@ModelAttribute("user") @Valid UserDTO userDTO, BindingResult bindingResult) {
+        model.addAttribute("roles", UserRoles.values());
         if (bindingResult.hasErrors()) {
             return "user/createUser";
         }
-
         try {
             restTemplate.postForObject(Urls.CREATE_USER.getUrl(), userDTO, HttpStatus.class);
         } catch (HttpClientErrorException.BadRequest e) {

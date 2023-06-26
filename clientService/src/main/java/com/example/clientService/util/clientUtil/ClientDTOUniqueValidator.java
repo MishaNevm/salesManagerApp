@@ -66,17 +66,16 @@ public class ClientDTOUniqueValidator {
     //У ИП нет КПП
     private void checkKpp(List<Client> clientList, ClientDTO clientToValidate, ErrorResponse errorResponse) {
         ValidationError validationError = new ValidationError();
-        String kpp = clientToValidate.getKpp();
-        int clientId = clientToValidate.getId();
-
-        if ((kpp.equals("-") && !clientToValidate.getType().equals(ClientTypes.IP))
-                || (!kpp.equals("-") && clientToValidate.getType().equals(ClientTypes.IP))) {
-            validationError.setMessage("КПП отсутствует только у ИП");
-            return;
-        }
-
         validationError.setField("kpp");
         validationError.setCode("0");
+        String kpp = clientToValidate.getKpp();
+        int clientId = clientToValidate.getId();
+        if (kpp.equals("-") && !clientToValidate.getType().equals(ClientTypes.IP)) {
+            validationError.setMessage("КПП отсутствует только у ИП");
+        }
+        if (!kpp.equals("-") && clientToValidate.getType().equals(ClientTypes.IP)) {
+            validationError.setMessage("У ИП отсутствует КПП");
+        }
 
         for (Client client : clientList) {
             if (client.getKpp().equals(kpp) && client.getId() != clientId) {

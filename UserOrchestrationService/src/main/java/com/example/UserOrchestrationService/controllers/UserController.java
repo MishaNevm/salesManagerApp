@@ -3,28 +3,25 @@ package com.example.UserOrchestrationService.controllers;
 import com.example.UserOrchestrationService.dto.UserDTO;
 import com.example.UserOrchestrationService.dto.UserDTOResponse;
 import com.example.UserOrchestrationService.services.UserService;
-import com.example.UserOrchestrationService.util.ErrorResponse;
-import com.example.UserOrchestrationService.util.ErrorResponseException;
 import com.example.UserOrchestrationService.util.UserUtil.UserDTOUniqueValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
+
     private final UserService userService;
     private final UserDTOUniqueValidator userDTOUniqueValidator;
 
-    @Autowired
     public UserController(UserService userService, UserDTOUniqueValidator userDTOUniqueValidator) {
         this.userService = userService;
         this.userDTOUniqueValidator = userDTOUniqueValidator;
     }
 
-    @GetMapping()
+    @GetMapping
     public UserDTOResponse getAllUsers(@RequestParam(value = "email", required = false) String email) {
         if (email == null) {
             return userService.findAll();
@@ -40,27 +37,17 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody UserDTO user) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        userDTOUniqueValidator.validate(user, errorResponse);
-        if (errorResponse.getErrors().isEmpty()) {
-            userService.save(user);
-            return ResponseEntity.ok(HttpStatus.OK);
-        }
-        throw new ErrorResponseException(errorResponse);
-
+        userDTOUniqueValidator.validate(user);
+        userService.save(user);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
-
 
     @PatchMapping("/{id}")
     public ResponseEntity<HttpStatus> update(@PathVariable("id") int id, @RequestBody UserDTO user) {
         user.setId(id);
-        ErrorResponse errorResponse = new ErrorResponse();
-        userDTOUniqueValidator.validate(user, errorResponse);
-        if (errorResponse.getErrors().isEmpty()) {
-            userService.update(user);
-            return ResponseEntity.ok(HttpStatus.OK);
-        }
-        throw new ErrorResponseException(errorResponse);
+        userDTOUniqueValidator.validate(user);
+        userService.update(user);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

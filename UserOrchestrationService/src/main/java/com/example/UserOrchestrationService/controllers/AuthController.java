@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -31,19 +31,32 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
     }
 
-
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody UserLogin userLogin) {
-        UsernamePasswordAuthenticationToken authInputToken =
-                new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword());
+        authenticateUser(userLogin.getEmail(), userLogin.getPassword());
+        String email = userLogin.getEmail();
+        String token = jwtUtil.generateToken(email);
+        String role = getUserRole(email);
+        return buildAuthResponse(token, role);
+    }
+
+    private void authenticateUser(String email, String password) {
         try {
-            authenticationManager.authenticate(authInputToken);
-            Map<String, String> authMap = new HashMap<>();
-            authMap.put("token", jwtUtil.generateToken(userLogin.getEmail()));
-            authMap.put("role", userService.findByEmail(userLogin.getEmail()).getResponse().get(0).getUserRole().name());
-            return authMap;
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         } catch (BadCredentialsException e) {
             throw new ErrorResponseException(new ErrorResponse());
         }
     }
+
+    private String getUserRole(String email) {
+        return userService.findByEmail(email).getResponse().get(0).getUserRole().name();
+    }
+
+    private Map<String, String> buildAuthResponse(String token, String role) {
+        Map<String, String> authMap = new HashMap<>();
+        authMap.put("token", token);
+        authMap.put("role", role);
+        return authMap;
+    }
+
 }

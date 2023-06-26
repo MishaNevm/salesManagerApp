@@ -12,16 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
 
     private final Producer producer;
     private final Consumer consumer;
-
     private final GlobalExceptionHandler globalExceptionHandler;
 
     public OrderController(Producer producer, Consumer consumer, GlobalExceptionHandler globalExceptionHandler) {
@@ -32,15 +30,13 @@ public class OrderController {
 
     @GetMapping
     public OrderDTOResponse findAll(@RequestParam(value = "client-short-name", required = false) String clientShortName) throws InterruptedException {
-        OrderDTOResponse orderDTOResponse;
         if (clientShortName != null) {
             producer.sendRequestToOrderService(MethodsCodes.GET_ORDERS_BY_CLIENT_SHORT_NAME, clientShortName);
-            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ORDERS_BY_CLIENT_SHORT_NAME).poll(15, TimeUnit.SECONDS);
+            return waitForResponse(MethodsCodes.GET_ORDERS_BY_CLIENT_SHORT_NAME);
         } else {
             producer.sendRequestToOrderService(MethodsCodes.GET_ALL_ORDERS, new OrderDTO());
-            orderDTOResponse = (OrderDTOResponse) consumer.getResponseMap().get(MethodsCodes.GET_ALL_ORDERS).poll(15, TimeUnit.SECONDS);
+            return waitForResponse(MethodsCodes.GET_ALL_ORDERS);
         }
-        return orderDTOResponse;
     }
 
     @GetMapping("/{id}")
@@ -48,9 +44,8 @@ public class OrderController {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(id);
         producer.sendRequestToOrderService(MethodsCodes.GET_ORDER_BY_ID, orderDTO);
-        return (OrderDTO) Objects.requireNonNull(consumer.getResponseMap().get(MethodsCodes.GET_ORDER_BY_ID).poll(15, TimeUnit.SECONDS)).getResponse().get(0);
+        return waitForResponse(MethodsCodes.GET_ORDER_BY_ID).getResponse().get(0);
     }
-
 
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody OrderDTO orderDTO) {
@@ -65,59 +60,62 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/update-product-quantity")
-    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId,
+    public ResponseEntity<HttpStatus> updateProductQuantityInOrder(@PathVariable("id") int orderId,
+                                                                   @RequestParam(value = "product-id", required = false) Integer productId,
                                                                    @RequestParam(value = "quantity", required = false) Integer quantity) throws InterruptedException {
-        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
-        productOrderDTO.setOrderId(orderId);
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(productId);
-        productOrderDTO.setProduct(productDTO);
-        productOrderDTO.setQuantity(quantity);
+        ProductOrderDTO productOrderDTO = createProductOrderDTO(orderId, productId, quantity);
         producer.sendRequestToInventoryService(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER, productOrderDTO);
         globalExceptionHandler.checkErrorResponse(MethodsCodes.UPDATE_PRODUCT_QUANTITY_IN_ORDER);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/delete-from-order")
-    public ResponseEntity<HttpStatus> deleteByOrderIdAndProductId(@PathVariable("id") int orderId, @RequestParam(value = "product-id", required = false) Integer productId) {
-        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
-        productOrderDTO.setOrderId(orderId);
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(productId);
-        productOrderDTO.setProduct(productDTO);
+    public ResponseEntity<HttpStatus> deleteByOrderIdAndProductId(@PathVariable("id") int orderId,
+                                                                  @RequestParam(value = "product-id", required = false) Integer productId) {
+        ProductOrderDTO productOrderDTO = createProductOrderDTO(orderId, productId, null);
         producer.sendRequestToInventoryService(MethodsCodes.DELETE_PRODUCT_BY_ORDER_ID_AND_PRODUCT_ID, productOrderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/delete-products")
     public ResponseEntity<HttpStatus> deleteProductsInOrderByOrderId(@PathVariable("id") int id) {
-        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
-        productOrderDTO.setOrderId(id);
+        ProductOrderDTO productOrderDTO = createProductOrderDTO(id, null, null);
         producer.sendRequestToInventoryService(MethodsCodes.DELETE_ALL_PRODUCTS_IN_ORDER_BY_ORDER_ID, productOrderDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable("id") int id) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(id);
         producer.sendRequestToOrderService(MethodsCodes.DELETE_ORDER, orderDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return deleteProductsInOrderByOrderId(id);
     }
 
     @PostMapping("/{id}/add-product")
     public ResponseEntity<HttpStatus> addProductToOrder(@PathVariable("id") int id,
                                                         @RequestParam("product-id") Integer productId,
                                                         @RequestParam("quantity") Integer quantity) throws InterruptedException {
-        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(productId);
-        productOrderDTO.setProduct(productDTO);
-        productOrderDTO.setOrderId(id);
-        productOrderDTO.setQuantity(quantity);
+        ProductOrderDTO productOrderDTO = createProductOrderDTO(id, productId, quantity);
         producer.sendRequestToInventoryService(MethodsCodes.ADD_PRODUCT_TO_ORDER, productOrderDTO);
         globalExceptionHandler.checkErrorResponse(MethodsCodes.ADD_PRODUCT_TO_ORDER);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
+    private OrderDTOResponse waitForResponse(MethodsCodes methodCode) throws InterruptedException {
+        return (OrderDTOResponse) consumer.getResponseMap().get(methodCode).poll(15, TimeUnit.SECONDS);
+    }
+
+    private ProductOrderDTO createProductOrderDTO(int orderId, Integer productId, Integer quantity) {
+        ProductOrderDTO productOrderDTO = new ProductOrderDTO();
+        productOrderDTO.setOrderId(orderId);
+        if (productId != null) {
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setId(productId);
+            productOrderDTO.setProduct(productDTO);
+        }
+        productOrderDTO.setQuantity(quantity);
+        return productOrderDTO;
+    }
 }
+
