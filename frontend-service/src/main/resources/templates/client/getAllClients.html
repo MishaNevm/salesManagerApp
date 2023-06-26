@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Clients</title>
+    <style>
+        body {
+            background-color: #333333;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        p, div {
+            margin-bottom: 10px;
+        }
+
+        a {
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 5px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ffffff;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<br/>
+<p th:if="${clients.isEmpty()}">No clients</p>
+<div th:unless="${clients.isEmpty()}" th:each="client : ${clients}">
+    <a th:href="@{/clients/{id}(id=${client.getId()})}"
+       th:text="${client.getShortName() + ', ' + client.getFullName()}"></a>
+</div>
+<br/>
+<hr/>
+<a href="/clients/new">Add client</a>
+</body>
+</html>
+

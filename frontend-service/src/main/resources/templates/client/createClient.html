@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Client and Bank</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #333333;
+      font-family: Arial, sans-serif;
+      color: #ffffff;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 300px;
+      padding: 20px;
+      background-color: #555555;
+      border-radius: 5px;
+    }
+
+    label {
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    div {
+      color: red;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<h2>Create client</h2>
+<form th:method="POST" th:action="@{/clients}" th:object="${client}">
+  <label for="clientShortName">Client Short Name:</label>
+  <input type="text" th:field="*{shortName}" id="clientShortName"/>
+  <div th:if="${#fields.hasErrors('shortName')}" th:errors="*{shortName}">Short Name error</div>
+  <br/>
+  <label for="clientFullName">Client Full Name:</label>
+  <input type="text" th:field="*{fullName}" id="clientFullName"/>
+  <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full Name error</div>
+  <br/>
+  <label for="clientInn">Client INN:</label>
+  <input type="text" th:field="*{inn}" id="clientInn"/>
+  <div th:if="${#fields.hasErrors('inn')}" th:errors="*{inn}">INN error</div>
+  <br/>
+  <label for="clientKpp">Client KPP:</label>
+  <input type="text" th:field="*{kpp}" id="clientKpp"/>
+  <div th:if="${#fields.hasErrors('kpp')}" th:errors="*{kpp}">KPP error</div>
+  <br/>
+  <label for="clientOgrn">Client OGRN:</label>
+  <input type="text" th:field="*{ogrn}" id="clientOgrn"/>
+  <div th:if="${#fields.hasErrors('ogrn')}" th:errors="*{ogrn}">OGRN error</div>
+  <br/>
+  <label for="clientType">Client Type:</label>
+  <select th:field="*{type}" id="clientType">
+    <option th:each="clientType : ${types}" th:value="${clientType}" th:text="${clientType.value}"></option>
+  </select>
+  <br/>
+  <input type="submit" value="Create Client"/>
+</form>
+</body>
+</html>
+

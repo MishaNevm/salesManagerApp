@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>User Details</title>
+  <style>
+    body {
+      background-color: #333333;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    div.container {
+      text-align: center;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #555555;
+      margin: 20px 0;
+    }
+
+    a {
+      color: white;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <p th:text="${'Имя: ' + user.getName()}">VALUE</p>
+  <p th:text="${'Фамилия: '+ user.getSurname()}">VALUE</p>
+  <p th:text="${'Отчество: ' + user.getPatronymic()}">VALUE</p>
+  <p th:text="${'Email: ' + user.getEmail()}">VALUE</p>
+  <p th:text="${'Создан: ' + user.getCreatedAt()}">VALUE</p>
+  <p th:text="${'Дата рождения: ' + user.getDateOfBirth()}">VALUE</p>
+  <p th:text="${'Должность: ' + user.getUserRole().getValue()}"></p>
+  <br/>
+  <hr/>
+  <a href="/users">All users</a>
+  <div th:if="${role.equals('ROLE_ADMIN')}">
+    <br/>
+    <a th:href="@{/users/{id}/edit(id=${user.getId()})}">Update</a>
+    <br/>
+    <form th:method="DELETE" th:action="@{/users/{id}(id=${user.getId()})}" th:object="${user}">
+      <input type="submit" value="Delete">
+    </form>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+server:
+  port: 9090
+application:
+  kafka:
+    clientTopicRequest: "clientTopicRequest"
+    clientTopicResponse: "clientTopicResponse"
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5444/clientDB
+    username: client
+    password: pass
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: com.example.clientService.kafka.JsonDeserializer
+      group-id: 'client-group-id'
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: com.example.clientService.kafka.JsonSerializer
+  jpa:
+    show-sql: true

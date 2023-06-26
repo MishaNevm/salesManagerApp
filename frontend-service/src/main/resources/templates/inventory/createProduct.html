@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Product</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            width: 400px;
+            margin: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        div.error {
+            color: red;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<form th:method="POST" th:action="@{/products}" th:object="${product}">
+    <label for="name">Name: </label>
+    <input type="text" th:field="*{name}" id="name"/>
+    <div class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</div>
+    <br/>
+    <label for="type">Type: </label>
+    <select th:field="*{type}" id="type">
+        <option th:each="type : ${types}" th:value="${type}" th:text="${type.getValue()}"></option>
+    </select>
+    <div class="error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}">Error</div>
+    <br/>
+    <label for="quantity">Quantity: </label>
+    <input type="number" th:field="*{quantity}" id="quantity"/>
+    <div class="error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">Error</div>
+    <br/>
+    <label for="price">Price: </label>
+    <input type="number" th:field="*{price}" id="price"/>
+    <div class="error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Error</div>
+    <br/>
+    <input type="submit" value="Create"/>
+</form>
+</body>
+</html>
+
+

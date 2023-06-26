@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Client and Bank</title>
+  <style>
+    body {
+      background-color: #333333;
+      color: white;
+    }
+
+    form {
+      margin: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    select {
+      width: 300px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+
+    div.error {
+      color: red;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<h2>Update client</h2>
+<form th:method="PATCH" th:action="@{/clients/{id}(id=${client.getId()})}" th:object="${client}">
+  <label for="clientShortName">Client Short Name:</label>
+  <input type="text" th:field="*{shortName}" id="clientShortName"/>
+  <div class="error" th:if="${#fields.hasErrors('shortName')}" th:errors="*{shortName}">Short Name error</div>
+  <br/>
+  <label for="clientFullName">Client Full Name:</label>
+  <input type="text" th:field="*{fullName}" id="clientFullName"/>
+  <div class="error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full Name error</div>
+  <br/>
+  <label for="clientInn">Client INN:</label>
+  <input type="text" th:field="*{inn}" id="clientInn"/>
+  <div class="error" th:if="${#fields.hasErrors('inn')}" th:errors="*{inn}">INN error</div>
+  <br/>
+  <label for="clientKpp">Client KPP:</label>
+  <input type="text" th:field="*{kpp}" id="clientKpp"/>
+  <div class="error" th:if="${#fields.hasErrors('kpp')}" th:errors="*{kpp}">KPP error</div>
+  <br/>
+  <label for="clientOgrn">Client OGRN:</label>
+  <input type="text" th:field="*{ogrn}" id="clientOgrn"/>
+  <div class="error" th:if="${#fields.hasErrors('ogrn')}" th:errors="*{ogrn}">OGRN error</div>
+  <br/>
+  <select th:field="*{type}" id="clientType">
+    <option th:each="clientType : ${types}" th:value="${clientType}" th:text="${clientType.value}"></option>
+  </select>
+  <br>
+  <input type="submit" value="Update Client"/>
+</form>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${bank.getName()}">VALUE</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #333333;
+      font-family: Arial, sans-serif;
+      color: #ffffff;
+    }
+
+    p {
+      text-align: center;
+    }
+
+    hr {
+      margin: 20px 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+
+    a {
+      margin: 5px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    form {
+      display: inline;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<p th:text="${'Name' + ', ' + bank.getName()}"></p>
+<p th:text="${'БИК: ' + bank.getBik()}"></p>
+<p th:text="${'Рассчетный счет: ' + bank.getCheckingAccount()}"></p>
+<p th:text="${'Корпоративный счет: ' + bank.getCorporateAccount()}"></p>
+<br/>
+<hr/>
+<div th:if="${bank.getClientDTO() == null}">
+  <p>Client information is not available</p>
+</div>
+<div th:if="${bank.getClientDTO() != null}">
+  <p th:text="${bank.getClientDTO().getFullName() + ', ' + bank.getClientDTO().getShortName()}"></p>
+  <p th:text="${'INN: ' + bank.getClientDTO().getInn()}"></p>
+  <p th:text="${'KPP: ' + bank.getClientDTO().getKpp()}"></p>
+  <p th:text="${'OGRN: ' + bank.getClientDTO().getOgrn()}"></p>
+</div>
+<br/>
+<a th:href="@{/banks/{id}/edit(id=${bank.getId()})}">Update bank</a>
+<br/>
+<form th:method="DELETE" th:action="@{/banks/{id}(id=${bank.getId()})}" th:object="${bank}">
+  <input type="submit" value="Delete"/>
+</form>
+</body>
+</html>
+
+

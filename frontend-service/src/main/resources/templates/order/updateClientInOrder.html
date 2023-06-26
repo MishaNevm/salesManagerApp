@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование заказа</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        table {
+            background-color: #222222;
+            border-collapse: collapse;
+            width: 80%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #444444;
+        }
+
+        th {
+            background-color: #555555;
+            color: white;
+        }
+
+        input[type="text"] {
+            padding: 4px;
+            border: none;
+            border-radius: 3px;
+            background-color: #444444;
+            color: white;
+        }
+
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        div[style="color:red"] {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Редактирование заказа</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Сокращенное наименование</th>
+        <th>Полное наименование</th>
+        <th>ИНН</th>
+        <th>КПП</th>
+        <th>ОГРН</th>
+        <th>Комментарий</th>
+        <th>Действие</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="client : ${clients}">
+        <td th:text="${client.shortName}"></td>
+        <td th:text="${client.fullName}"></td>
+        <td th:text="${client.inn}"></td>
+        <td th:text="${client.kpp}"></td>
+        <td th:text="${client.ogrn}"></td>
+        <td>
+            <form th:method="PATCH" th:action="@{/orders/{id}(id=${id})}" th:object="${order}">
+                <input type="hidden" name="client-short-name" th:value="${client.getShortName()}">
+                <input type="hidden" name="created-by" th:value="${order.createdBy}">
+                <input type="hidden" name="comment" th:value="${order.comment}">
+                <button type="submit">Обновить заказ</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
+
+

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Details</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #555555;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #777777;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #80c8e5;
+        }
+
+        form {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<table>
+    <tr>
+        <th>Property</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>Product ID:</td>
+        <td><span th:text="${product.id}"></span></td>
+    </tr>
+    <tr>
+        <td>Product Name:</td>
+        <td><span th:text="${product.name}"></span></td>
+    </tr>
+    <tr>
+        <td>Product Type:</td>
+        <td><span th:text="${product.type.getValue()}"></span></td>
+    </tr>
+    <tr>
+        <td>Product Quantity:</td>
+        <td><span th:text="${product.quantity}"></span></td>
+    </tr>
+    <tr>
+        <td>Product Price:</td>
+        <td><span th:text="${product.price}"></span></td>
+    </tr>
+    <tr>
+        <td>Created At:</td>
+        <td><span th:text="${product.createdAt}"></span></td>
+    </tr>
+    <tr>
+        <td>Updated At:</td>
+        <td><span th:text="${product.updatedAt}"></span></td>
+    </tr>
+</table>
+<div class="button-container">
+    <a href="/products">All Products</a>
+    <br/>
+    <div th:if="${role.equals('ROLE_ADMIN')}">
+    <a th:href="@{/products/{id}/edit(id=${product.id})}">Update</a>
+    <br/>
+    <form th:method="DELETE" th:action="@{/products/{id}(id=${product.id})}" th:object="${product}">
+        <input type="submit" value="Delete">
+    </form>
+        </div>
+</div>
+</body>
+</html>
+
+
+

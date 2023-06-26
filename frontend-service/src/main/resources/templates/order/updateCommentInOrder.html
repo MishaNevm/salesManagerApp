@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update comment</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: #222222;
+            padding: 20px;
+            text-align: center;
+        }
+
+        label {
+            color: white;
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            padding: 4px;
+            border: none;
+            border-radius: 3px;
+            background-color: #444444;
+            color: white;
+        }
+
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<h1>Редактирование комментария</h1>
+<br/>
+<form th:method="PATCH" th:action="@{/orders/{id}/update-comment(id=${id})}" th:object="${order}">
+    <input type="hidden" name="client-short-name" th:value="${order.getClientShortName()}">
+    <input type="hidden" name="created-by" th:value="${order.createdBy}">
+    <label for="comment">Comment: </label>
+    <input type="text" id="comment" name="comment">
+    <button type="submit">Обновить заказ</button>
+</form>
+</body>
+</html>

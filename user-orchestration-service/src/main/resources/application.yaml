@@ -1,0 +1,32 @@
+server:
+  port: 8484
+application:
+  kafka:
+    clientTopicRequest: "clientTopicRequest"
+    clientTopicResponse: "clientTopicResponse"
+    orderTopicRequest: "orderTopicRequest"
+    orderTopicResponse: "orderTopicResponse"
+    inventoryTopicRequest: "inventoryTopicRequest"
+    inventoryTopicResponse: "inventoryTopicResponse"
+spring:
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5445/userDB
+    username: user
+    password: pass
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: 'gateway-group-id'
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: com.example.userOrchestrationService.kafka.JsonDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: com.example.userOrchestrationService.kafka.JsonSerializer
+      client-id: 'gateway-group-id'
+secret: "Одна голова - хорошо, а две - хорошо, хорошо"
+admin-pass: "admin"

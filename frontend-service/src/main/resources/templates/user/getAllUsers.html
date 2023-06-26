@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All users</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        div.container {
+            text-align: center;
+        }
+
+        div.user {
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #555555;
+            margin: 20px 0;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        form.logout {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <br/>
+    <p th:if="${users.isEmpty()}">No users</p>
+    <div th:unless="${users.isEmpty()}" th:each="user : ${users}" class="user">
+        <a th:href="@{/users/{id}(id=${user.getId()})}" th:text="${user.getName() + ' ' + user.getSurname()+ '  ' + user.getUserRole().getValue()}">VALUE</a>
+    </div>
+    <br/>
+    <hr/>
+    <div th:if="${role.equals('ROLE_ADMIN')}">
+        <a href="/users/new">Add user</a>
+        <br/>
+    </div>
+    <form th:method="post" th:action="@{/logout}" class="logout">
+        <input type="submit" value="Logout">
+    </form>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${client.getShortName()}">VALUE</title>
+    <style>
+        body {
+            background-color: #333333;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        p, div {
+            margin-bottom: 10px;
+        }
+
+        a {
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 5px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ffffff;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<p th:text="${client.getFullName() + ', ' + client.getShortName()}"></p>
+<p th:text="${'INN: ' + client.getInn()}"></p>
+<p th:text="${'KPP: ' + client.getKpp()}"></p>
+<p th:text="${'OGRN: ' + client.getOgrn()}"></p>
+<br/>
+<hr/>
+<div th:if="${client.getBankDTO() == null}">
+    <p th:text="${client.getShortName() + 's bank information is not available'}"></p>
+    <br/>
+    <a th:href="@{/clients/{id}/add-bank(id=${client.getId()})}">Add bank</a>
+</div>
+<div th:if="${client.getBankDTO() != null}">
+    <p th:text="${'Bank Name: ' + client.getBankDTO().getName()}"></p>
+    <p th:text="${'БИК: ' + client.getBankDTO().getBik()}"></p>
+    <p th:text="${'Account Number: ' + client.getBankDTO().getCheckingAccount()}"></p>
+    <p th:text="${'Corporate Account: ' + client.getBankDTO().getCorporateAccount()}"></p>
+    <p th:text="${'Bank Address: ' + client.getBankDTO().getCountry() + ', ' + client.getBankDTO().getCity()}"></p>
+    <br/>
+    <a th:href="@{/banks/{id}/edit(id=${client.getBankDTO().getId()})}">Update bank</a>
+    <br/>
+    <form th:method="DELETE" th:action="@{/banks/{id}(id=${client.getBankDTO().getId()})}">
+        <input type="submit" value="Delete bank"/>
+        <input type="hidden" name="client-id" th:value="${client.getId()}"/>
+    </form>
+</div>
+<br/>
+<a th:href="@{/clients/{id}/edit(id=${client.getId()})}">Update client</a>
+<br/>
+<div th:if="${role.equals('ROLE_ADMIN')}">
+    <br/>
+    <form th:method="DELETE" th:action="@{/clients/{id}(id=${client.getId()})}" th:object="${client}">
+        <input type="submit" value="Delete client">
+    </form>
+    <br/>
+</div>
+<hr/>
+<br/>
+<p th:if="${orders.isEmpty()}">No orders</p>
+<div th:unless="${orders.isEmpty()}" th:each="order : ${orders}">
+    <a th:href="@{/orders/{id}(id=${order.getId()})}"
+       th:text="${order.getClientShortName() + ', ' + order.getCreatedAt()}"></a>
+</div>
+<br/>
+<hr/>
+<a href="/orders/new">Add order</a>
+</body>
+</html>
+

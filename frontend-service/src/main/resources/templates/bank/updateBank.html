@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Client and Bank</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #333333;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+            padding: 20px;
+            background-color: #555555;
+            border-radius: 5px;
+        }
+
+        label {
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        div {
+            color: red;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h2>Update bank</h2>
+<form th:method="PATCH" th:action="@{/banks/{id}(id=${bank.getId()})}" th:object="${bank}">
+    <input type="hidden" th:field="*{clientDTO.id}"/>
+    <label for="bankName">Bank Name:</label>
+    <input type="text" th:field="*{name}" id="bankName"/>
+    <div th:if="${#fields.hasErrors('name')}">Bank Name error</div>
+    <br/>
+    <label for="bik">BIK:</label>
+    <input type="text" th:field="*{bik}" id="bik"/>
+    <div th:if="${#fields.hasErrors('bik')}">BIK error</div>
+    <br/>
+    <label for="checkingAccount">Checking Account:</label>
+    <input type="text" th:field="*{checkingAccount}" id="checkingAccount"/>
+    <div th:if="${#fields.hasErrors('checkingAccount')}">Checking Account error</div>
+    <br/>
+    <label for="corporateAccount">Corporate Account:</label>
+    <input type="text" th:field="*{corporateAccount}" id="corporateAccount"/>
+    <div th:if="${#fields.hasErrors('corporateAccount')}">Corporate Account error</div>
+    <br/>
+    <label for="city">City:</label>
+    <input type="text" th:field="*{city}" id="city"/>
+    <div th:if="${#fields.hasErrors('city')}">City error</div>
+    <br/>
+    <label for="country">Country:</label>
+    <input type="text" th:field="*{country}" id="country"/>
+    <div th:if="${#fields.hasErrors('country')}">Country error</div>
+    <br/>
+    <input type="submit" value="Update bank"/>
+</form>
+</body>
+</html>
