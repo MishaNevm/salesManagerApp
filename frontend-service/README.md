@@ -4,6 +4,7 @@
 
 ## Используемые технологии:
 
+###### Java 17
 ###### Spring Boot
 ###### Spring Security
 ###### Thymeleaf 
