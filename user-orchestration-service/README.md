@@ -5,6 +5,7 @@
 
 ## Используемые технологии:
 
+###### Java 17
 ###### Spring Boot Starter Data JPA
 ###### Spring Boot Starter Security
 ###### Spring Boot Starter Web
