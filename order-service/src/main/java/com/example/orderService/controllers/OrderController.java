@@ -1,9 +1,11 @@
 package com.example.orderService.controllers;
 
 import com.example.orderService.dto.OrderDTO;
+import com.example.orderService.dto.OrderDTOResponse;
 import com.example.orderService.kafka.Producer;
 import com.example.orderService.services.OrderService;
 import com.example.orderService.util.MethodsCodes;
+import com.example.orderService.util.OrderNotFoundException;
 import org.springframework.stereotype.Service;
 
 
@@ -28,7 +30,11 @@ public class OrderController {
     }
 
     public void findById(int id) {
-        producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ORDER_BY_ID.getCode(), orderService.findById(id));
+        try {
+            producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ORDER_BY_ID.getCode(), orderService.findById(id));
+        } catch (OrderNotFoundException e) {
+            producer.sendMessageToOrderResponseTopic(MethodsCodes.GET_ORDER_BY_ID.getCode(), new OrderDTOResponse());
+        }
     }
 
     public void create(OrderDTO orderDTO) {
