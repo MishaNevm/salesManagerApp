@@ -2,6 +2,7 @@ package com.example.orderService.models;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
@@ -44,8 +45,8 @@ public class Order {
         return clientShortName;
     }
 
-    public void setClientShortName(String clientEmail) {
-        this.clientShortName = clientEmail;
+    public void setClientShortName(String clientShortName) {
+        this.clientShortName = clientShortName;
     }
 
     public String getComment() {
@@ -86,5 +87,17 @@ public class Order {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order order)) return false;
+        return id == order.id && Objects.equals(clientShortName, order.clientShortName) && Objects.equals(comment, order.comment) && Objects.equals(createdAt, order.createdAt) && Objects.equals(updatedAt, order.updatedAt) && Objects.equals(createdBy, order.createdBy) && Objects.equals(updatedBy, order.updatedBy);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, clientShortName, comment, createdAt, updatedAt, createdBy, updatedBy);
     }
 }

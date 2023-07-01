@@ -56,76 +56,81 @@
     </style>
 </head>
 <body>
+<div th:if="${order.getCreatedAt() == null}">
+    <h3>Заказ не найден</h3>
+</div>
 <br>
-<div style="display: flex; justify-content: center;">
-    <table>
-        <tr>
-            <th>Order ID</th>
-            <th>Client Name</th>
-            <th>Order Date</th>
-            <th>Created By</th>
-            <th>Comment</th>
-        </tr>
-        <tr>
-            <td th:text="${order.id}"></td>
-            <td th:text="${order.clientShortName}"></td>
-            <td th:text="${order.createdAt}"></td>
-            <td th:text="${order.createdBy}"></td>
-            <td th:text="${order.getComment()}"></td>
-        </tr>
-    </table>
-</div>
-<br/>
-<div style="display: flex; justify-content: center;">
-    <table>
-        <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price per Unit</th>
-            <th>Total Cost</th>
-            <th>Action</th>
-        </tr>
-        <th:block th:if="${not #lists.isEmpty(products)}">
-            <tr th:each="product : ${products}">
-                <td th:text="${product.name}"></td>
-                <td th:text="${product.quantity}"></td>
-                <td th:text="${product.price}"></td>
-                <td th:text="${product.quantity * product.price.doubleValue()}"></td>
-                <td>
-                    <form th:method="DELETE" th:action="@{/orders/{id}/delete-from-order(id=${order.id})}">
-                        <input type="hidden" name="product-id" th:value="${product.id}"/>
-                        <input type="submit" value="Delete product"/>
-                    </form>
-                    <a th:href="@{/orders/{id}/update-product-quantity(id=${order.id})}">Update quantity</a>
-                </td>
+<div th:unless="${order.getCreatedAt() == null}">
+    <div style="display: flex; justify-content: center;">
+        <table>
+            <tr>
+                <th>Order ID</th>
+                <th>Client Name</th>
+                <th>Order Date</th>
+                <th>Created By</th>
+                <th>Comment</th>
             </tr>
             <tr>
-                <td colspan="3" style="text-align: right;">Total Order Cost:</td>
-                <td th:text="${#numbers.formatDecimal(order.totalCost, 0, 'COMMA', 2, 'POINT')}"></td>
-                <td></td>
+                <td th:text="${order.id}"></td>
+                <td th:text="${order.clientShortName}"></td>
+                <td th:text="${order.createdAt}"></td>
+                <td th:text="${order.createdBy}"></td>
+                <td th:text="${order.getComment()}"></td>
             </tr>
-        </th:block>
-        <th:block th:if="${#lists.isEmpty(products)}">
+        </table>
+    </div>
+    <br/>
+    <div style="display: flex; justify-content: center;">
+        <table>
             <tr>
-                <td colspan="5">No products in the order.</td>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price per Unit</th>
+                <th>Total Cost</th>
+                <th>Action</th>
             </tr>
-        </th:block>
-    </table>
+            <th:block th:if="${not #lists.isEmpty(products)}">
+                <tr th:each="product : ${products}">
+                    <td th:text="${product.name}"></td>
+                    <td th:text="${product.quantity}"></td>
+                    <td th:text="${product.price}"></td>
+                    <td th:text="${product.quantity * product.price.doubleValue()}"></td>
+                    <td>
+                        <form th:method="DELETE" th:action="@{/orders/{id}/delete-from-order(id=${order.id})}">
+                            <input type="hidden" name="product-id" th:value="${product.id}"/>
+                            <input type="submit" value="Delete product"/>
+                        </form>
+                        <a th:href="@{/orders/{id}/update-product-quantity(id=${order.id})}">Update quantity</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: right;">Total Order Cost:</td>
+                    <td th:text="${#numbers.formatDecimal(order.totalCost, 0, 'COMMA', 2, 'POINT')}"></td>
+                    <td></td>
+                </tr>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(products)}">
+                <tr>
+                    <td colspan="5">No products in the order.</td>
+                </tr>
+            </th:block>
+        </table>
+    </div>
+    <br/>
+    <div style="display: flex; justify-content: center;">
+        <a href="/orders">All orders</a>
+        &nbsp;&nbsp;&nbsp;
+        <a th:href="@{/orders/{id}/edit(id=${order.id})}">Update</a>
+        &nbsp;&nbsp;&nbsp;
+        <a th:href="@{/orders/{id}/update-comment(id=${order.id})}">Update comment</a>
+        &nbsp;&nbsp;&nbsp;
+        <a th:href="@{/orders/{id}/add-product(id=${order.id})}">Add product</a>
+        &nbsp;&nbsp;&nbsp;
+        <form th:method="DELETE" th:action="@{/orders/{id}(id=${order.id})}" th:object="${order}">
+            <input type="submit" value="Delete order">
+        </form>
+    </div>
+    <br/>
 </div>
-<br/>
-<div style="display: flex; justify-content: center;">
-    <a href="/orders">All orders</a>
-    &nbsp;&nbsp;&nbsp;
-    <a th:href="@{/orders/{id}/edit(id=${order.id})}">Update</a>
-    &nbsp;&nbsp;&nbsp;
-    <a th:href="@{/orders/{id}/update-comment(id=${order.id})}">Update comment</a>
-    &nbsp;&nbsp;&nbsp;
-    <a th:href="@{/orders/{id}/add-product(id=${order.id})}">Add product</a>
-    &nbsp;&nbsp;&nbsp;
-    <form th:method="DELETE" th:action="@{/orders/{id}(id=${order.id})}" th:object="${order}">
-        <input type="submit" value="Delete order">
-    </form>
-</div>
-<br/>
 </body>
 </html>
