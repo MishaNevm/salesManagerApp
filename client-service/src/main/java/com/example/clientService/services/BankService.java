@@ -5,7 +5,6 @@ import com.example.clientService.dto.BankDTOResponse;
 import com.example.clientService.models.Bank;
 import com.example.clientService.repositoryes.BankRepository;
 import com.example.clientService.util.ModelMapperUtil;
-import com.example.clientService.util.bankUtil.BankNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,18 +41,23 @@ public class BankService {
                         .singletonList(modelMapperUtil
                                 .convertBankToBankDTO(bankRepository
                                         .findById(id)
-                                        .orElseThrow(BankNotFoundException::new))));
+                                        .orElse(new Bank()))));
         return bankDTOResponse;
     }
 
     public void save(BankDTO bankDTO) {
         Bank bank = modelMapperUtil.convertBankDTOToBank(bankDTO);
-        bank.setCreated_at(new Date());
+        bank.setCreatedAt(new Date());
         bankRepository.save(bank);
     }
 
     public void update(BankDTO bankDTO) {
-        bankDTO.setCreatedAt(findById(bankDTO.getId()).getResponse().get(0).getCreatedAt());
+        Bank bankFromDB = bankRepository.findById(bankDTO.getId()).orElse(null);
+        if (bankFromDB == null) {
+            save(bankDTO);
+            return;
+        }
+        bankDTO.setCreatedAt(bankFromDB.getCreatedAt());
         Bank bank = modelMapperUtil.convertBankDTOToBank(bankDTO);
         bank.setUpdated_at(new Date());
         bankRepository.save(bank);

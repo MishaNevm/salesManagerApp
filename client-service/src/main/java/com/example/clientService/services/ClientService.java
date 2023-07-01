@@ -6,7 +6,6 @@ import com.example.clientService.dto.ClientDTOResponse;
 import com.example.clientService.models.Client;
 import com.example.clientService.repositoryes.ClientRepository;
 import com.example.clientService.util.ModelMapperUtil;
-import com.example.clientService.util.clientUtil.ClientNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,7 @@ import java.util.Collections;
 import java.util.Date;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class ClientService {
 
     private final ClientRepository clientRepository;
@@ -30,6 +29,7 @@ public class ClientService {
         this.modelMapper = modelMapper;
     }
 
+    @Transactional(readOnly = true)
     public ClientDTOResponse findAll() {
         clientDTOResponse = new ClientDTOResponse();
         clientDTOResponse
@@ -40,6 +40,7 @@ public class ClientService {
         return clientDTOResponse;
     }
 
+    @Transactional(readOnly = true)
     public ClientDTOResponse findById(int id) {
         clientDTOResponse = new ClientDTOResponse();
         clientDTOResponse
@@ -47,11 +48,10 @@ public class ClientService {
                         .singletonList(modelMapperUtil
                                 .convertClientToClientDTO(clientRepository
                                         .findById(id)
-                                        .orElseThrow(ClientNotFoundException::new))));
+                                        .orElse(new Client()))));
         return clientDTOResponse;
     }
 
-    @Transactional
     public void save(ClientDTO clientDTO) {
         Client client = modelMapper.convertClientDTOToClient(clientDTO);
         client.setCreatedAt(new Date());
@@ -59,17 +59,22 @@ public class ClientService {
     }
 
 
-    @Transactional
     public void update(ClientDTO clientDTO) {
-        clientDTO.setCreatedAt(findById(clientDTO.getId()).getResponse().get(0).getCreatedAt());
+        Client clientFromDB = clientRepository.findById(clientDTO.getId()).orElse(null);
+        if (clientFromDB == null) {
+            save(clientDTO);
+            return;
+        }
+        clientDTO.setCreatedAt(clientFromDB.getCreatedAt());
         Client client = modelMapper.convertClientDTOToClient(clientDTO);
         client.setUpdatedAt(new Date());
         clientRepository.save(client);
     }
 
-    @Transactional
     public void delete(int id) {
+        if (clientRepository.findById(id).isEmpty()) {
+            return;
+        }
         clientRepository.deleteById(id);
     }
-
 }

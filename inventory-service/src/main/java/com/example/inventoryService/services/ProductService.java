@@ -40,7 +40,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductDTOResponse findById(int id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(ProductNotFoundException::new);
+                .orElse(new Product());
         ProductDTO productDTO = modelMapperUtil.convertProductToProductDTO(product);
 
         return createProductDTOResponse(Collections.singletonList(productDTO));
