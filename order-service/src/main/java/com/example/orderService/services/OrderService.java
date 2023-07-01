@@ -5,6 +5,7 @@ import com.example.orderService.dto.OrderDTOResponse;
 import com.example.orderService.models.Order;
 import com.example.orderService.repositoryes.OrderRepository;
 import com.example.orderService.util.ModelMapperUtil;
+import com.example.orderService.util.OrderNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +28,7 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public OrderDTOResponse findAll() {
-        List<OrderDTO> orderDTOs;
-        orderDTOs = orderRepository.findAll().stream()
+        List<OrderDTO> orderDTOs = orderRepository.findAll().stream()
                 .map(modelMapperUtil::convertOrderToOrderDTO)
                 .collect(Collectors.toList());
         return createOrderDTOResponse(orderDTOs);
@@ -36,7 +36,7 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public OrderDTOResponse findById(int id) {
-        Order order = orderRepository.findById(id).orElse(new Order());
+        Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
         OrderDTO orderDTO = modelMapperUtil.convertOrderToOrderDTO(order);
         return createOrderDTOResponse(Collections.singletonList(orderDTO));
     }
@@ -56,17 +56,14 @@ public class OrderService {
     }
 
     public void update(OrderDTO orderDTO) {
-        Order order = orderRepository.findById(orderDTO.getId()).orElse(new Order());
+        Order order = orderRepository.findById(orderDTO.getId()).orElseThrow(OrderNotFoundException::new);
         orderDTO.setCreatedAt(order.getCreatedAt());
         orderDTO.setUpdatedAt(new Date());
         orderRepository.save(modelMapperUtil.convertOrderDTOToOrder(orderDTO));
     }
 
     public void delete(int id) {
-        Order order = orderRepository.findById(id).orElse(null);
-        if (order == null) {
-            return;
-        }
+        Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
         orderRepository.delete(order);
     }
 

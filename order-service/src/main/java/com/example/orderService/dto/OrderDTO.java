@@ -2,7 +2,6 @@ package com.example.orderService.dto;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Objects;
 
 public class OrderDTO {
 
@@ -84,17 +83,5 @@ public class OrderDTO {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof OrderDTO orderDTO)) return false;
-        return id == orderDTO.id && Objects.equals(clientShortName, orderDTO.clientShortName) && Objects.equals(comment, orderDTO.comment) && Objects.equals(createdAt, orderDTO.createdAt) && Objects.equals(updatedAt, orderDTO.updatedAt) && Objects.equals(createdBy, orderDTO.createdBy) && Objects.equals(updatedBy, orderDTO.updatedBy) && Objects.equals(totalCost, orderDTO.totalCost);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, clientShortName, comment, createdAt, updatedAt, createdBy, updatedBy, totalCost);
     }
 }
