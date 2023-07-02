@@ -42,14 +42,17 @@ public class OrderDAO {
 
     public List<Order> findAll() {
         try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.getTransaction();
+            Transaction transaction = null;
             List<Order> orders = new ArrayList<>();
             try {
-                transaction.begin();
+                transaction = session.beginTransaction();
                 orders = session.createQuery("from Order", Order.class).list();
                 transaction.commit();
             } catch (Exception e) {
-                transaction.rollback();
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace();
             }
             return orders;
         }
@@ -57,14 +60,17 @@ public class OrderDAO {
 
     public Order findById(int id) {
         try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.getTransaction();
+            Transaction transaction = null;
             Order order = new Order();
             try {
-                transaction.begin();
+                transaction = session.beginTransaction();
                 order = session.get(Order.class, id);
                 transaction.commit();
             } catch (Exception e) {
-                transaction.rollback();
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace();
             }
             return order;
         }
@@ -72,15 +78,18 @@ public class OrderDAO {
 
     public boolean save(Order order) {
         try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.getTransaction();
+            Transaction transaction = null;
             try {
-                transaction.begin();
+                transaction = session.beginTransaction();
                 order.setCreatedAt(new Date());
                 session.save(order);
                 transaction.commit();
                 return true;
             } catch (Exception e) {
-                transaction.rollback();
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace();
                 return false;
             }
         }
@@ -88,15 +97,18 @@ public class OrderDAO {
 
     public boolean update(Order order) {
         try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.getTransaction();
+            Transaction transaction = null;
             try {
-                transaction.begin();
+                transaction = session.beginTransaction();
                 order.setUpdatedAt(new Date());
                 session.update(order);
                 transaction.commit();
                 return true;
             } catch (Exception e) {
-                transaction.rollback();
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace();
                 return false;
             }
         }
@@ -104,20 +116,22 @@ public class OrderDAO {
 
     public boolean delete(int id) {
         try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.getTransaction();
+            Transaction transaction = null;
             try {
-                transaction.begin();
+                transaction = session.beginTransaction();
                 session.createQuery("delete Order o where o.id = :id")
                         .setParameter("id", id)
                         .executeUpdate();
                 transaction.commit();
                 return true;
             } catch (Exception e) {
-                transaction.rollback();
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace();
                 return false;
             }
         }
     }
-
 }
 

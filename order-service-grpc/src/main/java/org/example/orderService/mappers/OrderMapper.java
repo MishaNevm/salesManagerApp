@@ -43,12 +43,14 @@ public class OrderMapper {
         order.setId(orderToConvert.getId());
         order.setClientShortName(orderToConvert.getClientShortName());
         order.setComment(orderToConvert.getComment());
+
         String createdAtString = orderToConvert.getCreatedAt();
         Date createdAt = parseDateString(createdAtString);
+        order.setCreatedAt(createdAt);
+
         String updatedAtString = orderToConvert.getUpdatedAt();
         Date updatedAt = parseDateString(updatedAtString);
         order.setUpdatedAt(updatedAt);
-        order.setCreatedAt(createdAt);
 
 
         order.setCreatedBy(orderToConvert.getCreatedBy());

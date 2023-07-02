@@ -5,24 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4ed92fff-4c7f-48f2-abd7-3f8d49cde480" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/OrderServiceApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/mappers/OrderMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/models/Order.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/services/OrderService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/proto/OrderService.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V1_0_3__creating_order_table.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/hibernate.cfg.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/orderService/dao/OrderDaoTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/orderService/mappers/OrderMapperTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/orderService/OrderServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/OrderServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/orderService/dao/OrderDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/dao/OrderDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/orderService/mappers/OrderMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/mappers/OrderMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/example/orderService/dao/OrderDaoTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/example/orderService/dao/OrderDaoTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +84,7 @@
       <recent name="org.example.orderService.models" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.OrderMapperTest">
+  <component name="RunManager" selected="JUnit.OrderDaoTest">
     <configuration name="OrderDaoTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="order-service-grpc" />
       <extension name="coverage">
@@ -145,9 +133,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.OrderMapperTest" />
         <item itemvalue="JUnit.OrderDaoTest" />
         <item itemvalue="JUnit.OrderDaoTest.testSave" />
+        <item itemvalue="JUnit.OrderMapperTest" />
       </list>
     </recent_temporary>
   </component>
@@ -160,7 +148,7 @@
       <option name="presentableId" value="Default" />
       <updated>1688297575842</updated>
       <workItem from="1688297576891" duration="10158000" />
-      <workItem from="1688326821772" duration="8185000" />
+      <workItem from="1688326821772" duration="9778000" />
     </task>
     <servers />
   </component>

@@ -22,7 +22,6 @@
       <artifactId>grpc-netty-shaded</artifactId>
       <version>1.24.0</version>
     </dependency>
-
     <dependency>
       <groupId>io.grpc</groupId>
       <artifactId>grpc-protobuf</artifactId>
@@ -43,7 +42,6 @@
       <artifactId>postgresql</artifactId>
       <version>42.5.1</version>
     </dependency>
-    <!-- Hibernate -->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
