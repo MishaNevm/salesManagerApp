@@ -1,0 +1,34 @@
+syntax = "proto3";
+package org.example.orderService;
+
+import "google/protobuf/empty.proto";
+
+message Order {
+  int32 id = 1;
+  string clientShortName = 2;
+  string comment = 3;
+  string createdAt = 4;
+  string updatedAt = 5;
+  string createdBy = 6;
+  string updatedBy = 7;
+}
+
+message OrderResponse {
+  repeated Order orders = 1;
+}
+
+message Id {
+  int32 id = 1;
+}
+
+message Result {
+  bool result = 1;
+}
+
+service OrderService {
+  rpc getAllOrders(google.protobuf.Empty) returns (OrderResponse);
+  rpc getById(Id) returns (Order);
+  rpc save (Order) returns (Result);
+  rpc update (Order) returns (Result);
+  rpc delete (Id) returns (Result);
+}

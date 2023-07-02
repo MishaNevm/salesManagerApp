@@ -1,0 +1,11 @@
+version: '3'
+services:
+  order-db:
+    image: postgres:12
+    restart: always
+    ports:
+      - 5446:5432
+    environment:
+      POSTGRES_PASSWORD : pass
+      POSTGRES_USER : order
+      POSTGRES_DB : orderDB
