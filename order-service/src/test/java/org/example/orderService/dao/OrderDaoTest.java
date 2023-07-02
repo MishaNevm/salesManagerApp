@@ -22,11 +22,9 @@ public class OrderDaoTest {
         Order order = new Order();
         order.setCreatedAt(new Date());
 
-
         boolean result = orderDao.save(order);
 
         Assertions.assertTrue(result);
-
 
         Assertions.assertTrue(order.getId() != 0);
     }

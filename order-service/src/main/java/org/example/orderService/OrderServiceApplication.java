@@ -7,7 +7,6 @@ import org.example.orderService.services.OrderService;
 import java.io.IOException;
 
 public class OrderServiceApplication {
-
     public static void main(String[] args) throws IOException, InterruptedException {
         Server server = ServerBuilder.forPort(8282).addService(new OrderService()).build();
         server.start();
