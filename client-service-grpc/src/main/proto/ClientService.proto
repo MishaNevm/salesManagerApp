@@ -1,0 +1,53 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "BankService.proto";
+package org.example.clientService;
+
+enum ClientTypes {
+  IP = 0;
+  OOO = 1;
+  AO = 2;
+  ZAO = 3;
+  NKO = 4;
+  PAO = 5;
+  KFH = 6;
+}
+
+message Client {
+  int32 id = 1;
+
+  string shortName = 2;
+
+  string fullName = 3;
+
+  string inn = 4;
+
+  string kpp = 5;
+
+  string ogrn = 6;
+
+  repeated Bank banks = 7;
+
+  ClientTypes type = 8;
+
+  string createdAt = 9;
+
+  string updatedAt = 10;
+
+  string createdBy = 11;
+
+  string updatedBy = 12;
+}
+
+message ClientResponse{
+  repeated Client clients = 1;
+}
+
+service ClientService {
+  rpc getAll(google.protobuf.Empty) returns (ClientResponse);
+  rpc getById(Id) returns (Client);
+  rpc create(Client) returns (ErrorResponse);
+  rpc update (Client) returns (ErrorResponse);
+  rpc delete (Id) returns (Result);
+}
+

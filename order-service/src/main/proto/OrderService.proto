@@ -26,7 +26,7 @@ message Result {
 }
 
 service OrderService {
-  rpc getAllOrders(google.protobuf.Empty) returns (OrderResponse);
+  rpc getAll(google.protobuf.Empty) returns (OrderResponse);
   rpc getById(Id) returns (Order);
   rpc save (Order) returns (Result);
   rpc update (Order) returns (Result);

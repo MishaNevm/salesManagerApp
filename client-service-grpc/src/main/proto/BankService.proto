@@ -1,0 +1,64 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+package org.example.clientService;
+
+message Bank{
+  int32 id = 1;
+
+
+  string name = 2;
+
+  string bik = 3;
+
+  string checkingAccount = 4;
+
+  string corporateAccount = 5;
+
+  string city = 6;
+
+  string country = 7;
+
+  int32 clientId = 8;
+
+  string createdAt = 9;
+
+  string updatedAt = 10;
+
+  string createdBy = 11;
+
+  string updatedBy = 12;
+}
+
+message Id {
+  int32 id = 1;
+}
+
+message Result {
+  bool result = 1;
+}
+
+message BankResponse {
+  repeated Bank banks = 1;
+}
+
+message ValidationError{
+  string field = 1;
+  string message = 2;
+  string code = 3;
+}
+
+message ErrorResponse {
+  repeated ValidationError errors = 1;
+}
+
+service BankService {
+  rpc getAll (google.protobuf.Empty) returns (BankResponse);
+  rpc getById (Id) returns (Bank);
+  rpc create (Bank) returns (ErrorResponse);
+  rpc update (Bank) returns (ErrorResponse);
+  rpc delete (Id) returns (Result);
+}
+
+
+

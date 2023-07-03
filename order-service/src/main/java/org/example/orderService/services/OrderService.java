@@ -22,7 +22,7 @@ public class OrderService extends OrderServiceGrpc.OrderServiceImplBase {
     }
 
     @Override
-    public void getAllOrders(com.google.protobuf.Empty request, StreamObserver<org.example.orderService.OrderServiceOuterClass.OrderResponse> responseObserver) {
+    public void getAll(com.google.protobuf.Empty request, StreamObserver<org.example.orderService.OrderServiceOuterClass.OrderResponse> responseObserver) {
         List<Order> orderList = orderDao.findAll();
         OrderServiceOuterClass.OrderResponse orderResponse = OrderServiceOuterClass.OrderResponse.newBuilder()
                 .addAllOrders(orderList.stream().map(orderMapper::convertOrderToOuterOrder).toList()).build();
