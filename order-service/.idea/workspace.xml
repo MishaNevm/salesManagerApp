@@ -5,38 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4ed92fff-4c7f-48f2-abd7-3f8d49cde480" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/protoeditor.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/ClientServiceApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/dao/BankDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/dao/ClientDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/dao/DatabaseConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/mappers/BankMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/mappers/ClientMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/models/Bank.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/models/Client.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/services/BankService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/services/ClientService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/util/BankUniqueValidator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/util/ClientTypes.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/util/ClientUniqueValidator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/util/ValidationError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/proto/BankService.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/proto/ClientService.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/resources/db/migration/V1_0_1__creating_client_and_banks_tables.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/resources/hibernate.cfg.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/test/java/org/example/clientService/mappers/ClientMapperTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../client-service-grpc/src/test/java/org/example/clientService/mappers/MapperTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../client-service-grpc/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/ClientServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/ClientServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/dao/BankDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/dao/BankDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/dao/ClientDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/dao/ClientDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/mappers/ModelsMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/mappers/ModelsMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/models/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/models/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/services/BankService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/services/BankService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/services/ClientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/services/ClientService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/util/BankUniqueValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/util/BankUniqueValidator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/java/org/example/clientService/util/ValidationError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/proto/BankService.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/proto/BankService.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/main/proto/ClientService.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/main/proto/ClientService.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../client-service-grpc/src/test/java/org/example/clientService/mappers/MapperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../client-service-grpc/src/test/java/org/example/clientService/mappers/MapperTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/orderService/services/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/services/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/proto/OrderService.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/proto/OrderService.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/orderService/dao/OrderDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/orderService/dao/OrderDAO.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +58,7 @@
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit3": "junit.framework.TestCase",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "last_opened_file_path": "/home/misha/IdeaProjects/SalesManagerApp/client-service-grpc",
+    "last_opened_file_path": "/home/misha/IdeaProjects/SalesManagerApp/order-service",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -180,6 +166,7 @@
       <workItem from="1688337559132" duration="196000" />
       <workItem from="1688394250014" duration="3034000" />
       <workItem from="1688414924943" duration="1574000" />
+      <workItem from="1688484232866" duration="2635000" />
     </task>
     <servers />
   </component>

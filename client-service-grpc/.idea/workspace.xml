@@ -5,38 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5156b300-c761-4c74-9616-5ac8611929d8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/protoeditor.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/ClientServiceApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/dao/BankDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/dao/ClientDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/dao/DatabaseConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/mappers/BankMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/mappers/ClientMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/models/Bank.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/models/Client.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/services/BankService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/services/ClientService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/util/BankUniqueValidator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/util/ClientTypes.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/util/ClientUniqueValidator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/util/ValidationError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/proto/BankService.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/proto/ClientService.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V1_0_1__creating_client_and_banks_tables.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/hibernate.cfg.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/clientService/mappers/ClientMapperTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/clientService/mappers/MapperTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/ClientServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/ClientServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/dao/BankDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/dao/BankDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/dao/ClientDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/dao/ClientDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/mappers/ModelsMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/mappers/ModelsMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/models/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/models/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/services/BankService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/services/BankService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/services/ClientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/services/ClientService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/util/BankUniqueValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/clientService/util/BankUniqueValidator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/clientService/util/ValidationError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/proto/BankService.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/proto/BankService.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/proto/ClientService.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/proto/ClientService.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/example/clientService/mappers/MapperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/example/clientService/mappers/MapperTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../order-service/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../order-service/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../order-service/src/main/java/org/example/orderService/services/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../order-service/src/main/java/org/example/orderService/services/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../order-service/src/main/proto/OrderService.proto" beforeDir="false" afterPath="$PROJECT_DIR$/../order-service/src/main/proto/OrderService.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../order-service/src/main/java/org/example/orderService/dao/OrderDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../order-service/src/main/java/org/example/orderService/dao/OrderDAO.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,16 +57,18 @@
     "WebServerToolWindowFactoryState": "false",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "last_opened_file_path": "/home/misha/IdeaProjects/SalesManagerApp/client-service",
+    "last_opened_file_path": "/home/misha/IdeaProjects/SalesManagerApp/client-service-grpc",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src/main/resources" />
       <recent name="$PROJECT_DIR$/src/main/resources/db" />
       <recent name="$PROJECT_DIR$/src/main/java/org/example/clientService/util" />
@@ -90,86 +78,88 @@
       <recent name="" />
     </key>
     <key name="CreateTestDialog.RecentsKey">
+      <recent name="org.example.clientService.dao" />
       <recent name="org.example.clientService.mappers" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="org.example.clientService.util" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.MapperTest">
-    <configuration name="ClientMapperTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.BankDAOTest">
+    <configuration name="BankDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="client-service-grpc" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.clientService.mappers.*" />
+          <option name="PATTERN" value="org.example.clientService.dao.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="org.example.clientService.mappers" />
-      <option name="MAIN_CLASS_NAME" value="org.example.clientService.mappers.ClientMapperTest" />
+      <option name="PACKAGE_NAME" value="org.example.clientService.dao" />
+      <option name="MAIN_CLASS_NAME" value="org.example.clientService.dao.BankDAOTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ClientMapperTest.convertClientToOuterClient" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="BankDAOTest.testDelete" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="client-service-grpc" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.clientService.mappers.*" />
+          <option name="PATTERN" value="org.example.clientService.dao.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="org.example.clientService.mappers" />
-      <option name="MAIN_CLASS_NAME" value="org.example.clientService.mappers.ClientMapperTest" />
-      <option name="METHOD_NAME" value="convertClientToOuterClient" />
+      <option name="PACKAGE_NAME" value="org.example.clientService.dao" />
+      <option name="MAIN_CLASS_NAME" value="org.example.clientService.dao.BankDAOTest" />
+      <option name="METHOD_NAME" value="testDelete" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ClientMapperTest.convertOuterClientToClient" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="BankDAOTest.testFindAll" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="client-service-grpc" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.clientService.mappers.*" />
+          <option name="PATTERN" value="org.example.clientService.dao.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="org.example.clientService.mappers" />
-      <option name="MAIN_CLASS_NAME" value="org.example.clientService.mappers.ClientMapperTest" />
-      <option name="METHOD_NAME" value="convertOuterClientToClient" />
+      <option name="PACKAGE_NAME" value="org.example.clientService.dao" />
+      <option name="MAIN_CLASS_NAME" value="org.example.clientService.dao.BankDAOTest" />
+      <option name="METHOD_NAME" value="testFindAll" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MapperTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="BankDAOTest.testFindById" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="client-service-grpc" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.clientService.mappers.*" />
+          <option name="PATTERN" value="org.example.clientService.dao.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="org.example.clientService.mappers" />
-      <option name="MAIN_CLASS_NAME" value="org.example.clientService.mappers.MapperTest" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="org.example.clientService.dao" />
+      <option name="MAIN_CLASS_NAME" value="org.example.clientService.dao.BankDAOTest" />
+      <option name="METHOD_NAME" value="testFindById" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MapperTest.convertBankToOuterBank" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="BankDAOTest.testSave" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="client-service-grpc" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.clientService.mappers.*" />
+          <option name="PATTERN" value="org.example.clientService.dao.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="org.example.clientService.mappers" />
-      <option name="MAIN_CLASS_NAME" value="org.example.clientService.mappers.MapperTest" />
-      <option name="METHOD_NAME" value="convertBankToOuterBank" />
+      <option name="PACKAGE_NAME" value="org.example.clientService.dao" />
+      <option name="MAIN_CLASS_NAME" value="org.example.clientService.dao.BankDAOTest" />
+      <option name="METHOD_NAME" value="testSave" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -177,11 +167,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.MapperTest" />
-        <item itemvalue="JUnit.MapperTest.convertBankToOuterBank" />
-        <item itemvalue="JUnit.ClientMapperTest" />
-        <item itemvalue="JUnit.ClientMapperTest.convertClientToOuterClient" />
-        <item itemvalue="JUnit.ClientMapperTest.convertOuterClientToClient" />
+        <item itemvalue="JUnit.BankDAOTest" />
+        <item itemvalue="JUnit.BankDAOTest.testFindById" />
+        <item itemvalue="JUnit.BankDAOTest.testFindAll" />
+        <item itemvalue="JUnit.BankDAOTest.testSave" />
+        <item itemvalue="JUnit.BankDAOTest.testDelete" />
       </list>
     </recent_temporary>
   </component>
@@ -194,7 +184,8 @@
       <option name="presentableId" value="Default" />
       <updated>1688394302637</updated>
       <workItem from="1688394303678" duration="12577000" />
-      <workItem from="1688414933038" duration="8287000" />
+      <workItem from="1688414933038" duration="9343000" />
+      <workItem from="1688483653527" duration="8645000" />
     </task>
     <servers />
   </component>

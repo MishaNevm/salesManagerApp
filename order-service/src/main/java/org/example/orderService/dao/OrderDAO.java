@@ -46,7 +46,7 @@ public class OrderDAO {
             List<Order> orders = new ArrayList<>();
             try {
                 transaction = session.beginTransaction();
-                orders = session.createQuery("from Order", Order.class).list();
+                orders = session.createQuery("from Order", Order.class).getResultList();
                 transaction.commit();
             } catch (Exception e) {
                 if (transaction != null) {

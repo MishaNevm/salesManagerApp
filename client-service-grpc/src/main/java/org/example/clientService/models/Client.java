@@ -6,6 +6,7 @@ import org.example.clientService.util.ClientTypes;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "clients")
@@ -144,6 +145,18 @@ public class Client {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Client client)) return false;
+        return id == client.id && Objects.equals(shortName, client.shortName) && Objects.equals(fullName, client.fullName) && Objects.equals(inn, client.inn) && Objects.equals(kpp, client.kpp) && Objects.equals(ogrn, client.ogrn) && type == client.type && Objects.equals(banks, client.banks) && Objects.equals(createdAt, client.createdAt) && Objects.equals(updatedAt, client.updatedAt) && Objects.equals(createdBy, client.createdBy) && Objects.equals(updatedBy, client.updatedBy);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, shortName, fullName, inn, kpp, ogrn, type, banks, createdAt, updatedAt, createdBy, updatedBy);
     }
 }
 

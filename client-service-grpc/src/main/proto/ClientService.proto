@@ -1,5 +1,6 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 import "BankService.proto";
 package org.example.clientService;
 
@@ -30,9 +31,9 @@ message Client {
 
   ClientTypes type = 8;
 
-  string createdAt = 9;
+  google.protobuf.Timestamp createdAt = 9;
 
-  string updatedAt = 10;
+  google.protobuf.Timestamp updatedAt = 10;
 
   string createdBy = 11;
 
